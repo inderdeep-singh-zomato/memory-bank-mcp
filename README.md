@@ -1,5 +1,9 @@
 # Memory Bank MCP
 
+[![NPM Version](https://img.shields.io/npm/v/@movibe/memory-bank-mcp.svg)](https://www.npmjs.com/package/@movibe/memory-bank-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://github.com/movibe/memory-bank-server/actions/workflows/test.yml/badge.svg)](https://github.com/movibe/memory-bank-server/actions/workflows/test.yml)
+
 A Model Context Protocol (MCP) server for managing Memory Banks, allowing AI assistants to store and retrieve information across sessions.
 
 ## Overview
@@ -138,10 +142,29 @@ For detailed documentation, see the [docs](docs) directory, which includes:
 - [Integration Testing Guide](docs/integration-testing-guide.md)
 - [MCP Protocol Specification](docs/mcp-protocol-specification.md)
 
-## License
+## Versioning
 
-MIT
+This project follows [Semantic Versioning](https://semver.org/). Releases are automatically published to npm when a tag is created.
+
+To create a new version:
+
+```bash
+# Patch version (bug fixes)
+npm run release:patch
+
+# Minor version (backward-compatible features)
+npm run release:minor
+
+# Major version (breaking changes)
+npm run release:major
+```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read the [contribution guide](CONTRIBUTING.md) for more details on how to contribute to the project.
+
+This project follows a [Code of Conduct](CODE_OF_CONDUCT.md) that all contributors must follow.
+
+## License
+
+MIT

@@ -6,6 +6,27 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Update History
 
+- [2025-03-08] - Translation to English: Translated Memory Bank files to English. The following changes were made:
+
+1. Updated activeContext.md to use English for all content
+2. Updated progress.md to use English for all content
+3. Verified that other Memory Bank files (decisionLog.md, systemPatterns.md) were already in English
+4. Verified that README.md sections were updated to English
+
+All project documentation and Memory Bank files are now consistently in English, which aligns with the project's development guidelines that specify "All code and documentation should be in English".
+
+- [2025-03-08] - Project Configuration for npm Publication: Configured the project to be an open source package with versioning and publication via npm using GitHub Actions. The following changes were made:
+
+1. Updated package.json with information needed for publication
+2. Created a .npmignore file
+3. Created a LICENSE file with the MIT license
+4. Configured GitHub Actions for automatic npm publication
+5. Configured GitHub Actions for tests
+6. Created CONTRIBUTING.md and CODE_OF_CONDUCT.md files
+7. Updated README.md with badges and contribution information
+8. Configured tsconfig.json to generate type declarations
+9. Updated the build script to correctly generate types
+
 - [2025-03-08] - File Update: Updated documentation-structure.md
 - [2025-03-08] - Decision Made: Documentation Structure Consolidation
 - [2025-03-08] - Documentation Consolidation: Consolidated all documentation into a single docs directory. Previously, documentation was split between the main docs directory and memory-bank/docs. Now all documentation is organized in a single location with a comprehensive README.md that categorizes the documentation files into Core Documentation, Usage Documentation, and Integration Documentation. Updated the main README.md to reference the consolidated documentation directory.
