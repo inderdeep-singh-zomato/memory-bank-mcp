@@ -1,0 +1,13 @@
+[install]
+# Usar o registro padrão do npm
+registry = "https://registry.npmjs.org/"
+
+[build]
+# Configurações de build
+target = "node"
+minify = true
+sourcemap = "external"
+
+[dev]
+# Configurações para desenvolvimento
+hot = true 
