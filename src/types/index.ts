@@ -1,14 +1,23 @@
 /**
  * Type definitions for Memory Bank MCP
  * 
- * This file exports all the interfaces used in the Memory Bank MCP project.
+ * This file exports all the interfaces, types, constants, and type guards used in the Memory Bank MCP project.
  */
 
-// Re-export interfaces from ProgressTracker
-export { ProgressDetails, Decision, ActiveContext } from '../core/ProgressTracker.js';
+// Re-export interfaces from progress.ts
+export * from './progress.js';
 
-// Re-export interfaces from ExternalRulesLoader
-export { ClineruleBase, MemoryBankConfig } from '../utils/ExternalRulesLoader.js';
+// Re-export interfaces from rules.ts
+export * from './rules.js';
+
+// Re-export utility types
+export * from './utils.js';
+
+// Re-export constants
+export * from './constants.js';
+
+// Re-export type guards
+export * from './guards.js';
 
 /**
  * Interface for Memory Bank status
@@ -28,20 +37,6 @@ export interface MemoryBankStatus {
   language: string;
   /** Last update time of the Memory Bank */
   lastUpdated?: Date;
-}
-
-/**
- * Interface for mode state
- */
-export interface ModeState {
-  /** Name of the current mode */
-  name: string;
-  /** Status of the Memory Bank */
-  memoryBankStatus: 'ACTIVE' | 'INACTIVE';
-  /** Whether UMB mode is active */
-  isUmbActive?: boolean;
-  /** Rules for the current mode */
-  rules?: any | null;
 }
 
 /**

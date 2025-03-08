@@ -5,53 +5,7 @@ import yaml from 'js-yaml';
 import { clineruleTemplates } from './ClineruleTemplates.js';
 import os from 'os';
 import { ValidationResult } from '../types/index.js';
-
-/**
- * Interface for Memory Bank configuration in clinerules
- */
-export interface MemoryBankConfig {
-  /** Files to read from the Memory Bank */
-  files_to_read?: string[];
-  /** Files to update in the Memory Bank */
-  files_to_update?: string[];
-  /** Custom templates for Memory Bank files */
-  templates?: Record<string, string>;
-  /** Additional configuration options */
-  options?: {
-    /** Whether to auto-initialize the Memory Bank if not found */
-    auto_initialize?: boolean;
-    /** Whether to create missing files */
-    create_missing_files?: boolean;
-    /** Whether to backup before updates */
-    backup_before_update?: boolean;
-  };
-}
-
-/**
- * Interface to represent the basic structure of rules
- */
-export interface ClineruleBase {
-  /** Mode identifier (architect, ask, code, debug, test) */
-  mode: string;
-  /** Instructions for the mode */
-  instructions: {
-    /** General instructions for the mode */
-    general: string[];
-    /** Update Memory Bank (UMB) configuration */
-    umb?: {
-      /** Mode that triggers UMB */
-      trigger: string;
-      /** Instructions for UMB */
-      instructions: string[];
-      /** Whether to override file restrictions */
-      override_file_restrictions: boolean;
-    };
-    /** Memory Bank configuration */
-    memory_bank?: MemoryBankConfig;
-  };
-  /** Mode triggers configuration */
-  mode_triggers?: Record<string, Array<{ condition: string }>>;
-}
+import { ClineruleBase, MemoryBankConfig } from '../types/rules.js';
 
 /**
  * Class responsible for loading and monitoring external .clinerules files
@@ -79,43 +33,36 @@ export class ExternalRulesLoader extends EventEmitter {
   private async getWritableDirectory(): Promise<string> {
     // Check if the project directory is writable
     let targetDir = this.projectDir;
-    let isWritable = false;
     
     try {
-      // Try to write a temporary file to check if the directory is writable
-      const testFile = path.join(targetDir, '.clinerules-test-write');
-      await fs.writeFile(testFile, 'test');
-      await fs.remove(testFile);
-      isWritable = true;
+      await fs.access(targetDir, fs.constants.W_OK);
+      return targetDir;
     } catch (error) {
-      console.warn(`Project directory ${targetDir} is not writable. Using fallback directory.`);
-      isWritable = false;
-    }
-    
-    // If the directory is not writable, use a fallback directory
-    if (!isWritable) {
+      console.warn(`Project directory ${targetDir} is not writable, trying home directory...`);
+      
       // Try user's home directory
+      targetDir = path.join(os.homedir(), '.clinerules');
+      
       try {
-        targetDir = path.join(os.homedir(), '.memory-bank-mcp');
         await fs.ensureDir(targetDir);
-        console.warn(`Using fallback directory: ${targetDir}`);
+        await fs.access(targetDir, fs.constants.W_OK);
         return targetDir;
       } catch (error) {
-        // If home directory is not writable, try temporary directory
+        console.warn(`Home directory ${targetDir} is not writable, trying temp directory...`);
+        
+        // Try temp directory
+        targetDir = path.join(os.tmpdir(), '.clinerules');
+        
         try {
-          targetDir = path.join(os.tmpdir(), '.memory-bank-mcp');
           await fs.ensureDir(targetDir);
-          console.warn(`Using temporary directory: ${targetDir}`);
+          await fs.access(targetDir, fs.constants.W_OK);
           return targetDir;
-        } catch (tmpError) {
-          console.error('Failed to create fallback directory:', tmpError);
-          // Return project directory as a last resort, even if it's not writable
-          return this.projectDir;
+        } catch (error) {
+          console.error(`Could not find a writable directory for .clinerules files`);
+          throw new Error(`Could not find a writable directory for .clinerules files`);
         }
       }
     }
-    
-    return targetDir;
   }
 
   /**
@@ -336,7 +283,7 @@ export class ExternalRulesLoader extends EventEmitter {
   }
 
   /**
-   * Creates missing .clinerules files using templates
+   * Creates missing .clinerules files
    * @param missingFiles Array of missing file names
    * @returns Array of created file names
    */
@@ -347,15 +294,16 @@ export class ExternalRulesLoader extends EventEmitter {
     const targetDir = await this.getWritableDirectory();
     
     for (const filename of missingFiles) {
-      // Extract mode from filename (e.g., 'architect' from '.clinerules-architect')
       const mode = filename.replace('.clinerules-', '');
+      const template = clineruleTemplates[mode];
       
-      if (clineruleTemplates[mode]) {
+      if (template) {
         const filePath = path.join(targetDir, filename);
+        
         try {
-          await fs.writeFile(filePath, clineruleTemplates[mode]);
+          await fs.writeFile(filePath, template);
           createdFiles.push(filename);
-          console.error(`Created ${filename} with default template in ${targetDir}`);
+          console.error(`Created ${filename} in ${targetDir}`);
         } catch (error) {
           console.error(`Failed to create ${filename}:`, error);
         }
