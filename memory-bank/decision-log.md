@@ -126,3 +126,17 @@ This document tracks important decisions made during the development of the Memo
   - Memory Bank files will be stored alongside the server code
   - Easier access to project documentation
   - Version control will include Memory Bank updates
+
+## Clinerule Templates Format Standardization
+- **Date:** 2025-03-08 11:05:55 AM
+- **Context:** The templates in ClineruleTemplates.ts were using JSON format, while the actual .clinerules files in the project were using YAML format. This inconsistency could lead to problems when creating new .clinerules files.
+- **Decision:** Updated all templates in ClineruleTemplates.ts to use YAML format that matches the existing .clinerules files in the project.
+- **Alternatives Considered:** 
+  - Keep JSON format and convert existing files
+  - Create a conversion utility to handle both formats
+  - Support both formats in the codebase
+- **Consequences:** 
+  - Consistent format across all .clinerules files
+  - New files will match existing ones in format and functionality
+  - Improved readability of template files
+  - No need for format conversion when creating new files

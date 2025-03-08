@@ -6,6 +6,8 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Update History
 
+- [2025-03-08 11:05:55 AM] - Decision Made: Clinerule Templates Format Standardization
+- [2025-03-08 11:05:48 AM] - Updated Clinerule Templates: Updated the templates in ClineruleTemplates.ts to use YAML format instead of JSON. The new templates match the current .clinerules files used in the project, which include detailed instructions for Memory Bank management, mode collaboration, and UMB (Update Memory Bank) functionality. This ensures that when new .clinerules files are created, they will have the same format and functionality as the existing ones.
 - [2025-03-08 10:59:42 AM] - Memory Bank Review: Reviewed the Memory Bank files and confirmed that all core files (active-context.md, decision-log.md, product-context.md, progress.md, system-patterns.md) are present and contain comprehensive information about the project. The Memory Bank is properly initialized and ready for use in the specified directory.
 - [2025-03-08 10:59:25 AM] - Decision Made: Memory Bank Location
 - [2025-03-08 10:59:20 AM] - Initialized Memory Bank: Successfully initialized the Memory Bank in the specified directory: /Users/movibe/Documents/Cline/MCP/memory-bank-server. All core files were created and the system is ready for use.
