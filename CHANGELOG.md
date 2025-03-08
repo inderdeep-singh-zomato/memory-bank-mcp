@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+### [0.2.1](https://github.com/movibe/memory-bank-server/compare/v0.2.0...v0.2.1) (2025-03-08)
+
+
+### Features
+
+* Add customizable Memory Bank folder name and user tracking ([60d0b53](https://github.com/movibe/memory-bank-server/commit/60d0b53192c1cc3b907e15ad05949e5be946fedc))
+
+
+### Documentation
+
+* Consolidate Cline Integration Documentation ([6dac2df](https://github.com/movibe/memory-bank-server/commit/6dac2df805762267f8d73d56984e898b9c9e15e2))
+* Update Memory Bank documentation with comprehensive improvements ([4476c77](https://github.com/movibe/memory-bank-server/commit/4476c771bbfca5342697624d1514fa1918b20abd))
+
+
+### Code Refactoring
+
+* Remove deprecated environment variable support ([15bfc7f](https://github.com/movibe/memory-bank-server/commit/15bfc7fd8dc348bd0f666eaa5007231e507a3fa0))
+* Simplify Memory Bank initialization and file structure ([1b5cf9f](https://github.com/movibe/memory-bank-server/commit/1b5cf9f9b3b076a7f4d9dfc281fc709a9dbbae26))
+
 ## [0.2.0](https://github.com/movibe/memory-bank-server/compare/v0.1.2...v0.2.0) (2025-03-08)
 
 
