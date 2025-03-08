@@ -50,6 +50,16 @@ npx @movibe/memory-bank-mcp --help
 
 For more detailed information about using npx, see [npx-usage.md](docs/npx-usage.md).
 
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/) and uses [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. The version is automatically bumped and a changelog is generated based on commit messages when changes are merged into the main branch.
+
+- **Major version** is bumped when there are breaking changes (commit messages with `BREAKING CHANGE` or `!:`)
+- **Minor version** is bumped when new features are added (commit messages with `feat:` or `feat(scope):`)
+- **Patch version** is bumped for all other changes (bug fixes, documentation, etc.)
+
+For the complete history of changes, see the [CHANGELOG.md](CHANGELOG.md) file.
+
 ## Usage
 
 ### As a Command Line Tool

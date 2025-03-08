@@ -70,3 +70,18 @@ This document tracks important decisions made during the development of the Memo
   - Ease of collaboration between users from different countries
   - Compatibility with tools and systems that expect English content
   - Simplification of code, as there's no need to handle multiple languages
+
+## Implementation of Semantic Versioning with Changelog Generation
+- **Date:** 2025-03-08 2:10:24 AM
+- **Context:** The project needed a standardized approach to versioning and a way to automatically generate a changelog based on commit messages.
+- **Decision:** Implemented Semantic Versioning with automatic changelog generation using standard-version in the GitHub Actions workflow for npm publish.
+- **Alternatives Considered:** 
+  - Manual version management
+  - Using a different versioning tool like semantic-release
+  - Not using automatic versioning at all
+- **Consequences:** 
+  - Automatic version bumping based on commit message types
+  - Standardized changelog generation
+  - Better documentation of changes for users
+  - Enforced commit message format for contributors
+  - Simplified release process

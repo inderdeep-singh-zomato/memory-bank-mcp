@@ -6,6 +6,8 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Update History
 
+- [2025-03-08 2:10:24 AM] - Decision Made: Implementation of Semantic Versioning with Changelog Generation
+- [2025-03-08 2:10:18 AM] - Added Versioning with Changelog Generation: Added automatic versioning with changelog generation to the GitHub Actions workflow for npm publish. Implemented Semantic Versioning and Conventional Commits for better version management. Created initial CHANGELOG.md, .versionrc.json configuration, and updated documentation with commit message guidelines.
 - [2025-03-08 2:06:48 AM] - English Translation of Memory Bank Files: Translated all remaining Portuguese content in the Memory Bank files to English. This includes entries in decision-log.md, progress.md, active-context.md, and modular-architecture-proposal.md. Also updated a comment in CoreTools.ts to English.
 - [2025-03-08 2:04:23 AM] - Decision Made: English Language Standardization for Memory Bank
 - [2025-03-08 2:04:16 AM] - Decision Made: Using Current Directory as Default for Memory Bank
