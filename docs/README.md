@@ -12,6 +12,7 @@ This directory contains the documentation for Memory Bank MCP, an MCP (Model Con
 - [**testing.md**](./testing.md) - Information about testing the project
 - [**clinerules-integration.md**](./clinerules-integration.md) - Guide for integrating with clinerules
 - [**testing-clinerules.md**](./testing-clinerules.md) - Guide for testing clinerules integration
+- [**memory-bank-status-prefix.md**](./memory-bank-status-prefix.md) - Documentation on the Memory Bank status prefix system
 
 ### Usage Documentation
 

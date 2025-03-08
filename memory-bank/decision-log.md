@@ -140,3 +140,17 @@ This document tracks important decisions made during the development of the Memo
   - New files will match existing ones in format and functionality
   - Improved readability of template files
   - No need for format conversion when creating new files
+
+## Documentation of Memory Bank Status Prefix System
+- **Date:** 2025-03-08 11:16:45 AM
+- **Context:** The Memory Bank status prefix system ([MEMORY BANK: ACTIVE], [MEMORY BANK: INACTIVE], [MEMORY BANK: UPDATING]) is a key feature of the project, but was not properly documented. Users needed clear information about what these status indicators mean and how they work.
+- **Decision:** Created comprehensive documentation about the Memory Bank status prefix system, including a dedicated documentation file, updates to the README, and integration with the usage modes documentation.
+- **Alternatives Considered:** 
+  - Add minimal documentation only in the README
+  - Document only in code comments
+  - Create a separate repository wiki page
+- **Consequences:** 
+  - Users now have clear information about what the status prefixes mean
+  - Improved troubleshooting guidance for when Memory Bank is inactive
+  - Better integration of status system with overall documentation
+  - Enhanced understanding of the Memory Bank operational states

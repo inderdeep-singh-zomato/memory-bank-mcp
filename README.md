@@ -20,6 +20,7 @@ Memory Bank Server provides a set of tools and resources for AI assistants to in
 - **Mode Support**: Detect and use .clinerules files for mode-specific behavior
 - **UMB Command**: Update Memory Bank files temporarily with the UMB command
 - **Robust Error Handling**: Gracefully handle errors and continue operation when possible
+- **Status Prefix System**: Immediate visibility into Memory Bank operational state
 
 ## Recent Improvements 🛠️
 
@@ -261,3 +262,25 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct
 ## License 📄
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Memory Bank Status System 🚦
+
+Memory Bank MCP implements a status prefix system that provides immediate visibility into the operational state of the Memory Bank:
+
+### Status Indicators
+
+Every response from an AI assistant using Memory Bank MCP begins with one of these status indicators:
+
+- **`[MEMORY BANK: ACTIVE]`**: The Memory Bank is available and being used to provide context-aware responses
+- **`[MEMORY BANK: INACTIVE]`**: The Memory Bank is not available or not properly configured
+- **`[MEMORY BANK: UPDATING]`**: The Memory Bank is currently being updated (during UMB command execution)
+
+This system ensures users always know whether the AI assistant is operating with full context awareness or limited information.
+
+### Benefits
+
+- **Transparency**: Users always know whether the AI has access to the full project context
+- **Troubleshooting**: Makes it immediately obvious when Memory Bank is not properly configured
+- **Context Awareness**: Helps users understand why certain responses may lack historical context
+
+For more details, see [Memory Bank Status Prefix System](docs/memory-bank-status-prefix.md).

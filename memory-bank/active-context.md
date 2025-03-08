@@ -6,6 +6,8 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Current Session Notes
 
+- [11:16:45 AM] Decision Made: Documentation of Memory Bank Status Prefix System
+- [11:16:39 AM] Documentation Update: Added comprehensive documentation about the Memory Bank status prefix system. Created a new file docs/memory-bank-status-prefix.md with detailed information about the status indicators ([MEMORY BANK: ACTIVE], [MEMORY BANK: INACTIVE], and [MEMORY BANK: UPDATING]), their meanings, implementation details, benefits, and troubleshooting. Updated the README.md with a new section about the status system. Updated docs/usage-modes.md to include information about the status prefix as a common feature across all modes. Added the new documentation file to the docs/README.md index.
 - [11:05:55 AM] Decision Made: Clinerule Templates Format Standardization
 - [11:05:48 AM] Updated Clinerule Templates: Updated the templates in ClineruleTemplates.ts to use YAML format instead of JSON. The new templates match the current .clinerules files used in the project, which include detailed instructions for Memory Bank management, mode collaboration, and UMB (Update Memory Bank) functionality. This ensures that when new .clinerules files are created, they will have the same format and functionality as the existing ones.
 - [10:59:42 AM] Memory Bank Review: Reviewed the Memory Bank files and confirmed that all core files (active-context.md, decision-log.md, product-context.md, progress.md, system-patterns.md) are present and contain comprehensive information about the project. The Memory Bank is properly initialized and ready for use in the specified directory.
