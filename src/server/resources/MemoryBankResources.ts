@@ -4,15 +4,15 @@ import { MemoryBankManager } from '../../core/MemoryBankManager.js';
 import path from 'path';
 
 /**
- * Configura os recursos do Memory Bank para o servidor MCP
- * @param server Servidor MCP
- * @param memoryBankManager Gerenciador do Memory Bank
+ * Sets up Memory Bank resources for the MCP server
+ * @param server MCP Server
+ * @param memoryBankManager Memory Bank Manager
  */
 export function setupMemoryBankResources(
   server: Server,
   memoryBankManager: MemoryBankManager
 ) {
-  // Define os recursos disponíveis
+  // Define available resources
   server.setRequestHandler(ListResourcesRequestSchema, async () => ({
     resources: [
       {
@@ -48,9 +48,9 @@ export function setupMemoryBankResources(
     ],
   }));
 
-  // Implementa o handler para leitura de recursos
+  // Implement handler for reading resources
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    // Encontra o diretório do Memory Bank se ainda não foi encontrado
+    // Find Memory Bank directory if not found yet
     const memoryBankDir = memoryBankManager.getMemoryBankDir();
     if (!memoryBankDir) {
       throw new McpError(
@@ -59,34 +59,20 @@ export function setupMemoryBankResources(
       );
     }
 
-    let filename: string;
-    
-    // Mapeia o URI para o nome do arquivo
-    switch (request.params.uri) {
-      case "memory-bank://product-context":
-        filename = "productContext.md";
-        break;
-      case "memory-bank://active-context":
-        filename = "activeContext.md";
-        break;
-      case "memory-bank://progress":
-        filename = "progress.md";
-        break;
-      case "memory-bank://decision-log":
-        filename = "decisionLog.md";
-        break;
-      case "memory-bank://system-patterns":
-        filename = "systemPatterns.md";
-        break;
-      default:
-        throw new McpError(
-          ErrorCode.InvalidRequest,
-          `Invalid URI: ${request.params.uri}`
-        );
+    // Extract filename from URI by removing the protocol prefix
+    const uriParts = request.params.uri.split('://');
+    if (uriParts.length !== 2 || uriParts[0] !== 'memory-bank') {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Invalid URI format: ${request.params.uri}`
+      );
     }
+    
+    // The filename is the same as the URI path with .md extension
+    const filename = `${uriParts[1]}.md`;
 
     try {
-      // Lê o conteúdo do arquivo
+      // Read file content
       const content = await memoryBankManager.readFile(filename);
 
       return {
@@ -99,12 +85,9 @@ export function setupMemoryBankResources(
         ],
       };
     } catch (error) {
-      if (error instanceof McpError) {
-        throw error;
-      }
       throw new McpError(
-        ErrorCode.InternalError,
-        `Error reading file ${filename}: ${error}`
+        ErrorCode.InvalidRequest,
+        `Failed to read resource: ${error}`
       );
     }
   });

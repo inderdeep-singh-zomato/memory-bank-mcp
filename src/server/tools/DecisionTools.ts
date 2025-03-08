@@ -43,10 +43,10 @@ export const decisionTools = [
 ];
 
 /**
- * Processa a ferramenta log_decision
+ * Processes the log_decision tool
  * @param progressTracker ProgressTracker
- * @param decision Decisão a ser registrada
- * @returns Resultado da operação
+ * @param decision Decision to be logged
+ * @returns Operation result
  */
 export async function handleLogDecision(
   progressTracker: ProgressTracker,
@@ -61,7 +61,7 @@ export async function handleLogDecision(
   try {
     await progressTracker.logDecision(decision);
 
-    // Também rastreia isso como progresso
+    // Also track this as progress
     await progressTracker.trackProgress('Decision Made', {
       description: decision.title,
     });

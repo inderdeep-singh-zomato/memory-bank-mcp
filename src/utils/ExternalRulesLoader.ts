@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { EventEmitter } from 'events';
+import yaml from 'js-yaml';
 
 /**
  * Interface to represent the basic structure of rules
@@ -82,8 +83,7 @@ export class ExternalRulesLoader extends EventEmitter {
    */
   private parseRuleContent(content: string): ClineruleBase | null {
     try {
-      // Simple format for initial parsing
-      // Can be expanded to support YAML or other formats
+      // First try to parse as JSON
       const rule = JSON.parse(content);
       
       // Basic validation
@@ -92,10 +92,21 @@ export class ExternalRulesLoader extends EventEmitter {
       }
       
       return rule;
-    } catch (error) {
-      // If not valid JSON, try to parse as YAML or other format
-      // For now, just return null
-      return null;
+    } catch (jsonError) {
+      // If not valid JSON, try to parse as YAML
+      try {
+        const rule = yaml.load(content) as ClineruleBase;
+        
+        // Basic validation
+        if (!rule.mode || !rule.instructions || !Array.isArray(rule.instructions.general)) {
+          return null;
+        }
+        
+        return rule;
+      } catch (yamlError) {
+        console.error('Failed to parse rule content as JSON or YAML:', yamlError);
+        return null;
+      }
     }
   }
   

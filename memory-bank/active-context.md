@@ -6,6 +6,66 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Current Session Notes
 
+- Memory Bank Update: Attempted to update the Memory Bank system. Identified that the Memory Bank files already exist in the memory-bank directory but the MCP tools are having trouble recognizing them. The Memory Bank contains comprehensive documentation and progress tracking for the Memory Bank MCP project, which has been translated to English and configured for npm publication.
+- Standardized Memory Bank file naming pattern: Implemented a consistent kebab-case naming pattern for Memory Bank files. Changes include:
+
+1. Updated CoreTemplates.ts to use kebab-case for file names
+2. Simplified URI to filename mapping in MemoryBankResources.ts
+3. Updated ProgressTracker.ts to use kebab-case file names
+4. Created MigrationUtils.ts with a method to migrate existing files
+5. Added a new migrate_file_naming tool to help users migrate existing Memory Banks
+6. Created documentation in docs/file-naming-convention.md explaining the new convention
+7. Added deleteFile method to FileUtils class
+
+- Decision Made: Memory Bank File Naming Pattern Standardization
+- Reviewed Memory Bank file naming pattern: Analyzed the current file naming pattern in the Memory Bank system. Found inconsistencies between the URI naming convention (kebab-case with hyphens) and the actual file naming convention (camelCase). This creates a mapping requirement in the code that could be simplified. Also identified that the file extensions are hardcoded as .md throughout the codebase.
+- Updated Memory Bank to English: Translated all Memory Bank files to English, ensuring consistency across the project. The following changes were made:
+
+1. Translated the "Configuração para uso via npx" entry in the decision log to "Configuration for npx usage"
+2. Translated the "Implementado suporte para npx" entry in the progress file to "Implemented npx support"
+3. Updated all task descriptions and next steps in the active context file to English
+4. Ensured all Memory Bank files use consistent English terminology
+
+- File Update: Updated decisionLog.md
+- File Update: Updated activeContext.md
+- Translated files to English: Translated all generated files to English, including:
+
+1. docs/npx-usage.md - Full translation of the documentation
+2. src/index.ts - Translated help messages and comments
+3. package.json - Translated package description
+
+- Decision Made: Configuration for npx usage
+- Implemented npx support: Added support to run Memory Bank MCP via npx after npm publication. Changes include:
+
+1. Added bin configuration in package.json
+2. Verified shebang in main file
+3. Added prepublishOnly script to ensure build is run before publication
+4. Updated .npmignore to exclude unnecessary files
+5. Added support for --help option
+6. Updated documentation (README.md and docs/npx-usage.md)
+7. Specified minimum Node.js version
+
+- Translation to English: Translated Memory Bank files to English. The following changes were made:
+
+1. Updated activeContext.md to use English for all content
+2. Updated progress.md to use English for all content
+3. Verified that other Memory Bank files (decisionLog.md, systemPatterns.md) were already in English
+4. Verified that README.md sections were updated to English
+
+All project documentation and Memory Bank files are now consistently in English, which aligns with the project's development guidelines that specify "All code and documentation should be in English".
+
+- Project Configuration for npm Publication: Configured the project to be an open source package with versioning and publication via npm using GitHub Actions. The following changes were made:
+
+1. Updated package.json with information needed for publication
+2. Created a .npmignore file
+3. Created a LICENSE file with the MIT license
+4. Configured GitHub Actions for automatic npm publication
+5. Configured GitHub Actions for tests
+6. Created CONTRIBUTING.md and CODE_OF_CONDUCT.md files
+7. Updated README.md with badges and contribution information
+8. Configured tsconfig.json to generate type declarations
+9. Updated the build script to correctly generate types
+
 - File Update: Updated documentation-structure.md
 - Decision Made: Documentation Structure Consolidation
 - Documentation Consolidation: Consolidated all documentation into a single docs directory. Previously, documentation was split between the main docs directory and memory-bank/docs. Now all documentation is organized in a single location with a comprehensive README.md that categorizes the documentation files into Core Documentation, Usage Documentation, and Integration Documentation. Updated the main README.md to reference the consolidated documentation directory.
@@ -46,35 +106,17 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Ongoing Tasks
 
-- Implementar suporte a YAML para arquivos de regras
-- Implementar suporte a TOML para arquivos de regras
-- Adicionar detecção automática de formato de arquivo
-- Implementar testes para os novos formatos de regras
-- Implementar additional tests to reach 100% coverage
-- Fix linter errors in progressTracker.test.ts
-- Add integration tests for complete workflows
-- Configure CI/CD for automated testing
-- Implement AI assistant integration examples
-- Update documentation references in code to point to consolidated docs directory
+- Standardize Memory Bank file naming pattern
+- Fix Memory Bank recognition issues
+
 ## Known Issues
 
-- Necessidade de adicionar dependências para parsing de YAML e TOML
-- Compatibilidade com regras existentes durante a transição
-- Some linter errors in progressTracker.test.ts related to missing toContain method
-- Remaining uncovered code in MemoryBankManager.ts (80.18% coverage)
-- Remaining uncovered code in ExternalRulesLoader.ts (79.71% coverage)
-- Remaining uncovered code in FileUtils.ts (83.02% coverage)
-- Need to test integration with different AI assistants
+- Verify if the build process is correctly generating type declaration files
+- Memory Bank tools are having trouble recognizing the existing Memory Bank directory
+
 ## Next Steps
 
-- Pesquisar e selecionar bibliotecas para parsing de YAML e TOML
-- Modificar ExternalRulesLoader para detectar e processar diferentes formatos
-- Atualizar a documentação para incluir informações sobre os novos formatos suportados
-- Criar exemplos de arquivos de regras em YAML e TOML
-- Implement tests for remaining uncovered code in MemoryBankManager.ts
-- Implement tests for remaining uncovered code in ExternalRulesLoader.ts
-- Implement tests for remaining uncovered code in FileUtils.ts
-- Fix linter errors in progressTracker.test.ts
-- Set up CI/CD pipeline for automated testing
-- Create sample integration code for Claude and GPT models
-- Update import paths and documentation references in code to use consolidated docs
+- Add tests for the new MigrationUtils class
+- Update existing tests to use the new file naming convention
+- Create a migration guide for users with existing Memory Banks
+- Investigate and fix Memory Bank recognition issues

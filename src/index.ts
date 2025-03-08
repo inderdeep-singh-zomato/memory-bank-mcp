@@ -2,7 +2,29 @@
 import { MemoryBankServer } from './server/MemoryBankServer.js';
 
 /**
- * Processes command line arguments
+ * Display program help
+ */
+function showHelp() {
+  console.log(`
+Memory Bank MCP - MCP Server for managing Memory Bank
+
+Usage: memory-bank-mcp [options]
+
+Options:
+  --mode, -m <mode>    Set execution mode (code, ask, architect, etc.)
+  --help, -h           Display this help
+  
+Examples:
+  memory-bank-mcp
+  memory-bank-mcp --mode code
+  
+For more information, visit: https://github.com/movibe/memory-bank-server
+`);
+  process.exit(0);
+}
+
+/**
+ * Process command line arguments
  * @returns Object with processed options
  */
 function processArgs() {
@@ -14,6 +36,8 @@ function processArgs() {
     
     if (arg === '--mode' || arg === '-m') {
       options.mode = args[++i];
+    } else if (arg === '--help' || arg === '-h') {
+      showHelp();
     }
   }
 

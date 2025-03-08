@@ -5,6 +5,11 @@ import { ProgressTracker } from '../core/ProgressTracker.js';
 import { setupToolHandlers } from './tools/index.js';
 import { setupResourceHandlers } from './resources/index.js';
 import { ModeManagerEvent } from '../utils/ModeManager.js';
+import { coreTools } from './tools/CoreTools.js';
+import { progressTools } from './tools/ProgressTools.js';
+import { contextTools } from './tools/ContextTools.js';
+import { decisionTools } from './tools/DecisionTools.js';
+import { modeTools } from './tools/ModeTools.js';
 
 /**
  * Main MCP server class for Memory Bank
@@ -21,10 +26,19 @@ export class MemoryBankServer {
    * Creates a new MemoryBankServer instance
    * 
    * Initializes the MCP server with the necessary handlers for tools and resources.
-   * @param initialMode Modo inicial (opcional)
+   * @param initialMode Initial mode (optional)
    */
   constructor(initialMode?: string) {
     this.memoryBankManager = new MemoryBankManager();
+    
+    // Combine all tools
+    const allTools = [
+      ...coreTools,
+      ...progressTools,
+      ...contextTools,
+      ...decisionTools,
+      ...modeTools,
+    ];
     
     this.server = new Server(
       {
@@ -33,7 +47,9 @@ export class MemoryBankServer {
       },
       {
         capabilities: {
-          tools: {},
+          tools: {
+            tools: allTools,
+          },
           resources: {},
         },
       }
@@ -47,29 +63,29 @@ export class MemoryBankServer {
     );
     setupResourceHandlers(this.server, this.memoryBankManager);
 
-    // Inicializar o gerenciador de modos
+    // Initialize the mode manager
     this.memoryBankManager.initializeModeManager(initialMode).catch(error => {
-      console.error('Erro ao inicializar o gerenciador de modos:', error);
+      console.error('Error initializing mode manager:', error);
     });
 
-    // Configurar listeners para eventos do gerenciador de modos
+    // Set up listeners for mode manager events
     const modeManager = this.memoryBankManager.getModeManager();
     if (modeManager) {
       modeManager.on(ModeManagerEvent.MODE_CHANGED, (modeState) => {
-        console.error(`Modo alterado para: ${modeState.name}`);
-        console.error(`Status do Memory Bank: ${modeState.memoryBankStatus}`);
+        console.error(`Mode changed to: ${modeState.name}`);
+        console.error(`Memory Bank status: ${modeState.memoryBankStatus}`);
       });
 
       modeManager.on(ModeManagerEvent.MODE_TRIGGER_DETECTED, (triggeredModes) => {
-        console.error(`Gatilhos de modo detectados: ${triggeredModes.join(', ')}`);
+        console.error(`Mode triggers detected: ${triggeredModes.join(', ')}`);
       });
 
       modeManager.on(ModeManagerEvent.UMB_TRIGGERED, () => {
-        console.error('Modo UMB ativado');
+        console.error('UMB mode activated');
       });
 
       modeManager.on(ModeManagerEvent.UMB_COMPLETED, () => {
-        console.error('Modo UMB desativado');
+        console.error('UMB mode deactivated');
       });
     }
 
@@ -109,12 +125,12 @@ export class MemoryBankServer {
       this.isRunning = true;
       console.error('Memory Bank MCP server running on stdio');
       
-      // Exibir informações sobre os modos disponíveis
+      // Display information about available modes
       const modeManager = this.memoryBankManager.getModeManager();
       if (modeManager) {
         const availableModes = modeManager.getCurrentModeState();
-        console.error(`Modo atual: ${availableModes.name}`);
-        console.error(`Status do Memory Bank: ${availableModes.memoryBankStatus}`);
+        console.error(`Current mode: ${availableModes.name}`);
+        console.error(`Memory Bank status: ${availableModes.memoryBankStatus}`);
       }
     } catch (error) {
       console.error('Failed to start Memory Bank server:', error);
@@ -132,7 +148,7 @@ export class MemoryBankServer {
     
     console.error('Shutting down Memory Bank server...');
     try {
-      // Limpar recursos do gerenciador de modos
+      // Clean up mode manager resources
       const modeManager = this.memoryBankManager.getModeManager();
       if (modeManager) {
         modeManager.dispose();

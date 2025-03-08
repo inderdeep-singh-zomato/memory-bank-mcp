@@ -109,7 +109,7 @@ export class ProgressTracker {
    * @private
    */
   private async updateActiveContextFile(action: string, details: ProgressDetails): Promise<void> {
-    const contextPath = path.join(this.memoryBankDir, 'activeContext.md');
+    const contextPath = path.join(this.memoryBankDir, 'active-context.md');
     
     try {
       let contextContent = await FileUtils.readFile(contextPath);
@@ -143,7 +143,7 @@ export class ProgressTracker {
    * @throws Error if logging fails
    */
   async logDecision(decision: Decision): Promise<void> {
-    const decisionLogPath = path.join(this.memoryBankDir, 'decisionLog.md');
+    const decisionLogPath = path.join(this.memoryBankDir, 'decision-log.md');
     
     try {
       let decisionLogContent = await FileUtils.readFile(decisionLogPath);
@@ -176,8 +176,8 @@ ${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
       
       await FileUtils.writeFile(decisionLogPath, decisionLogContent);
     } catch (error) {
-      console.error(`Error updating decision log file: ${error}`);
-      throw new Error(`Failed to update decision log: ${error}`);
+      console.error(`Error logging decision: ${error}`);
+      throw new Error(`Failed to log decision: ${error}`);
     }
   }
 
@@ -188,7 +188,7 @@ ${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
    * @throws Error if update fails
    */
   async updateActiveContext(context: ActiveContext): Promise<void> {
-    const contextPath = path.join(this.memoryBankDir, 'activeContext.md');
+    const contextPath = path.join(this.memoryBankDir, 'active-context.md');
     
     try {
       let contextContent = await FileUtils.readFile(contextPath);
@@ -231,7 +231,7 @@ ${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
       
       await FileUtils.writeFile(contextPath, contextContent);
     } catch (error) {
-      console.error(`Error updating active context file: ${error}`);
+      console.error(`Error updating active context: ${error}`);
       throw new Error(`Failed to update active context: ${error}`);
     }
   }
@@ -242,7 +242,7 @@ ${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
    * @throws Error if clearing fails
    */
   async clearSessionNotes(): Promise<void> {
-    const contextPath = path.join(this.memoryBankDir, 'activeContext.md');
+    const contextPath = path.join(this.memoryBankDir, 'active-context.md');
     
     try {
       let contextContent = await FileUtils.readFile(contextPath);

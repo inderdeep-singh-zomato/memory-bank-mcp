@@ -1,5 +1,6 @@
 import path from 'path';
 import { MemoryBankManager } from '../../core/MemoryBankManager.js';
+import { MigrationUtils } from '../../utils/MigrationUtils.js';
 
 /**
  * Definition of the main Memory Bank tools
@@ -83,13 +84,27 @@ export const coreTools = [
       required: [],
     },
   },
+  {
+    name: 'migrate_file_naming',
+    description: 'Migrate Memory Bank files from camelCase to kebab-case naming convention',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        random_string: {
+          type: 'string',
+          description: 'Dummy parameter for no-parameter tools',
+        },
+      },
+      required: ['random_string'],
+    },
+  },
 ];
 
 /**
- * Processa a ferramenta set_memory_bank_path
- * @param memoryBankManager Gerenciador do Memory Bank
- * @param customPath Caminho personalizado
- * @returns Resultado da operação
+ * Processes the set_memory_bank_path tool
+ * @param memoryBankManager Memory Bank Manager
+ * @param customPath Custom path for the Memory Bank
+ * @returns Operation result
  */
 export async function handleSetMemoryBankPath(
   memoryBankManager: MemoryBankManager,
@@ -123,10 +138,10 @@ export async function handleSetMemoryBankPath(
 }
 
 /**
- * Processa a ferramenta initialize_memory_bank
- * @param memoryBankManager Gerenciador do Memory Bank
- * @param dirPath Caminho do diretório
- * @returns Resultado da operação
+ * Processes the initialize_memory_bank tool
+ * @param memoryBankManager Memory Bank Manager
+ * @param dirPath Directory path where the Memory Bank will be initialized
+ * @returns Operation result
  */
 export async function handleInitializeMemoryBank(
   memoryBankManager: MemoryBankManager,
@@ -163,10 +178,10 @@ export async function handleInitializeMemoryBank(
 }
 
 /**
- * Processa a ferramenta read_memory_bank_file
- * @param memoryBankManager Gerenciador do Memory Bank
- * @param filename Nome do arquivo
- * @returns Resultado da operação
+ * Processes the read_memory_bank_file tool
+ * @param memoryBankManager Memory Bank Manager
+ * @param filename Name of the file to read
+ * @returns Operation result
  */
 export async function handleReadMemoryBankFile(
   memoryBankManager: MemoryBankManager,
@@ -197,11 +212,11 @@ export async function handleReadMemoryBankFile(
 }
 
 /**
- * Processa a ferramenta write_memory_bank_file
- * @param memoryBankManager Gerenciador do Memory Bank
- * @param filename Nome do arquivo
- * @param content Conteúdo a ser escrito
- * @returns Resultado da operação
+ * Processes the write_memory_bank_file tool
+ * @param memoryBankManager Memory Bank Manager
+ * @param filename Name of the file to write
+ * @param content Content to write to the file
+ * @returns Operation result
  */
 export async function handleWriteMemoryBankFile(
   memoryBankManager: MemoryBankManager,
@@ -233,9 +248,9 @@ export async function handleWriteMemoryBankFile(
 }
 
 /**
- * Processa a ferramenta list_memory_bank_files
- * @param memoryBankManager Gerenciador do Memory Bank
- * @returns Resultado da operação
+ * Processes the list_memory_bank_files tool
+ * @param memoryBankManager Memory Bank Manager
+ * @returns Operation result
  */
 export async function handleListMemoryBankFiles(
   memoryBankManager: MemoryBankManager
@@ -265,9 +280,9 @@ export async function handleListMemoryBankFiles(
 }
 
 /**
- * Processa a ferramenta get_memory_bank_status
- * @param memoryBankManager Gerenciador do Memory Bank
- * @returns Resultado da operação
+ * Processes the get_memory_bank_status tool
+ * @param memoryBankManager Memory Bank Manager
+ * @returns Operation result
  */
 export async function handleGetMemoryBankStatus(
   memoryBankManager: MemoryBankManager
@@ -289,6 +304,63 @@ export async function handleGetMemoryBankStatus(
         {
           type: 'text',
           text: `Error checking Memory Bank status: ${error}`,
+        },
+      ],
+      isError: true,
+    };
+  }
+}
+
+/**
+ * Handles the migrate_file_naming tool
+ * @param memoryBankManager Memory Bank Manager
+ * @returns Result of the migration
+ */
+export async function handleMigrateFileNaming(
+  memoryBankManager: MemoryBankManager
+) {
+  try {
+    const memoryBankDir = memoryBankManager.getMemoryBankDir();
+    if (!memoryBankDir) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'Memory Bank directory not found. Use initialize_memory_bank or set_memory_bank_path first.',
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    const result = await MigrationUtils.migrateFileNamingConvention(memoryBankDir);
+
+    if (result.success) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Migration completed successfully. Migrated files: ${result.migratedFiles.join(', ')}`,
+          },
+        ],
+      };
+    } else {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Migration completed with errors: ${result.errors.join(', ')}. Migrated files: ${result.migratedFiles.join(', ')}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Error during migration: ${error}`,
         },
       ],
       isError: true,

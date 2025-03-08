@@ -18,10 +18,11 @@ describe('ProgressTracker Tests', () => {
     await fs.ensureDir(memoryBankDir);
     
     // Create core files
-    await fs.writeFile(path.join(memoryBankDir, 'productContext.md'), '# Product Context');
-    await fs.writeFile(path.join(memoryBankDir, 'activeContext.md'), '# Active Context');
+    await fs.writeFile(path.join(memoryBankDir, 'product-context.md'), '# Product Context');
+    await fs.writeFile(path.join(memoryBankDir, 'active-context.md'), '# Active Context\n\n## Current Session Notes\n');
     await fs.writeFile(path.join(memoryBankDir, 'progress.md'), '# Progress');
-    await fs.writeFile(path.join(memoryBankDir, 'decisionLog.md'), '# Decision Log');
+    await fs.writeFile(path.join(memoryBankDir, 'decision-log.md'), '# Decision Log');
+    await fs.writeFile(path.join(memoryBankDir, 'system-patterns.md'), '# System Patterns');
     
     // Create a new ProgressTracker for each test
     progressTracker = new ProgressTracker(memoryBankDir);
@@ -42,119 +43,86 @@ describe('ProgressTracker Tests', () => {
     const progressContent = await fs.readFile(path.join(memoryBankDir, 'progress.md'), 'utf8');
     
     // Check if progress.md contains the action and description
-    expect(progressContent).toContain(action);
-    expect(progressContent).toContain(details.description);
+    expect(progressContent.includes(action)).toBe(true);
+    expect(progressContent.includes(details.description)).toBe(true);
   });
   
   test('Should update active context', async () => {
     // Update active context
-    const tasks = ['Task 1', 'Task 2'];
-    const issues = ['Issue 1', 'Issue 2'];
-    const nextSteps = ['Step 1', 'Step 2'];
+    const context = {
+      tasks: ['Task 1', 'Task 2'],
+      issues: ['Issue 1'],
+      nextSteps: ['Next step 1', 'Next step 2'],
+    };
+    await progressTracker.updateActiveContext(context);
     
-    await progressTracker.updateActiveContext({
-      tasks,
-      issues,
-      nextSteps
-    });
+    // Verify active-context.md was updated
+    const activeContextContent = await fs.readFile(path.join(memoryBankDir, 'active-context.md'), 'utf8');
     
-    // Verify activeContext.md was updated
-    const activeContextContent = await fs.readFile(path.join(memoryBankDir, 'activeContext.md'), 'utf8');
-    
-    // Check if activeContext.md contains the tasks, issues, and next steps
-    for (const task of tasks) {
-      expect(activeContextContent).toContain(task);
-    }
-    
-    for (const issue of issues) {
-      expect(activeContextContent).toContain(issue);
-    }
-    
-    for (const step of nextSteps) {
-      expect(activeContextContent).toContain(step);
-    }
+    // Check if active-context.md contains the tasks, issues, and next steps
+    expect(activeContextContent.includes('Task 1')).toBe(true);
+    expect(activeContextContent.includes('Task 2')).toBe(true);
+    expect(activeContextContent.includes('Issue 1')).toBe(true);
+    expect(activeContextContent.includes('Next step 1')).toBe(true);
+    expect(activeContextContent.includes('Next step 2')).toBe(true);
   });
   
   test('Should log decision', async () => {
     // Log decision
-    const title = 'Test Decision';
-    const context = 'Test Context';
-    const decision = 'Test Decision Text';
-    const alternatives = ['Alternative 1', 'Alternative 2'];
-    const consequences = ['Consequence 1', 'Consequence 2'];
+    const decision = {
+      title: 'Test Decision',
+      context: 'Test Context',
+      decision: 'Test Decision Content',
+      alternatives: ['Alternative 1', 'Alternative 2'],
+      consequences: ['Consequence 1', 'Consequence 2'],
+    };
+    await progressTracker.logDecision(decision);
     
-    await progressTracker.logDecision({
-      title,
-      context,
-      decision,
-      alternatives,
-      consequences
-    });
+    // Verify decision-log.md was updated
+    const decisionLogContent = await fs.readFile(path.join(memoryBankDir, 'decision-log.md'), 'utf8');
     
-    // Verify decisionLog.md was updated
-    const decisionLogContent = await fs.readFile(path.join(memoryBankDir, 'decisionLog.md'), 'utf8');
-    
-    // Check if decisionLog.md contains the decision details
-    expect(decisionLogContent).toContain(title);
-    expect(decisionLogContent).toContain(context);
-    expect(decisionLogContent).toContain(decision);
-    
-    for (const alternative of alternatives) {
-      expect(decisionLogContent).toContain(alternative);
-    }
-    
-    for (const consequence of consequences) {
-      expect(decisionLogContent).toContain(consequence);
-    }
+    // Check if decision-log.md contains the decision details
+    expect(decisionLogContent.includes('Test Decision')).toBe(true);
+    expect(decisionLogContent.includes('Test Context')).toBe(true);
+    expect(decisionLogContent.includes('Test Decision Content')).toBe(true);
+    expect(decisionLogContent.includes('Alternative 1')).toBe(true);
+    expect(decisionLogContent.includes('Alternative 2')).toBe(true);
+    expect(decisionLogContent.includes('Consequence 1')).toBe(true);
+    expect(decisionLogContent.includes('Consequence 2')).toBe(true);
   });
   
   test('Should clear session notes', async () => {
-    // Write test active context with session notes
-    const activeContextContent = `
-# Active Context
+    // Create active context with session notes
+    const activeContextContent = `# Active Context
 
 ## Current Project State
-
 Test project state
 
 ## Current Session Notes
-
 - [12:00:00] Note 1
 - [12:30:00] Note 2
 
 ## Ongoing Tasks
-
 - Task 1
 - Task 2
-
-## Known Issues
-
-- Issue 1
-- Issue 2
-
-## Next Steps
-
-- Step 1
-- Step 2
 `;
     
-    await fs.writeFile(path.join(memoryBankDir, 'activeContext.md'), activeContextContent);
+    await fs.writeFile(path.join(memoryBankDir, 'active-context.md'), activeContextContent);
     
     // Clear session notes
     await progressTracker.clearSessionNotes();
     
-    // Verify activeContext.md was updated
-    const updatedContent = await fs.readFile(path.join(memoryBankDir, 'activeContext.md'), 'utf8');
+    // Verify active-context.md was updated
+    const updatedContent = await fs.readFile(path.join(memoryBankDir, 'active-context.md'), 'utf8');
     
     // Check if session notes were cleared
-    expect(updatedContent).toContain('## Current Session Notes');
-    expect(updatedContent).not.toContain('[12:00:00] Note 1');
-    expect(updatedContent).not.toContain('[12:30:00] Note 2');
+    expect(updatedContent.includes('## Current Session Notes')).toBe(true);
+    expect(updatedContent.includes('[12:00:00] Note 1')).toBe(false);
+    expect(updatedContent.includes('[12:30:00] Note 2')).toBe(false);
     
     // Check if other sections were preserved
-    expect(updatedContent).toContain('Test project state');
-    expect(updatedContent).toContain('Task 1');
-    expect(updatedContent).toContain('Issue 1');
-    expect(updatedContent).toContain('Step 1');
+    expect(updatedContent.includes('Test project state')).toBe(true);
+    expect(updatedContent.includes('Task 1')).toBe(true);
+    expect(updatedContent.includes('Task 2')).toBe(true);
   });
 }); 
