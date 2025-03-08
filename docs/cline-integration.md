@@ -1,10 +1,10 @@
-# Clinerules Integration
+# Cline Integration
 
-> **Note**: This document has been consolidated with the automatic creation of .clinerules files document. Please refer to the `cline-integration.md` file for the updated documentation.
+This document describes how the Memory Bank Server integrates with Cline through `.clinerules` files to provide mode-specific functionality and context management.
 
 ## Overview
 
-The `.clinerules` files are configuration files that define rules and behaviors for different modes of interaction with an AI assistant. The Memory Bank Server can detect and use these files when present in the project directory.
+The `.clinerules` files are configuration files that define rules and behaviors for different modes of interaction with an AI assistant. The Memory Bank Server can detect and use these files when present in the project directory, as well as automatically create missing files when necessary.
 
 ## Supported Files
 
@@ -37,6 +37,30 @@ Each `.clinerules` file must follow a specific structure:
   }
 }
 ```
+
+## Automatic Creation of .clinerules Files
+
+### Feature Overview
+
+The Memory Bank Server now automatically creates missing `.clinerules` files during initialization. Previously, the system would fail if any of the required `.clinerules` files were missing. Now, it will automatically create the missing files using predefined templates.
+
+### Template System
+
+- A new file `src/utils/ClineruleTemplates.ts` contains templates for all required `.clinerules` files
+- Each template follows the current structure and format of the corresponding `.clinerules` file
+- A utility function `getTemplateForMode(mode: string)` retrieves the template for a specific mode
+
+### ExternalRulesLoader Enhancements
+
+- A new method `createMissingClinerules(missingFiles: string[])` has been added to the `ExternalRulesLoader` class
+- This method creates the missing `.clinerules` files using the templates from `ClineruleTemplates.ts`
+- It returns information about which files were successfully created and which failed
+
+### MemoryBankManager Updates
+
+- `initializeMemoryBank` has been modified to create missing `.clinerules` files instead of failing
+- `initializeModeManager` has been modified to create missing `.clinerules` files before initializing the mode manager
+- Both methods now log information about the creation process and only fail if the creation of any file fails
 
 ## Supported Features
 
@@ -126,7 +150,7 @@ Processes the Update Memory Bank (UMB) command.
    memory-bank-mcp --mode architect
    ```
 
-2. The server detects the `.clinerules` files in the project directory
+2. The server detects the `.clinerules` files in the project directory (creating missing ones if necessary)
 
 3. The server applies the rules of the specified mode
 
@@ -151,6 +175,18 @@ Processes the Update Memory Bank (UMB) command.
      }
    }
    ```
+
+## Impact for Users
+
+- Users no longer need to manually create `.clinerules` files before initializing a Memory Bank
+- The system will automatically create any missing files with sensible defaults
+- This makes the system more user-friendly and reduces the chance of initialization failures
+
+## Impact for Developers
+
+- The template system makes it easy to update the default content of `.clinerules` files
+- The creation process is well-documented and tested
+- The system still validates that all required files exist, but now has a fallback mechanism to create them if needed
 
 ## Security Considerations
 

@@ -1,5 +1,7 @@
 # Automatic Creation of .clinerules Files
 
+> **Note**: This document has been consolidated with the Cline integration document. Please refer to the `cline-integration.md` file for the updated documentation.
+
 ## Overview
 
 This document describes the implementation of automatic creation of `.clinerules` files when initializing a Memory Bank. Previously, the system would fail if any of the required `.clinerules` files were missing. Now, it will automatically create the missing files using predefined templates.
