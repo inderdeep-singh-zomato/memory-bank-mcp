@@ -25,3 +25,17 @@ This document tracks important decisions made during the development of the Memo
 - **Decision:** Implement the necessary configurations to allow execution via npx, including bin configuration in package.json, shebang verification, and appropriate documentation.
 - **Alternatives Considered:** Not offering npx support and focusing only on global installation, Creating a separate script for npx execution
 - **Consequences:** Ease of use without installation required, Better experience for users who prefer to test before installing, Clearer documentation about usage options
+
+## Memory Bank Path Configuration
+- **Date:** 2025-03-08 1:56:18 AM
+- **Context:** O Memory Bank não estava sendo reconhecido corretamente pelo MCP. Precisávamos configurar o caminho correto para o Memory Bank.
+- **Decision:** Configuramos o caminho do Memory Bank para /Users/movibe/Documents/Cline/MCP/memory-bank-server/memory-bank usando o comando mcp__set_memory_bank_path.
+- **Alternatives Considered:** 
+  - Inicializar um novo Memory Bank
+  - Migrar os arquivos existentes para um novo diretório
+  - Modificar o código para reconhecer o diretório existente
+- **Consequences:** 
+  - O Memory Bank agora é reconhecido corretamente pelo MCP
+  - Todos os arquivos existentes estão disponíveis e funcionando
+  - Não foi necessário criar ou migrar arquivos
+  - Resolvemos o problema de reconhecimento do Memory Bank listado nos problemas conhecidos

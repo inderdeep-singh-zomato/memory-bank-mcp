@@ -6,6 +6,9 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Update History
 
+- [2025-03-08 1:56:18 AM] - Decision Made: Memory Bank Path Configuration
+- [2025-03-08 1:55:57 AM] - Configuração do Memory Bank: Configuramos com sucesso o caminho do Memory Bank para /Users/movibe/Documents/Cline/MCP/memory-bank-server/memory-bank. Verificamos que todos os arquivos principais estão presentes e o Memory Bank está funcionando corretamente.
+- [2025-03-08] - NPM Publication: Successfully published the @movibe/memory-bank-mcp package version 0.1.0 to the npm registry. The package is now available for global installation and can be run as a command-line tool. Verified that the package works correctly when installed globally.
 - [2025-03-08] - GitHub Actions Workflow Update: Modified the npm-publish.yml workflow to automatically publish a new version to NPM whenever there's a merge to the main branch. Added auto-increment version functionality that bumps the patch version before publishing. This ensures that the package is always up-to-date on NPM without requiring manual version bumps and tag creation.
 - [2025-03-08] - Memory Bank Update: Attempted to update the Memory Bank system. Identified that the Memory Bank files already exist in the memory-bank directory but the MCP tools are having trouble recognizing them. The Memory Bank contains comprehensive documentation and progress tracking for the Memory Bank MCP project, which has been translated to English and configured for npm publication.
 - [2025-03-08] - Standardized Memory Bank file naming pattern: Implemented a consistent kebab-case naming pattern for Memory Bank files. Changes include:

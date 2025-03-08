@@ -1,5 +1,5 @@
 {
-  "name": "memory-bank-mcp",
+  "name": "@movibe/memory-bank-mcp",
   "version": "0.1.0",
   "description": "MCP Server for managing Memory Bank",
   "type": "module",
@@ -51,5 +51,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "directories": {
+    "doc": "docs"
   }
 }
