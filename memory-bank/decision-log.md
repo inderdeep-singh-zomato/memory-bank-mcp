@@ -2,6 +2,14 @@
 
 This document tracks important decisions made during the development of the Memory Bank MCP.
 
+## Automated NPM Publication
+
+- **Date:** 2025-03-08
+- **Context:** The project requires manual version bumping and tag creation to trigger NPM publication, which can lead to delays in releasing updates and potential human errors.
+- **Decision:** Modify the GitHub Actions workflow to automatically publish a new version to NPM whenever there's a merge to the main branch, with automatic patch version increments.
+- **Alternatives Considered:** Keeping the manual tag-based release process, Using a separate release management tool, Implementing a scheduled release cycle
+- **Consequences:** Faster and more consistent release cycle, Reduced manual intervention, Automatic version management, Potential for more frequent releases
+
 ## Memory Bank Recognition Investigation
 
 - **Date:** 2025-03-08
