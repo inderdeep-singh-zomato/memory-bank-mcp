@@ -1,5 +1,8 @@
 /**
  * Templates for the main Memory Bank files
+ * 
+ * All templates are in English to ensure consistency across different environments.
+ * The Memory Bank will always be generated in English regardless of the system locale.
  */
 
 /**
@@ -106,6 +109,8 @@ export const systemPatternsTemplate = `# System Patterns
 
 /**
  * Array with all main templates
+ * 
+ * All templates are in English to ensure consistency.
  */
 export const coreTemplates = [
   { name: 'product-context.md', content: productContextTemplate },

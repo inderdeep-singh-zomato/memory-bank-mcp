@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
@@ -30,13 +32,30 @@ jobs:
       - name: Configure NPM
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-      - name: Auto-increment version for main branch
-        if: github.ref == 'refs/heads/main'
+      - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          npm version patch -m "Auto-increment version [skip ci]"
-          git push --follow-tags
+      - name: Generate Changelog and Bump Version
+        if: github.ref == 'refs/heads/main'
+        run: |
+          # Get the latest commit message
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+
+          # Determine version bump type based on commit message
+          if [[ "$COMMIT_MSG" == *"BREAKING CHANGE"* || "$COMMIT_MSG" == *"!:"* ]]; then
+            echo "Detected breaking change, bumping major version"
+            npx standard-version --release-as major
+          elif [[ "$COMMIT_MSG" == *"feat:"* || "$COMMIT_MSG" == *"feat("* ]]; then
+            echo "Detected new feature, bumping minor version"
+            npx standard-version --release-as minor
+          else
+            echo "Bumping patch version"
+            npx standard-version --release-as patch
+          fi
+
+          # Push changes back to the repository
+          git push --follow-tags origin main
       - name: Publish to NPM
         run: npm publish
         env:

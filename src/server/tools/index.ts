@@ -63,10 +63,7 @@ export function setupToolHandlers(
       switch (request.params.name) {
         // Main tools
         case 'set_memory_bank_path': {
-          const { path: customPath } = request.params.arguments as { path: string };
-          if (!customPath) {
-            throw new McpError(ErrorCode.InvalidParams, 'Path not specified');
-          }
+          const { path: customPath } = request.params.arguments as { path?: string };
           return handleSetMemoryBankPath(memoryBankManager, customPath);
         }
 

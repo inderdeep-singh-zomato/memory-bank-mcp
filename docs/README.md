@@ -19,9 +19,14 @@ This directory contains the documentation for Memory Bank MCP, an MCP (Model Con
 - [**rule-examples.md**](./rule-examples.md) - Complete examples of rule files in JSON, YAML, and TOML
 - [**rule-formats.md**](./rule-formats.md) - Documentation on supported file formats for rules
 - [**implementation-plan-rule-formats.md**](./implementation-plan-rule-formats.md) - Implementation plan for multi-format rule support
+- [**npx-usage.md**](./npx-usage.md) - Guide for using Memory Bank MCP with npx
+- [**file-naming-convention.md**](./file-naming-convention.md) - Documentation on file naming conventions
+- [**migration-guide.md**](./migration-guide.md) - Guide for migrating between versions
+- [**testing-guide.md**](./testing-guide.md) - Comprehensive guide for testing
 
 ### Integration Documentation
 
+- [**cursor-integration.md**](./cursor-integration.md) - Detailed guide for integrating with Cursor code editor
 - [**roo-code-integration.md**](./roo-code-integration.md) - Explanation of the relationship with Roo Code Memory Bank
 - [**ai-assistant-integration.md**](./ai-assistant-integration.md) - Guide for integrating with AI assistants
 - [**integration-testing-guide.md**](./integration-testing-guide.md) - Step-by-step testing instructions for integration
@@ -54,6 +59,14 @@ Memory Bank MCP can be integrated with any AI assistant that supports the Model 
 - Claude (via Anthropic's MCP implementation)
 - GPT models (via OpenAI's MCP implementation)
 - Custom AI assistants built on MCP-compatible frameworks
+
+## Supported Editors
+
+Memory Bank MCP can be integrated with the following code editors:
+
+- **Cursor** - AI-powered code editor built on VS Code
+- **VS Code** - Through custom extensions that support MCP
+- **Any editor** - Through command-line interface
 
 ## Inspiration
 

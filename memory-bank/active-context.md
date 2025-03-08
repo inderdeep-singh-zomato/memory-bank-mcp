@@ -2,10 +2,24 @@
 
 ## Current Project State
 
-Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools and resources for managing memory banks. The code has been translated to English and improved with better error handling, more robust documentation, and additional utility methods. The build process has been configured to use Bun for improved performance. The project has been renamed from "memory-bank-server" to "@movibe/memory-bank-mcp" to follow npm scoped package naming conventions. Automated tests have been implemented for the clinerules integration using Bun's test runner.
+Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools and resources for managing memory banks. The code has been translated to English and improved with better error handling, more robust documentation, and additional utility methods. The build process has been configured to use Bun for improved performance. The project has been renamed from "memory-bank-server" to "@movibe/memory-bank-mcp" to follow npm scoped package naming conventions. Automated tests have been implemented for the clinerules integration using Bun's test runner. The package has been successfully published to npm and is available for global installation.
 
 ## Current Session Notes
 
+- [2:17:30 AM] Aprimoramento da Documentação: Atualizei o README.md para inglês, adicionei emojis em todas as seções para melhorar a apresentação visual e incluí uma nova seção detalhada sobre os diferentes modos do MCP (Code, Architect, Ask, Debug e Test) com instruções sobre como usar e alternar entre eles.
+- [2:15:54 AM] Atualização da Documentação para uso do npx: Atualizei o README.md e o docs/cursor-integration.md para usar npx em vez de instalação global do pacote Memory Bank MCP. Isso simplifica o processo de instalação e configuração para os usuários do Cursor, eliminando a necessidade de instalar o pacote globalmente.
+- [2:14:00 AM] Added Cursor Integration Documentation: Created comprehensive documentation for integrating Memory Bank MCP with Cursor. Added a detailed cursor-integration.md guide with configuration steps, usage examples, workflow examples, troubleshooting tips, and best practices. Updated the main README.md with a link to the new documentation and enhanced the docs/README.md index to include the new guide.
+- [2:12:42 AM] Enhanced README Documentation: Enhanced the README.md with comprehensive information about configuring Memory Bank MCP in Cursor, detailed explanations of how the MCP works, core components, data flow, Memory Bank structure, advanced features, and usage examples both as a command-line tool and as a library.
+- [2:10:24 AM] Decision Made: Implementation of Semantic Versioning with Changelog Generation
+- [2:10:18 AM] Added Versioning with Changelog Generation: Added automatic versioning with changelog generation to the GitHub Actions workflow for npm publish. Implemented Semantic Versioning and Conventional Commits for better version management. Created initial CHANGELOG.md, .versionrc.json configuration, and updated documentation with commit message guidelines.
+- [2:06:48 AM] English Translation of Memory Bank Files: Translated all remaining Portuguese content in the Memory Bank files to English. This includes entries in decision-log.md, progress.md, active-context.md, and modular-architecture-proposal.md. Also updated a comment in CoreTools.ts to English.
+- [2:04:23 AM] Decision Made: English Language Standardization for Memory Bank
+- [2:04:16 AM] Decision Made: Using Current Directory as Default for Memory Bank
+- [2:04:09 AM] Memory Bank Language Configuration: We modified the project to always generate the Memory Bank in English, regardless of the system locale. We added a language property to the MemoryBankManager class and updated the templates to ensure they are always in English.
+- [2:04:05 AM] Memory Bank Path Update: We modified the project so that if no folder is specified for the Memory Bank, it uses the current project folder. We changed the setCustomPath and handleSetMemoryBankPath methods to accept optional parameters and use the current directory as default.
+- [1:56:18 AM] Decision Made: Memory Bank Path Configuration
+- [1:55:57 AM] Memory Bank Configuration: We successfully configured the Memory Bank path to /Users/movibe/Documents/Cline/MCP/memory-bank-server/memory-bank. We verified that all core files are present and the Memory Bank is working correctly.
+- NPM Publication: Successfully published the @movibe/memory-bank-mcp package version 0.1.0 to the npm registry. The package is now available for global installation and can be run as a command-line tool. Verified that the package works correctly when installed globally.
 - GitHub Actions Workflow Update: Modified the npm-publish.yml workflow to automatically publish a new version to NPM whenever there's a merge to the main branch. Added auto-increment version functionality that bumps the patch version before publishing. This ensures that the package is always up-to-date on NPM without requiring manual version bumps and tag creation.
 - Memory Bank Update: Attempted to update the Memory Bank system. Identified that the Memory Bank files already exist in the memory-bank directory but the MCP tools are having trouble recognizing them. The Memory Bank contains comprehensive documentation and progress tracking for the Memory Bank MCP project, which has been translated to English and configured for npm publication.
 - Standardized Memory Bank file naming pattern: Implemented a consistent kebab-case naming pattern for Memory Bank files. Changes include:
@@ -108,16 +122,18 @@ All project documentation and Memory Bank files are now consistently in English,
 ## Ongoing Tasks
 
 - Standardize Memory Bank file naming pattern
-- Fix Memory Bank recognition issues
+- Maintain and update the npm package
+- Ensure all Memory Bank templates are in English
 
 ## Known Issues
 
 - Verify if the build process is correctly generating type declaration files
-- Memory Bank tools are having trouble recognizing the existing Memory Bank directory
 
 ## Next Steps
 
 - Add tests for the new MigrationUtils class
 - Update existing tests to use the new file naming convention
 - Create a migration guide for users with existing Memory Banks
-- Investigate and fix Memory Bank recognition issues
+- Consider implementing semantic versioning for future releases
+- Add more examples of using the package via npx in the documentation
+- Document the English-only approach in the project documentation
