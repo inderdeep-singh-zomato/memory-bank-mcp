@@ -13,7 +13,6 @@ The documentation is organized into the following categories:
 - [**README.md**](../README.md) - Main project README with overview and quick start
 - [**npx-usage.md**](./npx-usage.md) - Guide for using Memory Bank MCP with npx
 - [**build-with-bun.md**](./build-with-bun.md) - Guide for building the project with Bun
-- [**environment-variables.md**](./environment-variables.md) - Documentation on environment variables
 
 ### 2. Core Concepts
 

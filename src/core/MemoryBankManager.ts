@@ -215,33 +215,27 @@ export class MemoryBankManager {
       // Use the provided path directly as the memory bank path
       const memoryBankPath = dirPath;
       
-      // Create subdirectories
-      const dirs = [
-        'progress',
-        'decisions',
-        'context',
-        'templates',
-        'backups',
-        'modes',
-      ];
-      
-      for (const dir of dirs) {
-        await FileUtils.ensureDirectory(path.join(memoryBankPath, dir));
-      }
-      
-      // Create initial files
+      // Create initial files in the root directory
       const initialFiles = [
         {
-          path: path.join(memoryBankPath, 'progress', 'progress.md'),
+          path: path.join(memoryBankPath, 'product-context.md'),
+          content: coreTemplates.find(t => t.name === 'product-context.md')?.content || '',
+        },
+        {
+          path: path.join(memoryBankPath, 'active-context.md'),
+          content: coreTemplates.find(t => t.name === 'active-context.md')?.content || '',
+        },
+        {
+          path: path.join(memoryBankPath, 'progress.md'),
           content: coreTemplates.find(t => t.name === 'progress.md')?.content || '',
         },
         {
-          path: path.join(memoryBankPath, 'decisions', 'decisions.md'),
-          content: coreTemplates.find(t => t.name === 'decisions.md')?.content || '',
+          path: path.join(memoryBankPath, 'decision-log.md'),
+          content: coreTemplates.find(t => t.name === 'decision-log.md')?.content || '',
         },
         {
-          path: path.join(memoryBankPath, 'context', 'active-context.md'),
-          content: coreTemplates.find(t => t.name === 'active-context.md')?.content || '',
+          path: path.join(memoryBankPath, 'system-patterns.md'),
+          content: coreTemplates.find(t => t.name === 'system-patterns.md')?.content || '',
         },
       ];
       

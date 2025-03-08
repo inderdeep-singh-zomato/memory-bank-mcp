@@ -182,3 +182,35 @@ This document tracks important decisions made during the development of the Memo
   - The project history and context are preserved
   - Recent improvements are properly documented
   - The Memory Bank is ready for future updates
+
+## Removal of Environment Variables Support
+- **Date:** 2025-03-08 5:19:03 PM
+- **Author:** @movibe
+- **Context:** The project was using environment variables (MEMORY_BANK_PROJECT_PATH, MEMORY_BANK_FOLDER_NAME, MEMORY_BANK_MODE, MEMORY_BANK_USER_ID) as an alternative way to configure the Memory Bank MCP. This approach was adding complexity to the codebase and documentation.
+- **Decision:** Remove all support for environment variables from the codebase and documentation, focusing exclusively on command-line arguments for configuration.
+- **Alternatives Considered:** 
+  - Keep environment variables support but mark as deprecated
+  - Keep environment variables support only for specific use cases
+  - Replace environment variables with a configuration file
+- **Consequences:** 
+  - Simplified codebase with fewer configuration options
+  - More consistent configuration approach
+  - Clearer documentation
+  - Reduced maintenance burden
+  - Users who were relying on environment variables will need to switch to command-line arguments
+
+## Memory Bank Directory Structure Simplification
+- **Date:** 2025-03-08 5:23:30 PM
+- **Author:** @movibe
+- **Context:** The Memory Bank initialization was creating unnecessary subdirectories (progress, decisions, context, templates, backups, modes) and placing files in those subdirectories, but the rest of the codebase expected the files to be in the root directory of the Memory Bank. This was causing confusion and potential issues with file access.
+- **Decision:** Simplify the Memory Bank directory structure by removing the creation of subdirectories and placing all core files directly in the root directory of the Memory Bank.
+- **Alternatives Considered:** 
+  - Keep the subdirectory structure but modify all file access code to look in subdirectories
+  - Create a hybrid approach with some files in subdirectories and some in the root
+  - Add symbolic links from the root to files in subdirectories
+- **Consequences:** 
+  - Simpler and more consistent directory structure
+  - Better alignment with how files are accessed throughout the codebase
+  - Easier maintenance and debugging
+  - Reduced risk of file access errors
+  - Cleaner user experience

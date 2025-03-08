@@ -51,11 +51,11 @@ The Memory Bank uses markdown (.md) files for documentation, following a consist
 
 The Memory Bank follows a standardized structure with the following core files:
 
-- `productContext.md` - Project overview
-- `activeContext.md` - Current project context
+- `product-context.md` - Project overview
+- `active-context.md` - Current project context
 - `progress.md` - Project progress
-- `decisionLog.md` - Decision log
-- `systemPatterns.md` - System patterns (this file)
+- `decision-log.md` - Decision log
+- `system-patterns.md` - System patterns (this file)
 
 ## MCP Tool Patterns
 
