@@ -17,12 +17,6 @@ Options:
   --user, -u <user>    Set user ID for tracking changes
   --help, -h           Display this help
   
-Environment Variables (deprecated, use command line arguments instead):
-  MEMORY_BANK_PROJECT_PATH  Set project path (fallback if --path not provided)
-  MEMORY_BANK_FOLDER_NAME   Set Memory Bank folder name (fallback if --folder not provided)
-  MEMORY_BANK_MODE          Set execution mode (fallback if --mode not provided)
-  MEMORY_BANK_USER_ID       Set user ID for tracking changes (fallback if --user not provided)
-  
 Examples:
   memory-bank-mcp
   memory-bank-mcp --mode code
@@ -57,23 +51,6 @@ function processArgs() {
     } else if (arg === '--help' || arg === '-h') {
       showHelp();
     }
-  }
-
-  // Environment variables are used as fallback if command line arguments are not provided
-  if (!options.mode && process.env.MEMORY_BANK_MODE) {
-    options.mode = process.env.MEMORY_BANK_MODE;
-  }
-  
-  if (!options.projectPath && process.env.MEMORY_BANK_PROJECT_PATH) {
-    options.projectPath = process.env.MEMORY_BANK_PROJECT_PATH;
-  }
-  
-  if (!options.folderName && process.env.MEMORY_BANK_FOLDER_NAME) {
-    options.folderName = process.env.MEMORY_BANK_FOLDER_NAME;
-  }
-  
-  if (!options.userId && process.env.MEMORY_BANK_USER_ID) {
-    options.userId = process.env.MEMORY_BANK_USER_ID;
   }
 
   return options;

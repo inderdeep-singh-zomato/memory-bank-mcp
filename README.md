@@ -24,9 +24,9 @@ Memory Bank Server provides a set of tools and resources for AI assistants to in
 
 ## Directory Structure 📁
 
-By default, Memory Bank uses a `memory-bank` directory in the root of your project. When you specify a project path using the `--path` option or `MEMORY_BANK_PROJECT_PATH` environment variable, the Memory Bank will be created or accessed at `<project_path>/memory-bank`.
+By default, Memory Bank uses a `memory-bank` directory in the root of your project. When you specify a project path using the `--path` option, the Memory Bank will be created or accessed at `<project_path>/memory-bank`.
 
-You can customize the name of the Memory Bank folder using the `--folder` option or `MEMORY_BANK_FOLDER_NAME` environment variable. For example, if you set `--folder custom-memory` or `MEMORY_BANK_FOLDER_NAME=custom-memory`, the Memory Bank will be created or accessed at `<project_path>/custom-memory`.
+You can customize the name of the Memory Bank folder using the `--folder` option. For example, if you set `--folder custom-memory`, the Memory Bank will be created or accessed at `<project_path>/custom-memory`.
 
 For more details on customizing the folder name, see [Custom Memory Bank Folder Name](docs/custom-folder-name.md).
 

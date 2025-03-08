@@ -110,24 +110,6 @@ export const coreTools = [
       required: ['random_string'],
     },
   },
-  {
-    name: 'set_environment_variable',
-    description: 'Set an environment variable for the Memory Bank server',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          description: 'Name of the environment variable',
-        },
-        value: {
-          type: 'string',
-          description: 'Value of the environment variable',
-        },
-      },
-      required: ['name', 'value'],
-    },
-  },
 ];
 
 /**
@@ -414,98 +396,43 @@ export async function handleGetMemoryBankStatus(
 }
 
 /**
- * Handles the migrate_file_naming tool
- * @param memoryBankManager Memory Bank Manager
- * @returns Result of the migration
+ * Processes the migrate_file_naming tool
+ * @param memoryBankManager Memory Bank Manager instance
+ * @returns Operation result
  */
 export async function handleMigrateFileNaming(
   memoryBankManager: MemoryBankManager
 ) {
   try {
-    const memoryBankDir = memoryBankManager.getMemoryBankDir();
-    if (!memoryBankDir) {
+    if (!memoryBankManager.getMemoryBankDir()) {
       return {
         content: [
           {
-            type: 'text',
+            type: "text",
             text: 'Memory Bank directory not found. Use initialize_memory_bank or set_memory_bank_path first.',
           },
         ],
-        isError: true,
       };
     }
 
-    const result = await MigrationUtils.migrateFileNamingConvention(memoryBankDir);
-
-    if (result.success) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Migration completed successfully. Migrated files: ${result.migratedFiles.join(', ')}`,
-          },
-        ],
-      };
-    } else {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Migration completed with errors: ${result.errors.join(', ')}. Migrated files: ${result.migratedFiles.join(', ')}`,
-          },
-        ],
-        isError: true,
-      };
-    }
+    const result = await memoryBankManager.migrateFileNaming();
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Migration completed. ${result.migrated.length} files migrated.`,
+        },
+      ],
+    };
   } catch (error) {
+    console.error("Error in handleMigrateFileNaming:", error);
     return {
       content: [
         {
-          type: 'text',
-          text: `Error during migration: ${error}`,
+          type: "text",
+          text: `Error migrating file naming: ${error}`,
         },
       ],
-      isError: true,
     };
   }
-}
-
-/**
- * Processes the set_environment_variable tool
- * @param name Name of the environment variable
- * @param value Value of the environment variable
- * @returns Operation result
- */
-export function handleSetEnvironmentVariable(name: string, value: string) {
-  // Only allow setting specific environment variables for security
-  const allowedEnvVars = [
-    'MEMORY_BANK_USER_ID',
-    'MEMORY_BANK_MODE',
-    'MEMORY_BANK_PROJECT_PATH',
-    'MEMORY_BANK_FOLDER_NAME'
-  ];
-  
-  if (!allowedEnvVars.includes(name)) {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Error: Cannot set environment variable ${name}. Only the following variables are allowed: ${allowedEnvVars.join(', ')}`,
-        },
-      ],
-      isError: true,
-    };
-  }
-  
-  // Set the environment variable
-  process.env[name] = value;
-  
-  return {
-    content: [
-      {
-        type: 'text',
-        text: `Environment variable ${name} set to ${value}`,
-      },
-    ],
-  };
 }

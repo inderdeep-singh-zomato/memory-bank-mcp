@@ -2,7 +2,7 @@
 
 ## Overview
 
-Memory Bank MCP now allows you to customize the name of the folder where the Memory Bank is stored. This feature provides greater flexibility for projects that may already have a `memory-bank` directory for other purposes or that want to use a different naming convention.
+Memory Bank MCP allows you to customize the name of the folder where the Memory Bank is stored. This feature provides greater flexibility for projects that may already have a `memory-bank` directory for other purposes or that want to use a different naming convention.
 
 ## Configuration Options
 
@@ -16,18 +16,6 @@ npx @movibe/memory-bank-mcp --folder custom-memory
 
 # Combine with other options
 npx @movibe/memory-bank-mcp --path /path/to/project --folder custom-memory --mode code
-```
-
-### Environment Variable
-
-You can also set the folder name using the `MEMORY_BANK_FOLDER_NAME` environment variable:
-
-```bash
-# Set the environment variable
-export MEMORY_BANK_FOLDER_NAME=custom-memory
-
-# Run Memory Bank MCP
-npx @movibe/memory-bank-mcp
 ```
 
 ### Default Value
@@ -93,4 +81,4 @@ If you've started the Memory Bank MCP server with a custom folder name, the abov
 - Choose a descriptive folder name that reflects the purpose of the Memory Bank
 - Use consistent folder names across related projects
 - Document the folder name used for each project to ensure consistency
-- Consider using environment variables in CI/CD pipelines to ensure consistent folder names across environments
+- Consider using configuration files or scripts to ensure consistent folder names across environments

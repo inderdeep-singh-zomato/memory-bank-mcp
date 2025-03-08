@@ -45,7 +45,7 @@ export class MemoryBankManager {
       console.error(`MemoryBankManager initialized with current directory: ${this.projectPath}`);
     }
     
-    this.userId = userId || process.env.MEMORY_BANK_USER_ID || "Unknown User";
+    this.userId = userId || "Unknown User";
     console.error(`MemoryBankManager initialized with user ID: ${this.userId}`);
     
     if (folderName) {

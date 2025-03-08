@@ -4,7 +4,7 @@ import { MemoryBankManager } from '../../core/MemoryBankManager.js';
 import { ProgressTracker } from '../../core/ProgressTracker.js';
 
 // Import tools and handlers
-import { coreTools, handleSetMemoryBankPath, handleInitializeMemoryBank, handleReadMemoryBankFile, handleWriteMemoryBankFile, handleListMemoryBankFiles, handleGetMemoryBankStatus, handleMigrateFileNaming, handleSetEnvironmentVariable } from './CoreTools.js';
+import { coreTools, handleSetMemoryBankPath, handleInitializeMemoryBank, handleReadMemoryBankFile, handleWriteMemoryBankFile, handleListMemoryBankFiles, handleGetMemoryBankStatus, handleMigrateFileNaming } from './CoreTools.js';
 import { progressTools, handleTrackProgress } from './ProgressTools.js';
 import { contextTools, handleUpdateActiveContext } from './ContextTools.js';
 import { decisionTools, handleLogDecision } from './DecisionTools.js';
@@ -154,17 +154,6 @@ export function setupToolHandlers(
 
         case 'migrate_file_naming': {
           return handleMigrateFileNaming(memoryBankManager);
-        }
-
-        case 'set_environment_variable': {
-          const { name, value } = request.params.arguments as { name: string; value: string };
-          if (!name) {
-            throw new McpError(ErrorCode.InvalidParams, 'Environment variable name not specified');
-          }
-          if (value === undefined) {
-            throw new McpError(ErrorCode.InvalidParams, 'Environment variable value not specified');
-          }
-          return handleSetEnvironmentVariable(name, value);
         }
 
         // Progress tools

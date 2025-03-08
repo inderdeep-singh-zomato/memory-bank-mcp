@@ -18,11 +18,6 @@ This document describes the path handling in the Memory Bank MCP system. The sys
 - Absolute paths are used as-is.
 - The system handles both path formats correctly.
 
-### 3. Environment Variable Support
-
-- The `MEMORY_BANK_PROJECT_PATH` environment variable can be used to specify the project path.
-- This is particularly useful in environments with read-only file systems like Roo Code.
-
 ## Implementation Details
 
 ### Path Resolution Logic
@@ -60,21 +55,10 @@ memory-bank-mcp initialize_memory_bank path=/path/to/custom/memory-bank
 memory-bank-mcp set_memory_bank_path path=/path/to/custom/memory-bank
 ```
 
-### Using Environment Variable
-
-```bash
-# Set the project path using an environment variable
-export MEMORY_BANK_PROJECT_PATH=/path/to/project
-
-# Run Memory Bank MCP
-memory-bank-mcp
-```
-
 ## Best Practices
 
 1. **Use Relative Paths**: When possible, use relative paths to make your configuration more portable.
 2. **Be Consistent**: Use the same path format throughout your configuration.
-3. **Consider Environment Variables**: In environments with special requirements, use environment variables for path configuration.
 
 ---
 
