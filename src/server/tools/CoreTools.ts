@@ -28,10 +28,10 @@ export const coreTools = [
       properties: {
         path: {
           type: 'string',
-          description: 'Custom path for the Memory Bank',
+          description: 'Custom path for the Memory Bank. If not provided, the current directory will be used.',
         },
       },
-      required: ['path'],
+      required: [],
     },
   },
   {
@@ -103,12 +103,12 @@ export const coreTools = [
 /**
  * Processes the set_memory_bank_path tool
  * @param memoryBankManager Memory Bank Manager
- * @param customPath Custom path for the Memory Bank
+ * @param customPath Custom path for the Memory Bank (optional)
  * @returns Operation result
  */
 export async function handleSetMemoryBankPath(
   memoryBankManager: MemoryBankManager,
-  customPath: string
+  customPath?: string
 ) {
   memoryBankManager.setCustomPath(customPath);
   const CWD = process.cwd();
@@ -147,11 +147,11 @@ export async function handleInitializeMemoryBank(
   memoryBankManager: MemoryBankManager,
   dirPath: string
 ) {
-  // Usa o caminho personalizado se definido, caso contrário usa o padrão
-  const customPath = memoryBankManager.getCustomPath();
-  const basePath = customPath || dirPath;
   const CWD = process.cwd();
-  const fullPath = path.resolve(CWD, basePath, 'memory-bank');
+  const customPath = memoryBankManager.getCustomPath();
+  
+  // Use custom path if defined, otherwise use default
+  const fullPath = customPath ? path.resolve(CWD, dirPath) : dirPath;
 
   try {
     await memoryBankManager.initializeMemoryBank(fullPath);

@@ -17,6 +17,9 @@ export class MemoryBankManager {
   private progressTracker: ProgressTracker | null = null;
   private modeManager: ModeManager | null = null;
   private rulesLoader: ExternalRulesLoader | null = null;
+  
+  // Language is always set to English
+  private language: string = 'en';
 
   /**
    * Creates a new MemoryBankManager instance
@@ -24,10 +27,20 @@ export class MemoryBankManager {
   constructor() {}
 
   /**
+   * Gets the language used for the Memory Bank
+   * 
+   * @returns The language code (always 'en' for English)
+   */
+  getLanguage(): string {
+    return this.language;
+  }
+
+  /**
    * Finds a Memory Bank directory
    * 
    * Searches for a Memory Bank directory starting from the specified directory.
    * If a custom path is provided, it will check that path first.
+   * If no custom path is provided, it will use the current directory.
    * 
    * @param startDir - Starting directory for the search
    * @param customPath - Optional custom path to check
@@ -120,6 +133,7 @@ export class MemoryBankManager {
    * Initializes a new Memory Bank
    * 
    * Creates a new Memory Bank directory with all required template files.
+   * All templates are in English regardless of the system locale.
    * 
    * @param dirPath - Directory path where the Memory Bank will be created
    * @throws Error if initialization fails
@@ -128,6 +142,7 @@ export class MemoryBankManager {
     try {
       await FileUtils.ensureDirectory(dirPath);
       
+      // Create all template files in English
       for (const template of coreTemplates) {
         const filePath = path.join(dirPath, template.name);
         if (!(await FileUtils.fileExists(filePath))) {
@@ -138,7 +153,7 @@ export class MemoryBankManager {
       this.memoryBankDir = dirPath;
       this.progressTracker = new ProgressTracker(dirPath);
       
-      console.error(`Memory Bank initialized at ${dirPath}`);
+      console.error(`Memory Bank initialized at ${dirPath} (language: ${this.language})`);
     } catch (error) {
       console.error(`Failed to initialize Memory Bank at ${dirPath}:`, error);
       throw new Error(`Failed to initialize Memory Bank: ${error}`);
@@ -215,6 +230,7 @@ export class MemoryBankManager {
     coreFilesPresent: string[];
     missingCoreFiles: string[];
     isComplete: boolean;
+    language: string;
     lastUpdated?: Date;
   }> {
     if (!this.memoryBankDir) {
@@ -249,6 +265,7 @@ export class MemoryBankManager {
       coreFilesPresent: coreFiles.filter(file => files.includes(file)),
       missingCoreFiles,
       isComplete: missingCoreFiles.length === 0,
+      language: this.language,
       lastUpdated,
     };
   }
@@ -256,10 +273,12 @@ export class MemoryBankManager {
   /**
    * Sets a custom path for the Memory Bank
    * 
-   * @param customPath - Custom path
+   * If no path is provided, it will use the current directory.
+   * 
+   * @param customPath - Custom path (optional)
    */
-  setCustomPath(customPath: string): void {
-    this.customPath = customPath;
+  setCustomPath(customPath?: string): void {
+    this.customPath = customPath || process.cwd();
   }
 
   /**

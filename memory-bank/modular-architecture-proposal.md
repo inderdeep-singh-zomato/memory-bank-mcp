@@ -1,26 +1,26 @@
-# Proposta de Arquitetura Modular para o Memory Bank Server
+# Modular Architecture Proposal for Memory Bank Server
 
-## Visão Geral
+## Overview
 
-Após analisar o código e a documentação do projeto, proponho uma arquitetura modular para o Memory Bank Server, dividindo-o em componentes menores e mais gerenciáveis. Esta abordagem seguirá os princípios de responsabilidade única e separação de preocupações.
+After analyzing the code and project documentation, I propose a modular architecture for the Memory Bank Server, dividing it into smaller and more manageable components. This approach will follow the principles of single responsibility and separation of concerns.
 
-## Análise do Projeto Atual
+## Current Project Analysis
 
-O projeto atual tem as seguintes responsabilidades principais:
+The current project has the following main responsibilities:
 
-1. **Gerenciamento do Servidor MCP**: Configuração e execução do servidor MCP
-2. **Localização do Memory Bank**: Encontrar o diretório do Memory Bank
-3. **Inicialização do Memory Bank**: Criar os arquivos iniciais do Memory Bank
-4. **Rastreamento de Progresso**: Atualizar os arquivos do Memory Bank com informações de progresso
-5. **Manipulação de Arquivos**: Ler e escrever nos arquivos do Memory Bank
-6. **Gerenciamento de Ferramentas MCP**: Definir e implementar as ferramentas MCP
-7. **Gerenciamento de Recursos MCP**: Definir e implementar os recursos MCP
+1. **MCP Server Management**: Configuration and execution of the MCP server
+2. **Memory Bank Location**: Finding the Memory Bank directory
+3. **Memory Bank Initialization**: Creating the initial Memory Bank files
+4. **Progress Tracking**: Updating Memory Bank files with progress information
+5. **File Handling**: Reading and writing to Memory Bank files
+6. **MCP Tools Management**: Defining and implementing MCP tools
+7. **MCP Resources Management**: Defining and implementing MCP resources
 
-Todas essas responsabilidades estão atualmente em um único arquivo (`src/index.ts`), o que torna o código difícil de manter e evoluir.
+All these responsibilities are currently in a single file (`src/index.ts`), which makes the code difficult to maintain and evolve.
 
-## Proposta de Arquitetura
+## Architecture Proposal
 
-### Diagrama de Componentes
+### Component Diagram
 
 ```mermaid
 graph TD
@@ -39,37 +39,37 @@ graph TD
     M --> N[src/core/templates/CoreTemplates.ts]
 ```
 
-### Estrutura de Diretórios
+### Directory Structure
 
 ```
 src/
-├── index.ts                      # Ponto de entrada principal
-├── core/                         # Lógica principal do Memory Bank
-│   ├── MemoryBankManager.ts      # Gerenciamento do Memory Bank
-│   ├── ProgressTracker.ts        # Rastreamento de progresso
-│   └── templates/                # Templates para arquivos do Memory Bank
-│       ├── index.ts              # Exporta todos os templates
-│       └── CoreTemplates.ts      # Templates para arquivos principais
-├── server/                       # Código relacionado ao servidor MCP
-│   ├── MemoryBankServer.ts       # Classe principal do servidor
-│   ├── tools/                    # Ferramentas MCP
-│   │   ├── index.ts              # Exporta todas as ferramentas
-│   │   ├── CoreTools.ts          # Ferramentas principais
-│   │   ├── ProgressTools.ts      # Ferramentas de progresso
-│   │   ├── ContextTools.ts       # Ferramentas de contexto
-│   │   └── DecisionTools.ts      # Ferramentas de decisão
-│   └── resources/                # Recursos MCP
-│       ├── index.ts              # Exporta todos os recursos
-│       └── MemoryBankResources.ts # Recursos do Memory Bank
-└── utils/                        # Utilitários
-    └── FileUtils.ts              # Utilitários para manipulação de arquivos
+├── index.ts                      # Main entry point
+├── core/                         # Core Memory Bank logic
+│   ├── MemoryBankManager.ts      # Memory Bank management
+│   ├── ProgressTracker.ts        # Progress tracking
+│   └── templates/                # Templates for Memory Bank files
+│       ├── index.ts              # Export all templates
+│       └── CoreTemplates.ts      # Templates for main Memory Bank files
+├── server/                       # MCP code
+│   ├── MemoryBankServer.ts       # Main MCP server class
+│   ├── tools/                    # MCP tools
+│   │   ├── index.ts              # Export all tools
+│   │   ├── CoreTools.ts          # Main tools
+│   │   ├── ProgressTools.ts      # Progress tools
+│   │   ├── ContextTools.ts       # Context tools
+│   │   └── DecisionTools.ts      # Decision tools
+│   └── resources/                # MCP resources
+│       ├── index.ts              # Export all resources
+│       └── MemoryBankResources.ts # Memory Bank resources
+└── utils/                        # Utility functions
+    └── FileUtils.ts              # Utility functions for file handling
 ```
 
-## Detalhamento dos Módulos
+## Module Details
 
-### 1. Módulo Principal (`src/index.ts`)
+### 1. Main Module (`src/index.ts`)
 
-Este será o ponto de entrada principal do aplicativo. Ele importará e instanciará o `MemoryBankServer` e iniciará o servidor.
+This will be the main entry point for the application. It will import and instantiate the `MemoryBankServer` and start the server.
 
 ```typescript
 #!/usr/bin/env node
@@ -79,9 +79,9 @@ const server = new MemoryBankServer();
 server.run().catch(console.error);
 ```
 
-### 2. Módulo de Gerenciamento do Memory Bank (`src/core/MemoryBankManager.ts`)
+### 2. Memory Bank Management Module (`src/core/MemoryBankManager.ts`)
 
-Esta classe será responsável por gerenciar o Memory Bank, incluindo localização, inicialização e manipulação de arquivos.
+This class will be responsible for managing the Memory Bank, including location, initialization, and file handling.
 
 ```typescript
 import fs from "fs-extra";
@@ -95,14 +95,14 @@ export class MemoryBankManager {
 
   constructor() {}
 
-  // Métodos para gerenciar o Memory Bank
+  // Methods to manage the Memory Bank
   // ...
 }
 ```
 
-### 3. Módulo de Rastreamento de Progresso (`src/core/ProgressTracker.ts`)
+### 3. Progress Tracking Module (`src/core/ProgressTracker.ts`)
 
-Esta classe será responsável por rastrear o progresso do projeto e atualizar os arquivos do Memory Bank.
+This class will be responsible for tracking project progress and updating Memory Bank files.
 
 ```typescript
 import path from "path";
@@ -111,28 +111,28 @@ import { FileUtils } from "../utils/FileUtils";
 export class ProgressTracker {
   constructor(private memoryBankDir: string) {}
 
-  // Métodos para rastrear o progresso
+  // Methods to track progress
   // ...
 }
 ```
 
-### 4. Módulo de Utilitários de Arquivo (`src/utils/FileUtils.ts`)
+### 4. File Utility Module (`src/utils/FileUtils.ts`)
 
-Este módulo conterá funções utilitárias para manipulação de arquivos.
+This module will contain utility functions for file handling.
 
 ```typescript
 import fs from "fs-extra";
 import path from "path";
 
 export class FileUtils {
-  // Métodos utilitários para manipulação de arquivos
+  // Utility functions for file handling
   // ...
 }
 ```
 
-### 5. Módulo de Templates (`src/core/templates/CoreTemplates.ts`)
+### 5. Template Module (`src/core/templates/CoreTemplates.ts`)
 
-Este módulo conterá os templates para os arquivos principais do Memory Bank.
+This module will contain templates for main Memory Bank files.
 
 ```typescript
 export const productContextTemplate = `# Project Overview
@@ -143,18 +143,18 @@ export const activeContextTemplate = `# Current Context
 // Template content
 `;
 
-// Outros templates...
+// Other templates...
 
 export const coreTemplates = [
   { name: "productContext.md", content: productContextTemplate },
   { name: "activeContext.md", content: activeContextTemplate },
-  // Outros templates...
+  // Other templates...
 ];
 ```
 
-### 6. Módulo do Servidor MCP (`src/server/MemoryBankServer.ts`)
+### 6. MCP Server Module (`src/server/MemoryBankServer.ts`)
 
-Esta classe será responsável por configurar e executar o servidor MCP.
+This class will be responsible for configuring and executing the MCP server.
 
 ```typescript
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -165,57 +165,57 @@ import { setupToolHandlers } from "./tools";
 import { setupResourceHandlers } from "./resources";
 
 export class MemoryBankServer {
-  // Implementação do servidor MCP
+  // MCP server implementation
   // ...
 }
 ```
 
-### 7. Módulos de Ferramentas MCP
+### 7. MCP Tools Modules
 
-Estes módulos conterão as ferramentas MCP, divididas por funcionalidade:
+These modules will contain MCP tools, divided by functionality:
 
-- `src/server/tools/CoreTools.ts`: Ferramentas principais
-- `src/server/tools/ProgressTools.ts`: Ferramentas de progresso
-- `src/server/tools/ContextTools.ts`: Ferramentas de contexto
-- `src/server/tools/DecisionTools.ts`: Ferramentas de decisão
+- `src/server/tools/CoreTools.ts`: Main tools
+- `src/server/tools/ProgressTools.ts`: Progress tools
+- `src/server/tools/ContextTools.ts`: Context tools
+- `src/server/tools/DecisionTools.ts`: Decision tools
 
-### 8. Módulos de Recursos MCP
+### 8. MCP Resources Module
 
-Este módulo conterá os recursos MCP:
+This module will contain MCP resources:
 
-- `src/server/resources/MemoryBankResources.ts`: Recursos do Memory Bank
+- `src/server/resources/MemoryBankResources.ts`: Memory Bank resources
 
-## Benefícios da Nova Arquitetura
+## Benefits of the New Architecture
 
-1. **Separação de Preocupações**: Cada módulo tem uma responsabilidade específica, o que torna o código mais fácil de entender e manter.
-2. **Testabilidade**: A separação em módulos menores facilita a escrita de testes unitários.
-3. **Reutilização de Código**: Funções utilitárias e lógica de negócios podem ser reutilizadas em diferentes partes do código.
-4. **Escalabilidade**: A estrutura modular facilita a adição de novas funcionalidades sem afetar o código existente.
-5. **Manutenção**: Bugs e problemas são mais fáceis de identificar e corrigir em módulos menores.
+1. **Separation of Concerns**: Each module has a specific responsibility, making the code easier to understand and maintain.
+2. **Testability**: The separation into smaller modules makes it easier to write unit tests.
+3. **Code Reuse**: Utility functions and business logic can be reused in different parts of the code.
+4. **Scalability**: The modular structure makes it easy to add new features without affecting existing code.
+5. **Maintainability**: Bugs and issues are easier to identify and fix in smaller modules.
 
-## Plano de Implementação
+## Implementation Plan
 
-1. **Fase 1: Refatoração Inicial**
+1. **Phase 1: Initial Refactoring**
 
-   - Criar a estrutura de diretórios
-   - Mover o código existente para os novos módulos
-   - Garantir que o código continue funcionando
+   - Create directory structure
+   - Move existing code to new modules
+   - Ensure existing code continues to work
 
-2. **Fase 2: Melhorias**
+2. **Phase 2: Improvements**
 
-   - Implementar melhorias na API
-   - Adicionar validação de entrada
-   - Melhorar o tratamento de erros
+   - Implement API improvements
+   - Add input validation
+   - Improve error handling
 
-3. **Fase 3: Testes**
+3. **Phase 3: Tests**
 
-   - Escrever testes unitários para cada módulo
-   - Implementar testes de integração
+   - Write unit tests for each module
+   - Implement integration tests
 
-4. **Fase 4: Documentação**
-   - Atualizar a documentação para refletir a nova arquitetura
-   - Criar exemplos de uso
+4. **Phase 4: Documentation**
+   - Update documentation to reflect the new architecture
+   - Create usage examples
 
-## Conclusão
+## Conclusion
 
-A arquitetura proposta divide o projeto em módulos menores e mais gerenciáveis, seguindo os princípios de responsabilidade única e separação de preocupações. Isso tornará o código mais fácil de entender, manter e evoluir, além de facilitar a adição de novas funcionalidades no futuro.
+The proposed architecture divides the project into smaller and more manageable modules, following the principles of single responsibility and separation of concerns. This will make the code easier to understand, maintain, and evolve, as well as facilitate adding new features in the future.
