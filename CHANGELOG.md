@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0](https://github.com/movibe/memory-bank-server/compare/v0.1.2...v0.2.0) (2025-03-08)
+
+
+### Features
+
+* Add comprehensive test-memory-bank configuration and clinerule templates ([e95cd29](https://github.com/movibe/memory-bank-server/commit/e95cd2956003171c9989e40480d9736f1fb6f921))
+* Enhance Memory Bank Language Enforcement and Error Handling ([78af3d6](https://github.com/movibe/memory-bank-server/commit/78af3d60db863fcd57710ba51ea5ccd744b9e7ca))
+* Enhance Memory Bank MCP with Environment Variables and Roo Code Integration ([7059e5a](https://github.com/movibe/memory-bank-server/commit/7059e5a4e0363f184b4918982d9141474f39e9a1))
+* Enhance Type Safety and Interfaces for Memory Bank MCP ([7422abc](https://github.com/movibe/memory-bank-server/commit/7422abce3caa01a1a54d702506c6ad025285fa89))
+* Standardize Clinerule Templates to YAML Format ([dad5009](https://github.com/movibe/memory-bank-server/commit/dad5009d050ad36cfed7374facb45dc0045600d5))
+
+
+### Tests
+
+* Add comprehensive test suite for Memory Bank MCP server components ([0b2e244](https://github.com/movibe/memory-bank-server/commit/0b2e244effd78df94f6f6b7510372a9d479ce5e7))
+
+
+### Documentation
+
+* Add Memory Bank Status Prefix System Documentation ([8a0f1ca](https://github.com/movibe/memory-bank-server/commit/8a0f1caa3090cceabf4e3ad017c5a42cf2411cf7))
+
 ### [0.1.2](https://github.com/movibe/memory-bank-server/compare/v0.1.1...v0.1.2) (2025-03-08)
 
 
