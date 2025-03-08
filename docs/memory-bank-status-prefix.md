@@ -41,7 +41,7 @@ This special status appears temporarily when:
 The status prefix system is implemented through instructions in the `.clinerules` files for each mode. The key instruction is:
 
 ```yaml
-- "Status Prefix: Begin EVERY response with either '[MEMORY BANK: ACTIVE]' or '[MEMORY BANK: INACTIVE]'"
+- "Status Prefix: Begin EVERY response with either '[MEMORY BANK: ACTIVE]' or '[MEMORY BANK: INACTIVE]' or '[MEMORY BANK: UPDATING]'"
 ```
 
 This instruction is included in all mode configurations (architect, ask, code, debug, test) to ensure consistent status reporting regardless of the current operational mode.
@@ -54,6 +54,7 @@ The status prefix system provides several benefits:
 2. **Troubleshooting**: Makes it immediately obvious when Memory Bank is not properly configured
 3. **Context Awareness**: Helps users understand why certain responses may lack historical context
 4. **Operational Confidence**: Confirms when the Memory Bank is working correctly
+5. **Update Visibility**: Clearly indicates when the Memory Bank is being updated
 
 ## Usage Example
 
@@ -69,6 +70,14 @@ User: What's the status of the Memory Bank?
 
 [MEMORY BANK: INACTIVE]
 I cannot access the Memory Bank at the moment. The Memory Bank directory or its core files may be missing. Would you like me to switch to Architect mode to initialize the Memory Bank?
+
+User: Update Memory Bank
+
+[MEMORY BANK: UPDATING]
+I'm now updating the Memory Bank based on our conversation. I'll add information about the authentication feature discussion to the progress.md file and update the active-context.md with the current tasks.
+
+[MEMORY BANK: ACTIVE]
+Memory Bank has been updated successfully. I've added our discussion about the authentication feature to the progress.md file and updated the active-context.md with the current tasks.
 ```
 
 ## Troubleshooting
@@ -82,7 +91,10 @@ If you consistently see `[MEMORY BANK: INACTIVE]` when you expect the Memory Ban
 
 ## Related Documentation
 
-- [Memory Bank Initialization](memory-bank-initialization.md)
+- [Cline Integration](cline-integration.md)
 - [Usage Modes](usage-modes.md)
 - [Cursor Integration](cursor-integration.md)
-- [UMB Command](umb-command.md)
+
+---
+
+_Last updated: March 8, 2024_

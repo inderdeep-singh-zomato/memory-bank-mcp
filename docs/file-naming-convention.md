@@ -1,54 +1,65 @@
-# Memory Bank File Naming Convention
+# File Naming Convention
 
 ## Overview
 
-This document describes the file naming convention used in the Memory Bank system. Consistent file naming is important for maintainability, code clarity, and reducing the complexity of file path handling.
+This document describes the file naming conventions used in the Memory Bank MCP system. All Memory Bank files follow the kebab-case format (with hyphens) for consistency and readability.
 
-## Naming Pattern
+## Memory Bank File Names
 
-Memory Bank uses **kebab-case** for all file names, which means:
+### Core Files
 
-- All lowercase letters
-- Words separated by hyphens (`-`)
-- No spaces or special characters
-- File extension is `.md` for all Memory Bank files
+The Memory Bank system uses the following core files:
 
-## Core Memory Bank Files
+| File Name (kebab-case) | Description                                              |
+| ---------------------- | -------------------------------------------------------- |
+| `product-context.md`   | Overall project information and goals                    |
+| `active-context.md`    | Current state, ongoing tasks, and next steps             |
+| `progress.md`          | History of project updates and milestones                |
+| `decision-log.md`      | Record of important decisions with context and rationale |
+| `system-patterns.md`   | Architecture and code patterns used in the project       |
 
-The following core files are used in every Memory Bank:
+### Additional Files
 
-| File Name            | Description                       | URI                             |
-| -------------------- | --------------------------------- | ------------------------------- |
-| `product-context.md` | Project overview and context      | `memory-bank://product-context` |
-| `active-context.md`  | Current project context and tasks | `memory-bank://active-context`  |
-| `progress.md`        | Project progress and milestones   | `memory-bank://progress`        |
-| `decision-log.md`    | Project decisions and rationale   | `memory-bank://decision-log`    |
-| `system-patterns.md` | System patterns and architecture  | `memory-bank://system-patterns` |
+Additional files created in the Memory Bank should also follow the kebab-case convention:
 
-## URI to Filename Mapping
+- `user-stories.md`
+- `api-documentation.md`
+- `deployment-guide.md`
+- `feature-roadmap.md`
 
-The Memory Bank system uses a simple and consistent mapping between URIs and filenames:
+## Configuration Files
 
-1. URIs use the format `memory-bank://<name>`
-2. Filenames are derived directly from the URI path by adding the `.md` extension
-3. For example, `memory-bank://active-context` maps to `active-context.md`
+The system uses the following configuration files:
 
-This direct mapping eliminates the need for complex switch statements or mapping tables in the code.
+| File Name               | Description                  |
+| ----------------------- | ---------------------------- |
+| `.clinerules-architect` | Rules for the Architect mode |
+| `.clinerules-ask`       | Rules for the Ask mode       |
+| `.clinerules-code`      | Rules for the Code mode      |
+| `.clinerules-debug`     | Rules for the Debug mode     |
+| `.clinerules-test`      | Rules for the Test mode      |
 
-## Benefits
+## Historical Context
 
-- **Consistency**: All files follow the same naming pattern
-- **Simplicity**: Direct mapping between URIs and filenames
-- **Maintainability**: Easier to add new files without changing mapping code
-- **Readability**: File names clearly indicate their purpose
+The Memory Bank system previously used camelCase for file naming (e.g., `productContext.md`, `activeContext.md`). The system was migrated to kebab-case for better readability and consistency with common Markdown file naming conventions.
+
+For backward compatibility, the system still recognizes both formats, but all new files should use the kebab-case format.
 
 ## Migration
 
-When migrating from the previous naming convention (camelCase), the following files need to be renamed:
+If you have existing Memory Bank files in camelCase format, you can use the `migrate_file_naming` tool to automatically rename them to kebab-case:
 
-- `productContext.md` → `product-context.md`
-- `activeContext.md` → `active-context.md`
-- `decisionLog.md` → `decision-log.md`
-- `systemPatterns.md` → `system-patterns.md`
+```
+/mcp memory-bank-mcp migrate_file_naming random_string=migrate
+```
 
-The code has been updated to use the new naming convention, but existing Memory Banks will need to have their files renamed manually.
+## Best Practices
+
+1. **Use kebab-case for all new files**: All new files should use the kebab-case format (with hyphens).
+2. **Be consistent**: Use the same naming convention throughout your project.
+3. **Use descriptive names**: File names should clearly indicate the content of the file.
+4. **Keep names concise**: Avoid overly long file names.
+
+---
+
+_Last updated: March 8, 2024_

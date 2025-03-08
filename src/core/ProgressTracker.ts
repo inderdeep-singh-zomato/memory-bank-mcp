@@ -17,6 +17,8 @@ export interface ProgressDetails {
   timestamp?: Date;
   /** Optional additional metadata as key-value pairs */
   metadata?: Record<string, string | number | boolean>;
+  /** Optional user ID who performed the action */
+  userId?: string;
   /** 
    * Any additional properties
    * @deprecated Use metadata for additional properties instead
@@ -42,6 +44,8 @@ export interface Decision {
   date?: Date;
   /** Optional tags to categorize the decision */
   tags?: string[];
+  /** Optional user ID who made the decision */
+  userId?: string;
 }
 
 /**
@@ -61,18 +65,24 @@ export interface ActiveContext {
 }
 
 /**
- * Class responsible for tracking project progress and updating Memory Bank files
+ * Class for tracking progress and logging decisions
  * 
  * This class handles all operations related to tracking progress, logging decisions,
  * and updating the active context in the Memory Bank.
  */
 export class ProgressTracker {
+  private userId: string;
+
   /**
    * Creates a new ProgressTracker instance
    * 
    * @param memoryBankDir - Directory of the Memory Bank
+   * @param userId - User ID for tracking changes
    */
-  constructor(private memoryBankDir: string) {}
+  constructor(private memoryBankDir: string, userId?: string) {
+    // Use provided userId or "Unknown User" as default
+    this.userId = userId || "Unknown User";
+  }
 
   /**
    * Tracks project progress
@@ -85,6 +95,11 @@ export class ProgressTracker {
    */
   async trackProgress(action: string, details: ProgressDetails): Promise<void> {
     try {
+      // Add user ID to details if not already present
+      if (!details.userId) {
+        details.userId = this.userId;
+      }
+      
       // Update the progress file
       await this.updateProgressFile(action, details);
       
@@ -111,7 +126,8 @@ export class ProgressTracker {
       
       const timestamp = new Date().toISOString().split('T')[0];
       const time = new Date().toLocaleTimeString();
-      const newEntry = `- [${timestamp} ${time}] - ${action}: ${details.description}`;
+      const userId = details.userId || this.userId;
+      const newEntry = `- [${timestamp} ${time}] [${userId}] - ${action}: ${details.description}`;
       
       // Add the entry to the update history section
       const updateHistoryRegex = /## Update History\s+/;
@@ -148,7 +164,8 @@ export class ProgressTracker {
       // Add the entry to the current session notes section
       const sessionNotesRegex = /## Current Session Notes\s+/;
       const time = new Date().toLocaleTimeString();
-      const newNote = `- [${time}] ${action}: ${details.description}`;
+      const userId = details.userId || this.userId;
+      const newNote = `- [${time}] [${userId}] ${action}: ${details.description}`;
       
       if (sessionNotesRegex.test(contextContent)) {
         contextContent = contextContent.replace(
@@ -181,6 +198,7 @@ export class ProgressTracker {
       
       const timestamp = new Date().toISOString().split('T')[0];
       const time = new Date().toLocaleTimeString();
+      const userId = decision.userId || this.userId;
       
       // Format alternatives and consequences
       const alternatives = Array.isArray(decision.alternatives) 
@@ -194,6 +212,7 @@ export class ProgressTracker {
       const newDecision = `
 ## ${decision.title}
 - **Date:** ${timestamp} ${time}
+- **Author:** ${userId}
 - **Context:** ${decision.context}
 - **Decision:** ${decision.decision}
 - **Alternatives Considered:** 

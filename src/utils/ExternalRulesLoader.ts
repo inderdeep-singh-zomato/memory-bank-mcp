@@ -27,41 +27,19 @@ export class ExternalRulesLoader extends EventEmitter {
 
   /**
    * Gets a writable directory for storing .clinerules files
-   * Tries project directory first, then user's home directory, then temp directory
+   * Uses only the specified project directory without fallbacks
    * @returns A writable directory path
    */
   private async getWritableDirectory(): Promise<string> {
-    // Check if the project directory is writable
-    let targetDir = this.projectDir;
+    // Use only the project directory
+    const targetDir = this.projectDir;
     
     try {
       await fs.access(targetDir, fs.constants.W_OK);
       return targetDir;
     } catch (error) {
-      console.warn(`Project directory ${targetDir} is not writable, trying home directory...`);
-      
-      // Try user's home directory
-      targetDir = path.join(os.homedir(), '.clinerules');
-      
-      try {
-        await fs.ensureDir(targetDir);
-        await fs.access(targetDir, fs.constants.W_OK);
-        return targetDir;
-      } catch (error) {
-        console.warn(`Home directory ${targetDir} is not writable, trying temp directory...`);
-        
-        // Try temp directory
-        targetDir = path.join(os.tmpdir(), '.clinerules');
-        
-        try {
-          await fs.ensureDir(targetDir);
-          await fs.access(targetDir, fs.constants.W_OK);
-          return targetDir;
-        } catch (error) {
-          console.error(`Could not find a writable directory for .clinerules files`);
-          throw new Error(`Could not find a writable directory for .clinerules files`);
-        }
-      }
+      console.error(`Project directory ${targetDir} is not writable`);
+      throw new Error(`Project directory ${targetDir} is not writable`);
     }
   }
 
@@ -298,6 +276,7 @@ export class ExternalRulesLoader extends EventEmitter {
       const template = clineruleTemplates[mode];
       
       if (template) {
+        // Use only the path received via argument, without adding a folder
         const filePath = path.join(targetDir, filename);
         
         try {

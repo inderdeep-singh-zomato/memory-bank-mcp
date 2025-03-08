@@ -10,7 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 describe('Memory Bank Validation Tests', () => {
-  const tempDir = path.join(__dirname, 'temp-test-dir');
+  const tempDir = path.join(__dirname, 'temp-validation-test-dir');
+  const testUserId = 'test-user';
   let memoryBankManager: MemoryBankManager;
   let rulesLoader: ExternalRulesLoader;
   
@@ -44,8 +45,8 @@ describe('Memory Bank Validation Tests', () => {
       );
     }
     
-    // Initialize managers
-    memoryBankManager = new MemoryBankManager();
+    // Create a new MemoryBankManager for each test
+    memoryBankManager = new MemoryBankManager(undefined, testUserId);
     rulesLoader = new ExternalRulesLoader(tempDir);
   });
   
