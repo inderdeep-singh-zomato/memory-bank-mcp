@@ -1,64 +1,81 @@
-# Memory Bank Path Changes
+# Memory Bank Path Handling
 
 ## Overview
 
-This document describes the changes made to the Memory Bank initialization and path handling in the MCP (Memory Control Panel) system. The changes ensure that the Memory Bank is always created in a standardized location and that the necessary configuration files are present.
+This document describes the path handling in the Memory Bank MCP system. The system supports both standardized and custom paths for Memory Bank initialization and operation.
 
-## Changes Implemented
+## Current Path Handling
 
-### 1. Standardized Memory Bank Location
+### 1. Flexible Memory Bank Location
 
-- The Memory Bank is now **always** created in a directory named `memory-bank` at the root of the current project.
-- Custom paths are no longer supported for Memory Bank initialization.
-- The `findMemoryBankDir` method now only looks for the Memory Bank in the current directory, not in subdirectories.
+- Memory Bank can be created in a directory named `memory-bank` at the root of the current project (default behavior).
+- Custom paths are supported for Memory Bank initialization through the `path` parameter.
+- The system can find Memory Banks in the current directory or in specified paths.
 
-### 2. Validation of .clinerules Files
+### 2. Path Resolution
 
-- The system now validates that all required `.clinerules` files exist in the project root before initializing a Memory Bank.
-- Required files:
-  - `.clinerules-architect`
-  - `.clinerules-ask`
-  - `.clinerules-code`
-  - `.clinerules-debug`
-  - `.clinerules-test`
-- If any of these files are missing, the initialization will fail with an error message listing the missing files.
+- Relative paths are resolved relative to the current working directory.
+- Absolute paths are used as-is.
+- The system handles both path formats correctly.
+
+### 3. Environment Variable Support
+
+- The `MEMORY_BANK_PROJECT_PATH` environment variable can be used to specify the project path.
+- This is particularly useful in environments with read-only file systems like Roo Code.
 
 ## Implementation Details
 
-### MemoryBankManager Changes
+### Path Resolution Logic
 
-- Modified `findMemoryBankDir` to only look in the current directory
-- Added `validateClinerules` method to check for required .clinerules files
-- Updated `initializeMemoryBank` to validate .clinerules files and always create the Memory Bank in the current directory
-- Modified `initializeModeManager` to validate .clinerules files before initializing the mode manager
+The system uses the following logic to resolve paths:
 
-### ExternalRulesLoader Changes
+1. Check if the path is absolute
+2. If not, convert it to an absolute path using `path.resolve()`
+3. Use the resolved path for all operations
 
-- Added `validateRequiredFiles` method to check for required .clinerules files
-- Updated `detectAndLoadRules` to validate required files before loading rules
+### Memory Bank Detection
 
-### CoreTools Changes
+The system uses the following methods to detect Memory Banks:
 
-- Modified `handleInitializeMemoryBank` to always use the current directory
-- Modified `handleSetMemoryBankPath` to always use the current directory
+1. Check if the specified directory exists
+2. Check if the directory contains the required markdown files
+3. If both conditions are met, the directory is considered a valid Memory Bank
 
-## Testing
+## Usage Examples
 
-A new test file `memory-bank-validation.test.ts` was created to verify:
+### Using Default Path
 
-1. The validation of .clinerules files works correctly
-2. The Memory Bank is always created in the current directory
-3. The system fails gracefully when required files are missing
+```bash
+# Initialize a Memory Bank in the default location (./memory-bank)
+memory-bank-mcp initialize_memory_bank path=./memory-bank
+```
 
-## Usage Impact
+### Using Custom Path
 
-### For Users
+```bash
+# Initialize a Memory Bank in a custom location
+memory-bank-mcp initialize_memory_bank path=/path/to/custom/memory-bank
 
-- Memory Bank will always be created in a `memory-bank` directory at the root of the current project
-- All required .clinerules files must be present in the project root
+# Set a custom Memory Bank path
+memory-bank-mcp set_memory_bank_path path=/path/to/custom/memory-bank
+```
 
-### For Developers
+### Using Environment Variable
 
-- No need to handle custom paths for Memory Bank initialization
-- Always validate that required .clinerules files exist before initializing a Memory Bank
-- Always use the current directory as the root for Memory Bank operations
+```bash
+# Set the project path using an environment variable
+export MEMORY_BANK_PROJECT_PATH=/path/to/project
+
+# Run Memory Bank MCP
+memory-bank-mcp
+```
+
+## Best Practices
+
+1. **Use Relative Paths**: When possible, use relative paths to make your configuration more portable.
+2. **Be Consistent**: Use the same path format throughout your configuration.
+3. **Consider Environment Variables**: In environments with special requirements, use environment variables for path configuration.
+
+---
+
+_Last updated: March 8, 2024_
