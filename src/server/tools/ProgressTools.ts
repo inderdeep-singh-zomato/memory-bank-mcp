@@ -30,11 +30,11 @@ export const progressTools = [
 ];
 
 /**
- * Processa a ferramenta track_progress
+ * Processes the track_progress tool
  * @param progressTracker ProgressTracker
- * @param action Ação realizada
- * @param description Descrição da ação
- * @returns Resultado da operação
+ * @param action Action performed
+ * @param description Description of the action
+ * @returns Operation result
  */
 export async function handleTrackProgress(
   progressTracker: ProgressTracker,

@@ -3,7 +3,7 @@
  */
 
 /**
- * Template for the productContext.md file
+ * Template for the product-context.md file
  */
 export const productContextTemplate = `# Project Overview
 
@@ -28,7 +28,7 @@ export const productContextTemplate = `# Project Overview
 `;
 
 /**
- * Template for the activeContext.md file
+ * Template for the active-context.md file
  */
 export const activeContextTemplate = `# Current Context
 
@@ -70,7 +70,7 @@ export const progressTemplate = `# Project Progress
 `;
 
 /**
- * Template for the decisionLog.md file
+ * Template for the decision-log.md file
  */
 export const decisionLogTemplate = `# Decision Log
 
@@ -90,7 +90,7 @@ export const decisionLogTemplate = `# Decision Log
 `;
 
 /**
- * Template for the systemPatterns.md file
+ * Template for the system-patterns.md file
  */
 export const systemPatternsTemplate = `# System Patterns
 
@@ -108,9 +108,9 @@ export const systemPatternsTemplate = `# System Patterns
  * Array with all main templates
  */
 export const coreTemplates = [
-  { name: 'productContext.md', content: productContextTemplate },
-  { name: 'activeContext.md', content: activeContextTemplate },
+  { name: 'product-context.md', content: productContextTemplate },
+  { name: 'active-context.md', content: activeContextTemplate },
   { name: 'progress.md', content: progressTemplate },
-  { name: 'decisionLog.md', content: decisionLogTemplate },
-  { name: 'systemPatterns.md', content: systemPatternsTemplate },
+  { name: 'decision-log.md', content: decisionLogTemplate },
+  { name: 'system-patterns.md', content: systemPatternsTemplate },
 ];

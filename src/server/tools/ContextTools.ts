@@ -37,10 +37,10 @@ export const contextTools = [
 ];
 
 /**
- * Processa a ferramenta update_active_context
+ * Processes the update_active_context tool
  * @param progressTracker ProgressTracker
- * @param context Contexto a ser atualizado
- * @returns Resultado da operação
+ * @param context Context to be updated
+ * @returns Operation result
  */
 export async function handleUpdateActiveContext(
   progressTracker: ProgressTracker,

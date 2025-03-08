@@ -29,142 +29,31 @@ npm install @movibe/memory-bank-mcp
 # Or install globally
 npm install -g @movibe/memory-bank-mcp
 
-# Or use Bun
-bun install @movibe/memory-bank-mcp
+# Or run directly with npx (no installation required)
+npx @movibe/memory-bank-mcp
 ```
+
+## Usage with npx
+
+You can run Memory Bank MCP directly without installation using npx:
+
+```bash
+# Run with default settings
+npx @movibe/memory-bank-mcp
+
+# Run with specific mode
+npx @movibe/memory-bank-mcp --mode code
+
+# Show help
+npx @movibe/memory-bank-mcp --help
+```
+
+For more detailed information about using npx, see [npx-usage.md](docs/npx-usage.md).
 
 ## Usage
 
 ### As a Command Line Tool
 
-```bash
-# Initialize a Memory Bank in the current directory
-memory-bank-mcp init
-
-# Start the Memory Bank Server
-memory-bank-mcp start
-
-# Start with a specific mode
-memory-bank-mcp start --mode architect
 ```
 
-### As a Library
-
-```typescript
-import { MemoryBankServer } from "@movibe/memory-bank-mcp";
-
-async function main() {
-  // Optional: specify an initial mode
-  const server = new MemoryBankServer("code");
-  await server.run();
-}
-
-main().catch(console.error);
 ```
-
-## Memory Bank Structure
-
-A Memory Bank is a directory containing the following files:
-
-- `productContext.md`: Information about the product or project
-- `activeContext.md`: Current context and session notes
-- `progress.md`: Progress tracking and update history
-- `decisionLog.md`: Log of important decisions
-- `systemPatterns.md`: System patterns and architectural decisions
-
-## Mode Support
-
-Memory Bank Server can detect and use `.clinerules` files in the project directory to provide mode-specific behavior. The following modes are supported:
-
-- **architect**: Design and architecture focus
-- **ask**: Question answering focus
-- **code**: Implementation focus
-- **debug**: Debugging focus
-- **test**: Testing focus
-
-For more information about mode support, see [Clinerules Integration](docs/clinerules-integration.md).
-
-## Development
-
-### Prerequisites
-
-- Node.js 16+ or [Bun](https://bun.sh/)
-- npm, yarn, or bun
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/memory-bank-mcp.git
-cd memory-bank-mcp
-
-# Install dependencies
-npm install
-# or
-bun install
-
-# Build the project
-npm run build
-# or
-bun run build
-
-# Run the server
-npm start
-# or
-bun run start
-
-# Development mode with hot reloading
-bun run dev
-
-# Run tests
-bun test
-```
-
-For more information about building with Bun, see [Building with Bun](docs/build-with-bun.md).
-
-For more information about testing with Bun, see [Testing with Bun](docs/testing.md).
-
-### Project Structure
-
-- `src/core/`: Core functionality for Memory Bank management
-- `src/server/`: MCP server implementation
-- `src/utils/`: Utility functions
-- `src/index.ts`: Main entry point
-- `src/__tests__/`: Test files
-
-## Documentation
-
-For detailed documentation, see the [docs](docs) directory, which includes:
-
-- [Usage Modes](docs/usage-modes.md)
-- [Rule Formats](docs/rule-formats.md)
-- [AI Assistant Integration](docs/ai-assistant-integration.md)
-- [Integration Testing Guide](docs/integration-testing-guide.md)
-- [MCP Protocol Specification](docs/mcp-protocol-specification.md)
-
-## Versioning
-
-This project follows [Semantic Versioning](https://semver.org/). Releases are automatically published to npm when a tag is created.
-
-To create a new version:
-
-```bash
-# Patch version (bug fixes)
-npm run release:patch
-
-# Minor version (backward-compatible features)
-npm run release:minor
-
-# Major version (breaking changes)
-npm run release:major
-```
-
-## Contributing
-
-Contributions are welcome! Please read the [contribution guide](CONTRIBUTING.md) for more details on how to contribute to the project.
-
-This project follows a [Code of Conduct](CODE_OF_CONDUCT.md) that all contributors must follow.
-
-## License
-
-MIT

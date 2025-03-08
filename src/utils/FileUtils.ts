@@ -149,4 +149,18 @@ export class FileUtils {
   static joinPath(...paths: string[]): string {
     return path.join(...paths);
   }
+
+  /**
+   * Deletes a file
+   * 
+   * @param filePath - Path to the file to delete
+   * @throws Error if file deletion fails
+   */
+  static async deleteFile(filePath: string): Promise<void> {
+    try {
+      await fs.remove(filePath);
+    } catch (error) {
+      throw new Error(`Failed to delete file ${filePath}: ${error}`);
+    }
+  }
 }

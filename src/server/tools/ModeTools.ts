@@ -7,7 +7,7 @@ export const modeTools = [
   {
     name: 'switch_mode',
     description: 'Switches to a specific mode',
-    parameters: {
+    inputSchema: {
       type: 'object',
       properties: {
         mode: {
@@ -21,21 +21,15 @@ export const modeTools = [
   {
     name: 'get_current_mode',
     description: 'Gets information about the current mode',
-    parameters: {
+    inputSchema: {
       type: 'object',
-      properties: {
-        random_string: {
-          type: 'string',
-          description: 'Dummy parameter for tools without parameters',
-        },
-      },
-      required: ['random_string'],
+      properties: {},
     },
   },
   {
     name: 'process_umb_command',
     description: 'Processes the Update Memory Bank (UMB) command',
-    parameters: {
+    inputSchema: {
       type: 'object',
       properties: {
         command: {
@@ -44,6 +38,14 @@ export const modeTools = [
         },
       },
       required: ['command'],
+    },
+  },
+  {
+    name: 'complete_umb',
+    description: 'Completes the Update Memory Bank (UMB) process',
+    inputSchema: {
+      type: 'object',
+      properties: {},
     },
   },
 ];
@@ -158,7 +160,7 @@ export function handleProcessUmbCommand(memoryBankManager: MemoryBankManager, co
     };
   }
   
-  const success = memoryBankManager.activateUmb();
+  const success = memoryBankManager.activateUmbMode();
   
   if (!success) {
     return {
@@ -200,7 +202,7 @@ export function handleCompleteUmb(memoryBankManager: MemoryBankManager) {
     };
   }
   
-  memoryBankManager.deactivateUmb();
+  memoryBankManager.completeUmbMode();
   
   return {
     content: [

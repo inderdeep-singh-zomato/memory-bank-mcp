@@ -54,10 +54,11 @@ describe('MemoryBankManager Tests', () => {
     await fs.ensureDir(memoryBankDir);
     
     // Create core files
-    await fs.writeFile(path.join(memoryBankDir, 'productContext.md'), '# Product Context');
-    await fs.writeFile(path.join(memoryBankDir, 'activeContext.md'), '# Active Context');
+    await fs.writeFile(path.join(memoryBankDir, 'product-context.md'), '# Product Context');
+    await fs.writeFile(path.join(memoryBankDir, 'active-context.md'), '# Active Context');
     await fs.writeFile(path.join(memoryBankDir, 'progress.md'), '# Progress');
-    await fs.writeFile(path.join(memoryBankDir, 'decisionLog.md'), '# Decision Log');
+    await fs.writeFile(path.join(memoryBankDir, 'decision-log.md'), '# Decision Log');
+    await fs.writeFile(path.join(memoryBankDir, 'system-patterns.md'), '# System Patterns');
     
     // Check if directory is a Memory Bank
     const isMemoryBank = await memoryBankManager.isMemoryBank(memoryBankDir);
@@ -80,10 +81,11 @@ describe('MemoryBankManager Tests', () => {
     await fs.ensureDir(memoryBankDir);
     
     // Create core files
-    await fs.writeFile(path.join(memoryBankDir, 'productContext.md'), '# Product Context');
-    await fs.writeFile(path.join(memoryBankDir, 'activeContext.md'), '# Active Context');
+    await fs.writeFile(path.join(memoryBankDir, 'product-context.md'), '# Product Context');
+    await fs.writeFile(path.join(memoryBankDir, 'active-context.md'), '# Active Context');
     await fs.writeFile(path.join(memoryBankDir, 'progress.md'), '# Progress');
-    await fs.writeFile(path.join(memoryBankDir, 'decisionLog.md'), '# Decision Log');
+    await fs.writeFile(path.join(memoryBankDir, 'decision-log.md'), '# Decision Log');
+    await fs.writeFile(path.join(memoryBankDir, 'system-patterns.md'), '# System Patterns');
     
     // Find Memory Bank directory
     const foundDir = await memoryBankManager.findMemoryBankDir(tempDir);
@@ -110,17 +112,20 @@ describe('MemoryBankManager Tests', () => {
     expect(dirExists).toBe(true);
     
     // Verify core files were created
-    const productContextExists = await fs.pathExists(path.join(memoryBankDir, 'productContext.md'));
+    const productContextExists = await fs.pathExists(path.join(memoryBankDir, 'product-context.md'));
     expect(productContextExists).toBe(true);
     
-    const activeContextExists = await fs.pathExists(path.join(memoryBankDir, 'activeContext.md'));
+    const activeContextExists = await fs.pathExists(path.join(memoryBankDir, 'active-context.md'));
     expect(activeContextExists).toBe(true);
     
     const progressExists = await fs.pathExists(path.join(memoryBankDir, 'progress.md'));
     expect(progressExists).toBe(true);
     
-    const decisionLogExists = await fs.pathExists(path.join(memoryBankDir, 'decisionLog.md'));
+    const decisionLogExists = await fs.pathExists(path.join(memoryBankDir, 'decision-log.md'));
     expect(decisionLogExists).toBe(true);
+    
+    const systemPatternsExists = await fs.pathExists(path.join(memoryBankDir, 'system-patterns.md'));
+    expect(systemPatternsExists).toBe(true);
     
     // Verify Memory Bank directory was set
     const dir = memoryBankManager.getMemoryBankDir();
@@ -154,7 +159,7 @@ describe('MemoryBankManager Tests', () => {
     // Create Memory Bank directory with required files
     await fs.ensureDir(memoryBankDir);
     await fs.writeFile(path.join(memoryBankDir, 'progress.md'), '# Progress');
-    await fs.writeFile(path.join(memoryBankDir, 'activeContext.md'), '# Active Context');
+    await fs.writeFile(path.join(memoryBankDir, 'active-context.md'), '# Active Context');
     
     // Set Memory Bank directory
     memoryBankManager.setMemoryBankDir(memoryBankDir);
@@ -201,11 +206,11 @@ describe('MemoryBankManager Tests', () => {
     await fs.ensureDir(memoryBankDir);
     
     // Create core files
-    await fs.writeFile(path.join(memoryBankDir, 'productContext.md'), '# Product Context');
-    await fs.writeFile(path.join(memoryBankDir, 'activeContext.md'), '# Active Context');
+    await fs.writeFile(path.join(memoryBankDir, 'product-context.md'), '# Product Context');
+    await fs.writeFile(path.join(memoryBankDir, 'active-context.md'), '# Active Context');
     await fs.writeFile(path.join(memoryBankDir, 'progress.md'), '# Progress');
-    await fs.writeFile(path.join(memoryBankDir, 'decisionLog.md'), '# Decision Log');
-    await fs.writeFile(path.join(memoryBankDir, 'systemPatterns.md'), '# System Patterns');
+    await fs.writeFile(path.join(memoryBankDir, 'decision-log.md'), '# Decision Log');
+    await fs.writeFile(path.join(memoryBankDir, 'system-patterns.md'), '# System Patterns');
     
     // Set Memory Bank directory
     memoryBankManager.setMemoryBankDir(memoryBankDir);

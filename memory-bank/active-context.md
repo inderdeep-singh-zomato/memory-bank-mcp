@@ -6,6 +6,45 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Current Session Notes
 
+- Memory Bank Update: Attempted to update the Memory Bank system. Identified that the Memory Bank files already exist in the memory-bank directory but the MCP tools are having trouble recognizing them. The Memory Bank contains comprehensive documentation and progress tracking for the Memory Bank MCP project, which has been translated to English and configured for npm publication.
+- Standardized Memory Bank file naming pattern: Implemented a consistent kebab-case naming pattern for Memory Bank files. Changes include:
+
+1. Updated CoreTemplates.ts to use kebab-case for file names
+2. Simplified URI to filename mapping in MemoryBankResources.ts
+3. Updated ProgressTracker.ts to use kebab-case file names
+4. Created MigrationUtils.ts with a method to migrate existing files
+5. Added a new migrate_file_naming tool to help users migrate existing Memory Banks
+6. Created documentation in docs/file-naming-convention.md explaining the new convention
+7. Added deleteFile method to FileUtils class
+
+- Decision Made: Memory Bank File Naming Pattern Standardization
+- Reviewed Memory Bank file naming pattern: Analyzed the current file naming pattern in the Memory Bank system. Found inconsistencies between the URI naming convention (kebab-case with hyphens) and the actual file naming convention (camelCase). This creates a mapping requirement in the code that could be simplified. Also identified that the file extensions are hardcoded as .md throughout the codebase.
+- Updated Memory Bank to English: Translated all Memory Bank files to English, ensuring consistency across the project. The following changes were made:
+
+1. Translated the "Configuração para uso via npx" entry in the decision log to "Configuration for npx usage"
+2. Translated the "Implementado suporte para npx" entry in the progress file to "Implemented npx support"
+3. Updated all task descriptions and next steps in the active context file to English
+4. Ensured all Memory Bank files use consistent English terminology
+
+- File Update: Updated decisionLog.md
+- File Update: Updated activeContext.md
+- Translated files to English: Translated all generated files to English, including:
+
+1. docs/npx-usage.md - Full translation of the documentation
+2. src/index.ts - Translated help messages and comments
+3. package.json - Translated package description
+
+- Decision Made: Configuration for npx usage
+- Implemented npx support: Added support to run Memory Bank MCP via npx after npm publication. Changes include:
+
+1. Added bin configuration in package.json
+2. Verified shebang in main file
+3. Added prepublishOnly script to ensure build is run before publication
+4. Updated .npmignore to exclude unnecessary files
+5. Added support for --help option
+6. Updated documentation (README.md and docs/npx-usage.md)
+7. Specified minimum Node.js version
+
 - Translation to English: Translated Memory Bank files to English. The following changes were made:
 
 1. Updated activeContext.md to use English for all content
@@ -67,14 +106,17 @@ All project documentation and Memory Bank files are now consistently in English,
 
 ## Ongoing Tasks
 
-- Configure the project for npm publication
+- Standardize Memory Bank file naming pattern
+- Fix Memory Bank recognition issues
 
 ## Known Issues
 
 - Verify if the build process is correctly generating type declaration files
+- Memory Bank tools are having trouble recognizing the existing Memory Bank directory
 
 ## Next Steps
 
-- Configure NPM_TOKEN in GitHub to allow automatic publication
-- Test the publication process with an initial version
-- Add more unit tests to ensure code quality
+- Add tests for the new MigrationUtils class
+- Update existing tests to use the new file naming convention
+- Create a migration guide for users with existing Memory Banks
+- Investigate and fix Memory Bank recognition issues

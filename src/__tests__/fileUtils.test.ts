@@ -209,4 +209,35 @@ describe('FileUtils Tests', () => {
     // Verify joined path
     expect(joined).toBe(path.join('path', 'to', 'file.txt'));
   });
+  
+  test('Should delete file', async () => {
+    // Create a test file
+    await fs.writeFile(testFilePath, testContent);
+    
+    // Verify file exists
+    const existsBefore = await fs.pathExists(testFilePath);
+    expect(existsBefore).toBe(true);
+    
+    // Delete file
+    await FileUtils.deleteFile(testFilePath);
+    
+    // Verify file was deleted
+    const existsAfter = await fs.pathExists(testFilePath);
+    expect(existsAfter).toBe(false);
+  });
+  
+  test('Should handle deleteFile errors', async () => {
+    // Try to delete non-existent file
+    const nonExistentPath = path.join(tempDir, 'non-existent.txt');
+    
+    try {
+      await FileUtils.deleteFile(nonExistentPath);
+      // This should not throw an error as fs.remove doesn't throw if file doesn't exist
+      const exists = await fs.pathExists(nonExistentPath);
+      expect(exists).toBe(false);
+    } catch (error) {
+      // Should not reach here
+      expect(true).toBe(false);
+    }
+  });
 }); 

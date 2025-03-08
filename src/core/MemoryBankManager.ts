@@ -91,12 +91,24 @@ export class MemoryBankManager {
 
       // Check if at least one of the core files exists
       const files = await FileUtils.listFiles(dirPath);
+      
+      // Support both camelCase and kebab-case during transition
       const coreFiles = [
+        // Kebab-case (new format)
+        'product-context.md',
+        'active-context.md',
+        'progress.md',
+        'decision-log.md',
+        'system-patterns.md',
+        
+        // CamelCase (old format)
         'productContext.md',
         'activeContext.md',
         'progress.md',
         'decisionLog.md',
+        'systemPatterns.md'
       ];
+      
       return coreFiles.some(file => files.includes(file));
     } catch (error) {
       console.error(`Error checking if ${dirPath} is a Memory Bank:`, error);
@@ -323,45 +335,60 @@ export class MemoryBankManager {
   }
 
   /**
-   * Inicializa o gerenciador de modos
-   * @param initialMode Modo inicial (opcional)
+   * Initializes the mode manager
+   * 
+   * @param initialMode Initial mode to set (optional)
+   * @returns Promise that resolves when initialization is complete
    */
   async initializeModeManager(initialMode?: string): Promise<void> {
-    if (!this.rulesLoader) {
-      this.rulesLoader = new ExternalRulesLoader(process.cwd());
+    if (this.modeManager) {
+      return; // Already initialized
     }
     
-    if (!this.modeManager) {
-      this.modeManager = new ModeManager(this.rulesLoader);
-    }
+    // Load external rules
+    this.rulesLoader = new ExternalRulesLoader();
+    await this.rulesLoader.detectAndLoadRules();
+    
+    // Create mode manager
+    this.modeManager = new ModeManager(this.rulesLoader);
     
     await this.modeManager.initialize(initialMode);
     
-    // Atualizar o status do Memory Bank
-    this.updateMemoryBankStatus();
+    // Update Memory Bank status
+    await this.updateMemoryBankStatus();
   }
 
   /**
-   * Obtém o gerenciador de modos
-   * @returns Gerenciador de modos ou null se não inicializado
+   * Gets the mode manager
+   * 
+   * @returns Mode manager or null if not initialized
    */
   getModeManager(): ModeManager | null {
     return this.modeManager;
   }
 
   /**
-   * Atualiza o status do Memory Bank no gerenciador de modos
+   * Updates the Memory Bank status in the mode manager
    */
-  updateMemoryBankStatus(): void {
+  async updateMemoryBankStatus(): Promise<void> {
     if (this.modeManager) {
-      const status = this.memoryBankDir ? 'ACTIVE' : 'INACTIVE';
+      let status: 'ACTIVE' | 'INACTIVE' = 'INACTIVE';
+      
+      if (this.memoryBankDir) {
+        // Check if the directory is a valid Memory Bank
+        const isValid = await this.isMemoryBank(this.memoryBankDir);
+        if (isValid) {
+          status = 'ACTIVE';
+        }
+      }
+      
       this.modeManager.setMemoryBankStatus(status);
     }
   }
 
   /**
-   * Obtém o prefixo de status para respostas
-   * @returns Prefixo de status
+   * Gets the status prefix for responses
+   * @returns Status prefix
    */
   getStatusPrefix(): string {
     if (this.modeManager) {
@@ -371,9 +398,9 @@ export class MemoryBankManager {
   }
 
   /**
-   * Verifica se um texto corresponde ao gatilho UMB
-   * @param text Texto a ser verificado
-   * @returns true se o texto corresponder ao gatilho UMB, false caso contrário
+   * Checks if a text matches the UMB trigger
+   * @param text Text to be checked
+   * @returns true if the text matches the UMB trigger, false otherwise
    */
   checkUmbTrigger(text: string): boolean {
     if (this.modeManager) {
@@ -383,10 +410,11 @@ export class MemoryBankManager {
   }
 
   /**
-   * Ativa o modo UMB
-   * @returns true se a ativação foi bem-sucedida, false caso contrário
+   * Activates UMB mode
+   * 
+   * @returns true if UMB mode was activated, false otherwise
    */
-  activateUmb(): boolean {
+  activateUmbMode(): boolean {
     if (this.modeManager) {
       return this.modeManager.activateUmb();
     }
@@ -394,17 +422,21 @@ export class MemoryBankManager {
   }
 
   /**
-   * Desativa o modo UMB
+   * Deactivates UMB mode
+   * 
+   * @returns true if UMB mode was deactivated, false otherwise
    */
-  deactivateUmb(): void {
+  async completeUmbMode(): Promise<boolean> {
     if (this.modeManager) {
       this.modeManager.deactivateUmb();
+      return true;
     }
+    return false;
   }
 
   /**
-   * Verifica se o modo UMB está ativo
-   * @returns true se o modo UMB estiver ativo, false caso contrário
+   * Checks if UMB mode is active
+   * @returns true if UMB mode is active, false otherwise
    */
   isUmbModeActive(): boolean {
     if (this.modeManager) {
@@ -426,13 +458,25 @@ export class MemoryBankManager {
   }
 
   /**
-   * Verifica se um texto corresponde a algum gatilho de modo
-   * @param text Texto a ser verificado
-   * @returns Array com os modos correspondentes aos gatilhos encontrados
+   * Checks if a text matches any mode trigger
+   * @param text Text to be checked
+   * @returns Array with modes corresponding to the triggers found
    */
   checkModeTriggers(text: string): string[] {
     if (this.modeManager) {
       return this.modeManager.checkModeTriggers(text);
+    }
+    return [];
+  }
+
+  /**
+   * Detects mode triggers in a message
+   * @param message Message to check for triggers
+   * @returns Array with modes corresponding to the triggers found
+   */
+  detectModeTriggers(message: string): string[] {
+    if (this.modeManager) {
+      return this.modeManager.checkModeTriggers(message);
     }
     return [];
   }
