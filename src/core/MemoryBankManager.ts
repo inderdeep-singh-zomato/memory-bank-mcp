@@ -5,6 +5,7 @@ import { ProgressTracker } from './ProgressTracker.js';
 import { ModeManager } from '../utils/ModeManager.js';
 import { ExternalRulesLoader } from '../utils/ExternalRulesLoader.js';
 import fs from 'fs';
+import { MemoryBankStatus, ModeState } from '../types/index.js';
 
 /**
  * Class responsible for managing Memory Bank operations
@@ -346,15 +347,7 @@ export class MemoryBankManager {
    * @returns Status object with information about the Memory Bank
    * @throws Error if the Memory Bank directory is not set
    */
-  async getStatus(): Promise<{
-    path: string;
-    files: string[];
-    coreFilesPresent: string[];
-    missingCoreFiles: string[];
-    isComplete: boolean;
-    language: string;
-    lastUpdated?: Date;
-  }> {
+  async getStatus(): Promise<MemoryBankStatus> {
     try {
       if (!this.memoryBankDir) {
         throw new Error('Memory Bank directory not set');
