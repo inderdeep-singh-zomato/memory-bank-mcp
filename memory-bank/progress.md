@@ -6,6 +6,15 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Update History
 
+- [2025-03-08] - File Update: Updated documentation-structure.md
+- [2025-03-08] - Decision Made: Documentation Structure Consolidation
+- [2025-03-08] - Documentation Consolidation: Consolidated all documentation into a single docs directory. Previously, documentation was split between the main docs directory and memory-bank/docs. Now all documentation is organized in a single location with a comprehensive README.md that categorizes the documentation files into Core Documentation, Usage Documentation, and Integration Documentation. Updated the main README.md to reference the consolidated documentation directory.
+- [2025-03-08] - File Update: Updated docs/README.md
+- [2025-03-08] - Decision Made: AI Assistant Integration Documentation
+- [2025-03-08] - AI Assistant Integration Documentation: Created comprehensive documentation for integrating Memory Bank MCP with AI assistants that support the Model Context Protocol (MCP). Added three new documentation files: (1) ai-assistant-integration.md with detailed integration methods and examples, (2) integration-testing-guide.md with step-by-step testing instructions and sample code, and (3) mcp-protocol-specification.md with a complete specification of the Memory Bank MCP protocol. These documents provide developers with all the information needed to integrate Memory Bank MCP with various AI assistants.
+- [2025-03-08] - File Update: Updated docs/mcp-protocol-specification.md
+- [2025-03-08] - File Update: Updated docs/integration-testing-guide.md
+- [2025-03-08] - File Update: Updated docs/ai-assistant-integration.md
 - [2025-03-08] - Documentation: Updated usage-modes.md (from modos-de-uso.md), rule-examples.md, rule-formats.md, implementation-plan-rule-formats.md, and a README.md index file for the documentation. All files are now properly organized in the memory-bank/docs directory.
 - [2025-03-08] - File Update: Updated docs/usage-modes.md
 - [2025-03-08] - File Update: Updated docs/implementation-plan-rule-formats.md

@@ -128,6 +128,16 @@ For more information about testing with Bun, see [Testing with Bun](docs/testing
 - `src/index.ts`: Main entry point
 - `src/__tests__/`: Test files
 
+## Documentation
+
+For detailed documentation, see the [docs](docs) directory, which includes:
+
+- [Usage Modes](docs/usage-modes.md)
+- [Rule Formats](docs/rule-formats.md)
+- [AI Assistant Integration](docs/ai-assistant-integration.md)
+- [Integration Testing Guide](docs/integration-testing-guide.md)
+- [MCP Protocol Specification](docs/mcp-protocol-specification.md)
+
 ## License
 
 MIT
