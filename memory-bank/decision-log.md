@@ -114,3 +114,15 @@ This document tracks important decisions made during the development of the Memo
   - The system is more flexible and can be configured in containerized environments
   - Environment variables take precedence over command-line arguments, providing a clear priority order
   - Added documentation makes it easy for users to understand how to use the environment variables
+
+## Memory Bank Location
+- **Date:** 2025-03-08 10:59:25 AM
+- **Context:** Needed to determine where to store the Memory Bank files for the project
+- **Decision:** Initialized Memory Bank in /Users/movibe/Documents/Cline/MCP/memory-bank-server
+- **Alternatives Considered:** 
+  - Use default location
+  - Create a separate repository for Memory Bank
+- **Consequences:** 
+  - Memory Bank files will be stored alongside the server code
+  - Easier access to project documentation
+  - Version control will include Memory Bank updates

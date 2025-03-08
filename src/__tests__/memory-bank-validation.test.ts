@@ -109,8 +109,8 @@ describe('Memory Bank Validation Tests', () => {
     // Initialize memory bank
     await memoryBankManager.initializeMemoryBank(tempDir);
     
-    // Check if memory-bank directory was created in the current directory (process.cwd())
-    const mbDir = path.join(process.cwd(), 'memory-bank');
+    // Check if memory-bank directory was created in the specified directory (tempDir)
+    const mbDir = path.join(tempDir, 'memory-bank');
     expect(await fs.pathExists(mbDir)).toBe(true);
     
     // Check if core files were created
