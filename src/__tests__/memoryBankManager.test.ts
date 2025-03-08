@@ -9,7 +9,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 describe('MemoryBankManager Tests', () => {
-  const tempDir = path.join(__dirname, 'temp-memorybank-test-dir');
+  const tempDir = path.join(__dirname, 'temp-test-dir');
+  const testUserId = 'test-user';
   const memoryBankDir = path.join(tempDir, 'memory-bank');
   let memoryBankManager: MemoryBankManager;
   
@@ -18,7 +19,7 @@ describe('MemoryBankManager Tests', () => {
     await fs.ensureDir(tempDir);
     
     // Create a new MemoryBankManager for each test
-    memoryBankManager = new MemoryBankManager();
+    memoryBankManager = new MemoryBankManager(undefined, testUserId);
   });
   
   afterEach(async () => {
@@ -27,25 +28,27 @@ describe('MemoryBankManager Tests', () => {
   });
   
   test('Should set and get project path', () => {
-    // Create a new MemoryBankManager with a custom project path
-    const customProjectPath = path.join(tempDir, 'custom-project');
-    const managerWithPath = new MemoryBankManager(customProjectPath);
+    // Set a custom project path
+    const customProjectPath = '/custom/project/path';
     
-    // Get project path
+    // Create a new MemoryBankManager with a custom project path
+    const managerWithPath = new MemoryBankManager(customProjectPath, testUserId);
+    
+    // Get the project path
     const projectPath = managerWithPath.getProjectPath();
     
-    // Verify
+    // Verify the project path
     expect(projectPath).toBe(customProjectPath);
   });
   
-  test('Should use default project path when not provided', () => {
+  test('Should use current directory if no project path is provided', () => {
     // Create a new MemoryBankManager without a custom project path
-    const managerWithoutPath = new MemoryBankManager();
+    const managerWithoutPath = new MemoryBankManager(undefined, testUserId);
     
-    // Get project path
+    // Get the project path
     const projectPath = managerWithoutPath.getProjectPath();
     
-    // Verify it uses process.cwd() as default
+    // Verify the project path is the current directory
     expect(projectPath).toBe(process.cwd());
   });
   

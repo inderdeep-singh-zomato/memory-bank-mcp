@@ -73,8 +73,13 @@ export const coreTools = [
     description: 'List Memory Bank files',
     inputSchema: {
       type: 'object',
-      properties: {},
-      required: [],
+      properties: {
+        random_string: {
+          type: 'string',
+          description: 'Dummy parameter for no-parameter tools',
+        },
+      },
+      required: ['random_string'],
     },
   },
   {
@@ -82,8 +87,13 @@ export const coreTools = [
     description: 'Check Memory Bank status',
     inputSchema: {
       type: 'object',
-      properties: {},
-      required: [],
+      properties: {
+        random_string: {
+          type: 'string',
+          description: 'Dummy parameter for no-parameter tools',
+        },
+      },
+      required: ['random_string'],
     },
   },
   {
@@ -100,12 +110,30 @@ export const coreTools = [
       required: ['random_string'],
     },
   },
+  {
+    name: 'set_environment_variable',
+    description: 'Set an environment variable for the Memory Bank server',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Name of the environment variable',
+        },
+        value: {
+          type: 'string',
+          description: 'Value of the environment variable',
+        },
+      },
+      required: ['name', 'value'],
+    },
+  },
 ];
 
 /**
  * Processes the set_memory_bank_path tool
  * @param memoryBankManager Memory Bank Manager
- * @param customPath Custom path for the Memory Bank (ignored, always uses current directory)
+ * @param customPath Custom path for the Memory Bank
  * @returns Operation result
  */
 export async function handleSetMemoryBankPath(
@@ -119,27 +147,20 @@ export async function handleSetMemoryBankPath(
   const absolutePath = path.isAbsolute(basePath) ? basePath : path.resolve(process.cwd(), basePath);
   console.error('Using absolute path for Memory Bank:', absolutePath);
   
-  memoryBankManager.setCustomPath(absolutePath);
+  // Set the custom path and check for a memory-bank directory
+  await memoryBankManager.setCustomPath(absolutePath);
   
-  // Check for files in both project directory and fallback directory
-  const directMemoryBankPath = path.join(absolutePath, 'memory-bank');
-  if (await FileUtils.fileExists(directMemoryBankPath) && await FileUtils.isDirectory(directMemoryBankPath)) {
-    // Check if it contains .md files
-    const files = await FileUtils.listFiles(directMemoryBankPath);
-    const mdFiles = files.filter(file => file.endsWith('.md'));
-    
-    if (mdFiles.length > 0) {
-      memoryBankManager.setMemoryBankDir(directMemoryBankPath);
-      
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Memory Bank path set to ${directMemoryBankPath}`,
-          },
-        ],
-      };
-    }
+  // Check if a memory-bank directory was found
+  const memoryBankDir = memoryBankManager.getMemoryBankDir();
+  if (memoryBankDir) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Memory Bank path set to ${memoryBankDir}`,
+        },
+      ],
+    };
   }
   
   // If we get here, no valid Memory Bank was found
@@ -172,8 +193,20 @@ export async function handleInitializeMemoryBank(
     console.error('Using absolute path:', absolutePath);
     
     try {
-      // Use the provided directory path
+      // Initialize the Memory Bank in the provided directory
       await memoryBankManager.initializeMemoryBank(absolutePath);
+      
+      // Get the Memory Bank directory
+      const memoryBankDir = memoryBankManager.getMemoryBankDir();
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Memory Bank initialized at ${memoryBankDir}`,
+          },
+        ],
+      };
     } catch (initError) {
       // Check if the error is related to .clinerules files
       const errorMessage = String(initError);
@@ -181,8 +214,8 @@ export async function handleInitializeMemoryBank(
         console.warn('Warning: Error related to .clinerules files:', initError);
         console.warn('Continuing with Memory Bank initialization despite .clinerules issues.');
         
-        // Try to create the memory-bank directory anyway
-        const memoryBankDir = path.join(absolutePath, 'memory-bank');
+        // Use the provided path directly as the memory bank directory
+        const memoryBankDir = absolutePath;
         try {
           await FileUtils.ensureDirectory(memoryBankDir);
           memoryBankManager.setMemoryBankDir(memoryBankDir);
@@ -212,48 +245,28 @@ export async function handleInitializeMemoryBank(
             };
           }
           
-          // If we can't create or find a memory-bank directory, try to use a fallback directory
-          try {
-            const homeDir = os.homedir();
-            const fallbackDir = path.join(homeDir, '.memory-bank-mcp', 'memory-bank');
-            await FileUtils.ensureDirectory(fallbackDir);
-            memoryBankManager.setMemoryBankDir(fallbackDir);
-            
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `Memory Bank initialized at fallback location: ${fallbackDir}`,
-                },
-              ],
-            };
-          } catch (fallbackError) {
-            // If all else fails, return an error
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `Error initializing Memory Bank: ${initError}. Failed to create fallback directory: ${fallbackError}`,
-                },
-              ],
-              isError: true,
-            };
-          }
+          // If we can't create or find a memory-bank directory, return an error
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Failed to initialize Memory Bank: ${dirError}`,
+              },
+            ],
+          };
         }
       }
       
-      // For other types of errors, just return the error
-      throw initError;
+      // For other errors, return the error message
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Failed to initialize Memory Bank: ${initError}`,
+          },
+        ],
+      };
     }
-
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Memory Bank successfully initialized at ${absolutePath}/memory-bank`,
-        },
-      ],
-    };
   } catch (error) {
     return {
       content: [
@@ -262,7 +275,6 @@ export async function handleInitializeMemoryBank(
           text: `Error initializing Memory Bank: ${error}`,
         },
       ],
-      isError: true,
     };
   }
 }
@@ -456,4 +468,44 @@ export async function handleMigrateFileNaming(
       isError: true,
     };
   }
+}
+
+/**
+ * Processes the set_environment_variable tool
+ * @param name Name of the environment variable
+ * @param value Value of the environment variable
+ * @returns Operation result
+ */
+export function handleSetEnvironmentVariable(name: string, value: string) {
+  // Only allow setting specific environment variables for security
+  const allowedEnvVars = [
+    'MEMORY_BANK_USER_ID',
+    'MEMORY_BANK_MODE',
+    'MEMORY_BANK_PROJECT_PATH',
+    'MEMORY_BANK_FOLDER_NAME'
+  ];
+  
+  if (!allowedEnvVars.includes(name)) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Error: Cannot set environment variable ${name}. Only the following variables are allowed: ${allowedEnvVars.join(', ')}`,
+        },
+      ],
+      isError: true,
+    };
+  }
+  
+  // Set the environment variable
+  process.env[name] = value;
+  
+  return {
+    content: [
+      {
+        type: 'text',
+        text: `Environment variable ${name} set to ${value}`,
+      },
+    ],
+  };
 }

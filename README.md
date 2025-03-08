@@ -22,8 +22,18 @@ Memory Bank Server provides a set of tools and resources for AI assistants to in
 - **Robust Error Handling**: Gracefully handle errors and continue operation when possible
 - **Status Prefix System**: Immediate visibility into Memory Bank operational state
 
+## Directory Structure 📁
+
+By default, Memory Bank uses a `memory-bank` directory in the root of your project. When you specify a project path using the `--path` option or `MEMORY_BANK_PROJECT_PATH` environment variable, the Memory Bank will be created or accessed at `<project_path>/memory-bank`.
+
+You can customize the name of the Memory Bank folder using the `--folder` option or `MEMORY_BANK_FOLDER_NAME` environment variable. For example, if you set `--folder custom-memory` or `MEMORY_BANK_FOLDER_NAME=custom-memory`, the Memory Bank will be created or accessed at `<project_path>/custom-memory`.
+
+For more details on customizing the folder name, see [Custom Memory Bank Folder Name](docs/custom-folder-name.md).
+
 ## Recent Improvements 🛠️
 
+- **Customizable Folder Name**: You can now specify a custom folder name for the Memory Bank
+- **Consistent Directory Structure**: Memory Bank now always uses the configured folder name in the project root
 - **Enhanced Initialization**: Memory Bank now works even when .clinerules files don't exist
 - **Better Path Handling**: Improved handling of absolute and relative paths
 - **Improved Directory Detection**: Better detection of existing memory-bank directories
@@ -54,6 +64,12 @@ npx @movibe/memory-bank-mcp
 
 # Run with specific mode
 npx @movibe/memory-bank-mcp --mode code
+
+# Run with custom project path
+npx @movibe/memory-bank-mcp --path /path/to/project
+
+# Run with custom folder name
+npx @movibe/memory-bank-mcp --folder custom-memory-bank
 
 # Show help
 npx @movibe/memory-bank-mcp --help

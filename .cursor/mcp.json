@@ -3,15 +3,22 @@
         "memory-bank": {
             "command": "node",
             "args": [
-                "/Users/movibe/Documents/Cline/MCP/memory-bank-server/build/index.js"
+                "/Users/movibe/Documents/Cline/MCP/memory-bank-server/build/index.js",
+                "--path",
+                "/Users/movibe/Documents/Cline/MCP/memory-bank-server",
+                "--folder",
+                "memory-bank",
+                "--user",
+                "@movibe"
             ],
             "disabled": false,
-            "alwaysAllow": [],
-            "env": {
-                "DEBUG": "mcp:*",
-                "NODE_ENV": "production",
-                "MEMORY_BANK_PROJECT_PATH": "/Users/movibe/Documents/Cline/MCP/memory-bank-server"
-            }
+            "alwaysAllow": [
+                "track_progress",
+                "set_memory_bank_path",
+                "log_decision",
+                "update_active_context",
+                "read_memory_bank_file"
+            ]
         }
     }
 }

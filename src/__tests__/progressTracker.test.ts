@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 describe('ProgressTracker Tests', () => {
   const tempDir = path.join(__dirname, 'temp-progress-test-dir');
   const memoryBankDir = path.join(tempDir, 'memory-bank');
+  const testUserId = 'test-user';
   let progressTracker: ProgressTracker;
   
   beforeEach(async () => {
@@ -25,7 +26,7 @@ describe('ProgressTracker Tests', () => {
     await fs.writeFile(path.join(memoryBankDir, 'system-patterns.md'), '# System Patterns');
     
     // Create a new ProgressTracker for each test
-    progressTracker = new ProgressTracker(memoryBankDir);
+    progressTracker = new ProgressTracker(memoryBankDir, testUserId);
   });
   
   afterEach(async () => {
@@ -45,6 +46,7 @@ describe('ProgressTracker Tests', () => {
     // Check if progress.md contains the action and description
     expect(progressContent.includes(action)).toBe(true);
     expect(progressContent.includes(details.description)).toBe(true);
+    expect(progressContent.includes(testUserId)).toBe(true);
   });
   
   test('Should update active context', async () => {

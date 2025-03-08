@@ -13,6 +13,7 @@ describe('CoreTools Tests', () => {
   const tempDir = path.join(__dirname, 'temp-coretools-test-dir');
   const projectPath = path.join(tempDir, 'project');
   const memoryBankDir = path.join(projectPath, 'memory-bank');
+  const testUserId = 'test-user';
   let memoryBankManager: MemoryBankManager;
   
   beforeEach(async () => {
@@ -21,7 +22,7 @@ describe('CoreTools Tests', () => {
     await fs.ensureDir(projectPath);
     
     // Create a new MemoryBankManager with the project path
-    memoryBankManager = new MemoryBankManager(projectPath);
+    memoryBankManager = new MemoryBankManager(projectPath, testUserId);
   });
   
   afterEach(async () => {

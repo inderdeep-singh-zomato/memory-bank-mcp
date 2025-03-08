@@ -13,17 +13,22 @@ Usage: memory-bank-mcp [options]
 Options:
   --mode, -m <mode>    Set execution mode (code, ask, architect, etc.)
   --path, -p <path>    Set project path (default: current directory)
+  --folder, -f <folder> Set Memory Bank folder name (default: memory-bank)
+  --user, -u <user>    Set user ID for tracking changes
   --help, -h           Display this help
   
-Environment Variables:
-  MEMORY_BANK_PROJECT_PATH  Set project path (overrides --path)
-  MEMORY_BANK_MODE          Set execution mode (overrides --mode)
+Environment Variables (deprecated, use command line arguments instead):
+  MEMORY_BANK_PROJECT_PATH  Set project path (fallback if --path not provided)
+  MEMORY_BANK_FOLDER_NAME   Set Memory Bank folder name (fallback if --folder not provided)
+  MEMORY_BANK_MODE          Set execution mode (fallback if --mode not provided)
+  MEMORY_BANK_USER_ID       Set user ID for tracking changes (fallback if --user not provided)
   
 Examples:
   memory-bank-mcp
   memory-bank-mcp --mode code
   memory-bank-mcp --path /path/to/project
-  MEMORY_BANK_PROJECT_PATH=/path/to/project memory-bank-mcp
+  memory-bank-mcp --folder custom-memory-bank
+  memory-bank-mcp --user "John Doe"
   
 For more information, visit: https://github.com/movibe/memory-bank-server
 `);
@@ -36,7 +41,7 @@ For more information, visit: https://github.com/movibe/memory-bank-server
  */
 function processArgs() {
   const args = process.argv.slice(2);
-  const options: { mode?: string; projectPath?: string } = {};
+  const options: { mode?: string; projectPath?: string; folderName?: string; userId?: string } = {};
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -45,18 +50,30 @@ function processArgs() {
       options.mode = args[++i];
     } else if (arg === '--path' || arg === '-p') {
       options.projectPath = args[++i];
+    } else if (arg === '--folder' || arg === '-f') {
+      options.folderName = args[++i];
+    } else if (arg === '--user' || arg === '-u') {
+      options.userId = args[++i];
     } else if (arg === '--help' || arg === '-h') {
       showHelp();
     }
   }
 
-  // Environment variables override command line arguments
-  if (process.env.MEMORY_BANK_MODE) {
+  // Environment variables are used as fallback if command line arguments are not provided
+  if (!options.mode && process.env.MEMORY_BANK_MODE) {
     options.mode = process.env.MEMORY_BANK_MODE;
   }
   
-  if (process.env.MEMORY_BANK_PROJECT_PATH) {
+  if (!options.projectPath && process.env.MEMORY_BANK_PROJECT_PATH) {
     options.projectPath = process.env.MEMORY_BANK_PROJECT_PATH;
+  }
+  
+  if (!options.folderName && process.env.MEMORY_BANK_FOLDER_NAME) {
+    options.folderName = process.env.MEMORY_BANK_FOLDER_NAME;
+  }
+  
+  if (!options.userId && process.env.MEMORY_BANK_USER_ID) {
+    options.userId = process.env.MEMORY_BANK_USER_ID;
   }
 
   return options;
@@ -80,8 +97,14 @@ async function main() {
     if (options.projectPath) {
       console.error(`Using project path: ${options.projectPath}`);
     }
+    if (options.folderName) {
+      console.error(`Using Memory Bank folder name: ${options.folderName}`);
+    }
+    if (options.userId) {
+      console.error(`Using user ID: ${options.userId}`);
+    }
     
-    const server = new MemoryBankServer(options.mode, options.projectPath);
+    const server = new MemoryBankServer(options.mode, options.projectPath, options.userId, options.folderName);
     await server.run();
     console.error('Memory Bank Server started successfully');
   } catch (error) {

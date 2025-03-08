@@ -28,9 +28,11 @@ export class MemoryBankServer {
    * Initializes the MCP server with the necessary handlers for tools and resources.
    * @param initialMode Initial mode (optional)
    * @param projectPath Project path (optional)
+   * @param userId User ID for tracking changes (optional)
+   * @param folderName Memory Bank folder name (optional, default: 'memory-bank')
    */
-  constructor(initialMode?: string, projectPath?: string) {
-    this.memoryBankManager = new MemoryBankManager(projectPath);
+  constructor(initialMode?: string, projectPath?: string, userId?: string, folderName?: string) {
+    this.memoryBankManager = new MemoryBankManager(projectPath, userId, folderName);
     
     // Combine all tools
     const allTools = [

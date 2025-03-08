@@ -301,10 +301,43 @@ describe('Clinerules Integration Tests', () => {
     await fs.ensureDir(memoryBankDir);
     
     // Create a MemoryBankManager
-    const memoryBankManager = new MemoryBankManager();
+    const memoryBankManager = new MemoryBankManager(undefined, 'test-user');
     memoryBankManager.setMemoryBankDir(memoryBankDir);
     
     // Check if memory bank status was updated
     expect(memoryBankManager.getStatusPrefix()).toBe('[MEMORY BANK: ACTIVE]');
+  });
+  
+  test('Should detect mode triggers in message', async () => {
+    // Create a temporary directory for the test
+    const tempDir = path.join(__dirname, 'temp-mode-triggers-test');
+    await fs.ensureDir(tempDir);
+    
+    try {
+      // Create a new MemoryBankManager
+      const memoryBankManager = new MemoryBankManager(tempDir, 'test-user');
+      
+      // Initialize the Memory Bank
+      await memoryBankManager.initializeMemoryBank(tempDir);
+      
+      // Test messages with mode triggers
+      const messages = [
+        { text: 'Let\'s switch to code mode', expectedTriggers: ['code'] },
+        { text: 'I need to ask a question', expectedTriggers: ['ask'] },
+        { text: 'Let\'s architect this system', expectedTriggers: ['architect'] },
+        { text: 'We need to debug this issue', expectedTriggers: ['debug'] },
+        { text: 'Time to test our code', expectedTriggers: ['test'] },
+        { text: 'No triggers here', expectedTriggers: [] },
+        { text: 'Let\'s code and test', expectedTriggers: ['code', 'test'] },
+      ];
+      
+      for (const message of messages) {
+        const triggers = memoryBankManager.detectModeTriggers(message.text);
+        expect(triggers).toEqual(message.expectedTriggers);
+      }
+    } finally {
+      // Clean up
+      await fs.remove(tempDir);
+    }
   });
 }); 
