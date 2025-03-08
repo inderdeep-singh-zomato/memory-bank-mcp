@@ -6,6 +6,13 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Current Session Notes
 
+- Documentation Translation: Translated all documentation files to English and organized them in the docs folder. Created English versions of: usage-modes.md (from modos-de-uso.md), rule-examples.md (from exemplos-de-regras.md), roo-code-integration.md (from integracao-roo-code.md), rule-formats.md, implementation-plan-rule-formats.md, and a README.md index file for the documentation. All files are now properly organized in the memory-bank/docs directory.
+- File Update: Updated docs/usage-modes.md
+- File Update: Updated docs/implementation-plan-rule-formats.md
+- File Update: Updated docs/rule-formats.md
+- File Update: Updated docs/roo-code-integration.md
+- File Update: Updated docs/rule-examples.md
+- File Update: Updated docs/README.md
 - File Update: Updated testing-strategy.md
 - File Update: Updated test-coverage.md
 - Decision Made: Test Framework Selection
@@ -22,7 +29,7 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 - [17:00:00] Project Rename: Updated all references in code and documentation
 - [17:00:00] Project Rename: Updated Memory Bank files to reflect the new name
 - [22:40:00] Testing Implementation: Added automated tests for clinerules integration
-- [22:40:00] Testing Implementation: Created test directory structure (src/__tests__)
+- [22:40:00] Testing Implementation: Created test directory structure (src/**tests**)
 - [22:40:00] Testing Implementation: Configured Bun as the test runner
 - [22:40:00] Testing Implementation: Added type definitions for Bun's test API
 - [22:40:00] Testing Implementation: Created documentation for testing with Bun
@@ -34,12 +41,14 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 - Fix linter errors in progressTracker.test.ts
 - Add integration tests for complete workflows
 - Configure CI/CD for automated testing
+
 ## Known Issues
 
 - Some linter errors in progressTracker.test.ts related to missing toContain method
 - Remaining uncovered code in MemoryBankManager.ts (80.18% coverage)
 - Remaining uncovered code in ExternalRulesLoader.ts (79.71% coverage)
 - Remaining uncovered code in FileUtils.ts (83.02% coverage)
+
 ## Next Steps
 
 - Implement tests for remaining uncovered code in MemoryBankManager.ts

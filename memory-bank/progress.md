@@ -6,6 +6,13 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Update History
 
+- [2025-03-08] - Documentation: Updated usage-modes.md (from modos-de-uso.md), rule-examples.md, rule-formats.md, implementation-plan-rule-formats.md, and a README.md index file for the documentation. All files are now properly organized in the memory-bank/docs directory.
+- [2025-03-08] - File Update: Updated docs/usage-modes.md
+- [2025-03-08] - File Update: Updated docs/implementation-plan-rule-formats.md
+- [2025-03-08] - File Update: Updated docs/rule-formats.md
+- [2025-03-08] - File Update: Updated docs/roo-code-integration.md
+- [2025-03-08] - File Update: Updated docs/rule-examples.md
+- [2025-03-08] - File Update: Updated docs/README.md
 - [2025-03-08] - File Update: Updated testing-strategy.md
 - [2025-03-08] - File Update: Updated test-coverage.md
 - [2025-03-08] - Decision Made: Test Framework Selection
