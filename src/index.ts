@@ -12,11 +12,18 @@ Usage: memory-bank-mcp [options]
 
 Options:
   --mode, -m <mode>    Set execution mode (code, ask, architect, etc.)
+  --path, -p <path>    Set project path (default: current directory)
   --help, -h           Display this help
+  
+Environment Variables:
+  MEMORY_BANK_PROJECT_PATH  Set project path (overrides --path)
+  MEMORY_BANK_MODE          Set execution mode (overrides --mode)
   
 Examples:
   memory-bank-mcp
   memory-bank-mcp --mode code
+  memory-bank-mcp --path /path/to/project
+  MEMORY_BANK_PROJECT_PATH=/path/to/project memory-bank-mcp
   
 For more information, visit: https://github.com/movibe/memory-bank-server
 `);
@@ -29,16 +36,27 @@ For more information, visit: https://github.com/movibe/memory-bank-server
  */
 function processArgs() {
   const args = process.argv.slice(2);
-  const options: { mode?: string } = {};
+  const options: { mode?: string; projectPath?: string } = {};
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     
     if (arg === '--mode' || arg === '-m') {
       options.mode = args[++i];
+    } else if (arg === '--path' || arg === '-p') {
+      options.projectPath = args[++i];
     } else if (arg === '--help' || arg === '-h') {
       showHelp();
     }
+  }
+
+  // Environment variables override command line arguments
+  if (process.env.MEMORY_BANK_MODE) {
+    options.mode = process.env.MEMORY_BANK_MODE;
+  }
+  
+  if (process.env.MEMORY_BANK_PROJECT_PATH) {
+    options.projectPath = process.env.MEMORY_BANK_PROJECT_PATH;
   }
 
   return options;
@@ -59,8 +77,11 @@ async function main() {
     if (options.mode) {
       console.error(`Using mode: ${options.mode}`);
     }
+    if (options.projectPath) {
+      console.error(`Using project path: ${options.projectPath}`);
+    }
     
-    const server = new MemoryBankServer(options.mode);
+    const server = new MemoryBankServer(options.mode, options.projectPath);
     await server.run();
     console.error('Memory Bank Server started successfully');
   } catch (error) {

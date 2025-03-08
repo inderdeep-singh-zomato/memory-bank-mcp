@@ -4,6 +4,8 @@ import { coreTemplates } from './templates/index.js';
 import { ProgressTracker } from './ProgressTracker.js';
 import { ModeManager } from '../utils/ModeManager.js';
 import { ExternalRulesLoader } from '../utils/ExternalRulesLoader.js';
+import fs from 'fs';
+import { MemoryBankStatus, ModeState } from '../types/index.js';
 
 /**
  * Class responsible for managing Memory Bank operations
@@ -17,14 +19,30 @@ export class MemoryBankManager {
   private progressTracker: ProgressTracker | null = null;
   private modeManager: ModeManager | null = null;
   private rulesLoader: ExternalRulesLoader | null = null;
+  private projectPath: string | null = null;
   
   // Language is always set to English
   private language: string = 'en';
 
   /**
    * Creates a new MemoryBankManager instance
+   * 
+   * @param projectPath Optional project path to use instead of current directory
    */
-  constructor() {}
+  constructor(projectPath?: string) {
+    // Ensure language is always English
+    this.language = 'en';
+    
+    if (projectPath) {
+      this.projectPath = projectPath;
+      console.error(`MemoryBankManager initialized with project path: ${projectPath}`);
+    } else {
+      this.projectPath = process.cwd();
+      console.error(`MemoryBankManager initialized with current directory: ${this.projectPath}`);
+    }
+    
+    console.error(`Memory Bank language is set to English (${this.language})`);
+  }
 
   /**
    * Gets the language used for the Memory Bank
@@ -36,59 +54,54 @@ export class MemoryBankManager {
   }
 
   /**
+   * Sets the language for the Memory Bank
+   * 
+   * Note: This method is provided for API consistency, but the Memory Bank
+   * will always use English (en) regardless of the language parameter.
+   * 
+   * @param language - Language code (ignored, always sets to 'en')
+   */
+  setLanguage(language: string): void {
+    // Always use English regardless of the parameter
+    this.language = 'en';
+    console.warn('Memory Bank language is always set to English (en) regardless of the requested language.');
+  }
+
+  /**
+   * Gets the project path
+   * 
+   * @returns The project path
+   */
+  getProjectPath(): string {
+    return this.projectPath || process.cwd();
+  }
+
+  /**
    * Finds a Memory Bank directory
    * 
-   * Searches for a Memory Bank directory starting from the specified directory.
-   * If a custom path is provided, it will check that path first.
-   * If no custom path is provided, it will use the current directory.
+   * Always uses the current directory as the root and checks for a 'memory-bank' subdirectory.
+   * If a custom path is provided, it will be ignored as we always use the current directory.
    * 
-   * @param startDir - Starting directory for the search
-   * @param customPath - Optional custom path to check
+   * @param startDir - Starting directory for the search (current directory)
+   * @param customPath - Optional custom path (ignored in this implementation)
    * @returns Path to the Memory Bank directory or null if not found
    */
   async findMemoryBankDir(startDir: string, customPath?: string): Promise<string | null> {
-    // If a custom path is provided, check if it's a valid Memory Bank
-    if (customPath) {
-      const fullPath = path.resolve(startDir, customPath);
-      if (await FileUtils.fileExists(fullPath) && await this.isMemoryBank(fullPath)) {
-        return fullPath;
-      }
-      
-      // If the custom path is not a Memory Bank, check if it contains a memory-bank subdirectory
-      if (await FileUtils.fileExists(fullPath) && await FileUtils.isDirectory(fullPath)) {
-        const mbSubDir = path.join(fullPath, 'memory-bank');
-        if (await FileUtils.fileExists(mbSubDir) && await this.isMemoryBank(mbSubDir)) {
-          return mbSubDir;
-        }
-      }
-    }
-
-    // Check if the current directory contains a Memory Bank
+    // Always use the provided directory as the root
     const mbDir = path.join(startDir, 'memory-bank');
-    if (await FileUtils.fileExists(mbDir) && await this.isMemoryBank(mbDir)) {
-      return mbDir;
-    }
-
-    // Check if any subdirectory contains a Memory Bank
-    try {
-      const entries = await FileUtils.listFiles(startDir);
-      for (const entry of entries) {
-        const subDir = path.join(startDir, entry);
-        if (
-          await FileUtils.isDirectory(subDir) &&
-          !entry.startsWith('.') &&
-          entry !== 'node_modules'
-        ) {
-          const mbSubDir = path.join(subDir, 'memory-bank');
-          if (await FileUtils.fileExists(mbSubDir) && await this.isMemoryBank(mbSubDir)) {
-            return mbSubDir;
-          }
-        }
+    
+    // Check if the memory-bank directory exists in the provided directory
+    if (await FileUtils.fileExists(mbDir) && await FileUtils.isDirectory(mbDir)) {
+      // Check if it's a valid Memory Bank or just a directory
+      const files = await FileUtils.listFiles(mbDir);
+      const mdFiles = files.filter(file => file.endsWith('.md'));
+      
+      if (mdFiles.length > 0) {
+        return mbDir;
       }
-    } catch (error) {
-      console.error('Error searching for Memory Bank:', error);
     }
-
+    
+    // If memory-bank directory doesn't exist or is not a valid Memory Bank, return null
     return null;
   }
 
@@ -130,33 +143,122 @@ export class MemoryBankManager {
   }
 
   /**
+   * Validates if all required .clinerules files exist in the project root
+   * 
+   * @param projectDir - Project directory to check
+   * @returns Object with validation results
+   */
+  async validateClinerules(projectDir: string): Promise<{
+    valid: boolean;
+    missingFiles: string[];
+    existingFiles: string[];
+  }> {
+    const requiredFiles = [
+      '.clinerules-architect',
+      '.clinerules-ask',
+      '.clinerules-code',
+      '.clinerules-debug',
+      '.clinerules-test'
+    ];
+    
+    const missingFiles: string[] = [];
+    const existingFiles: string[] = [];
+    
+    for (const file of requiredFiles) {
+      const filePath = path.join(projectDir, file);
+      if (await FileUtils.fileExists(filePath)) {
+        existingFiles.push(file);
+      } else {
+        missingFiles.push(file);
+      }
+    }
+    
+    return {
+      valid: missingFiles.length === 0,
+      missingFiles,
+      existingFiles
+    };
+  }
+
+  /**
    * Initializes a new Memory Bank
    * 
    * Creates a new Memory Bank directory with all required template files.
    * All templates are in English regardless of the system locale.
+   * Also validates that all required .clinerules files exist in the project root.
    * 
    * @param dirPath - Directory path where the Memory Bank will be created
-   * @throws Error if initialization fails
+   * @throws Error if initialization fails or required .clinerules files are missing
    */
   async initializeMemoryBank(dirPath: string): Promise<void> {
     try {
-      await FileUtils.ensureDirectory(dirPath);
+      // Ensure language is always English
+      this.language = 'en';
+      
+      // First, validate that all required .clinerules files exist
+      const projectRoot = dirPath;
+      
+      // Create the ExternalRulesLoader to handle .clinerules files
+      try {
+        this.rulesLoader = new ExternalRulesLoader(projectRoot);
+        
+        // Validate and create missing .clinerules files
+        try {
+          const validation = await this.rulesLoader.validateRequiredFiles();
+          if (!validation.valid) {
+            console.warn(`Warning: Some .clinerules files could not be created: ${validation.missingFiles.join(', ')}`);
+            console.warn('Continuing with Memory Bank initialization despite missing .clinerules files.');
+          }
+        } catch (validationError) {
+          console.warn('Error validating .clinerules files:', validationError);
+          console.warn('Continuing with Memory Bank initialization despite validation errors.');
+        }
+      } catch (rulesLoaderError) {
+        console.warn('Error creating ExternalRulesLoader:', rulesLoaderError);
+        console.warn('Continuing with Memory Bank initialization without rules loader.');
+      }
+      
+      // Create the memory-bank directory in the provided directory
+      const memoryBankPath = path.join(dirPath, 'memory-bank');
+      try {
+        await FileUtils.ensureDirectory(memoryBankPath);
+      } catch (dirError) {
+        console.error('Failed to create memory-bank directory:', dirError);
+        throw new Error(`Failed to create memory-bank directory: ${dirError instanceof Error ? dirError.message : String(dirError)}`);
+      }
       
       // Create all template files in English
+      let templateErrors = [];
       for (const template of coreTemplates) {
-        const filePath = path.join(dirPath, template.name);
+        const filePath = path.join(memoryBankPath, template.name);
         if (!(await FileUtils.fileExists(filePath))) {
-          await FileUtils.writeFile(filePath, template.content);
+          try {
+            await FileUtils.writeFile(filePath, template.content);
+          } catch (writeError) {
+            console.warn(`Failed to create template file ${template.name}:`, writeError);
+            templateErrors.push(template.name);
+          }
         }
       }
-
-      this.memoryBankDir = dirPath;
-      this.progressTracker = new ProgressTracker(dirPath);
       
-      console.error(`Memory Bank initialized at ${dirPath} (language: ${this.language})`);
+      if (templateErrors.length > 0) {
+        console.warn(`Failed to create the following template files: ${templateErrors.join(', ')}`);
+        console.warn('Continuing with Memory Bank initialization despite template creation errors.');
+      }
+
+      this.memoryBankDir = memoryBankPath;
+      
+      try {
+        this.progressTracker = new ProgressTracker(memoryBankPath);
+      } catch (progressTrackerError) {
+        console.warn('Error creating ProgressTracker:', progressTrackerError);
+        console.warn('Progress tracking may not be available.');
+      }
+      
+      console.error(`Memory Bank initialized at ${memoryBankPath} (language: ${this.language})`);
     } catch (error) {
-      console.error(`Failed to initialize Memory Bank at ${dirPath}:`, error);
-      throw new Error(`Failed to initialize Memory Bank: ${error}`);
+      console.error(`Failed to initialize Memory Bank:`, error);
+      throw new Error(`Failed to initialize Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -168,16 +270,21 @@ export class MemoryBankManager {
    * @throws Error if the Memory Bank directory is not set or the file doesn't exist
    */
   async readFile(filename: string): Promise<string> {
-    if (!this.memoryBankDir) {
-      throw new Error('Memory Bank directory not set');
+    try {
+      if (!this.memoryBankDir) {
+        throw new Error('Memory Bank directory not set');
+      }
+      
+      const filePath = path.join(this.memoryBankDir, filename);
+      if (!await FileUtils.fileExists(filePath)) {
+        throw new Error(`File ${filename} not found in Memory Bank`);
+      }
+      
+      return await FileUtils.readFile(filePath);
+    } catch (error) {
+      console.error(`Error reading file ${filename} from Memory Bank:`, error);
+      throw new Error(`Error reading file ${filename} from Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
     }
-    
-    const filePath = path.join(this.memoryBankDir, filename);
-    if (!await FileUtils.fileExists(filePath)) {
-      throw new Error(`File ${filename} not found in Memory Bank`);
-    }
-    
-    return FileUtils.readFile(filePath);
   }
 
   /**
@@ -188,18 +295,29 @@ export class MemoryBankManager {
    * @throws Error if the Memory Bank directory is not set
    */
   async writeFile(filename: string, content: string): Promise<void> {
-    if (!this.memoryBankDir) {
-      throw new Error('Memory Bank directory not set');
-    }
-    
-    const filePath = path.join(this.memoryBankDir, filename);
-    await FileUtils.writeFile(filePath, content);
-    
-    // Track progress if ProgressTracker is available
-    if (this.progressTracker) {
-      await this.progressTracker.trackProgress('File Update', {
-        description: `Updated ${filename}`,
-      });
+    try {
+      if (!this.memoryBankDir) {
+        throw new Error('Memory Bank directory not set');
+      }
+      
+      const filePath = path.join(this.memoryBankDir, filename);
+      await FileUtils.writeFile(filePath, content);
+      
+      // Track progress if ProgressTracker is available
+      if (this.progressTracker) {
+        try {
+          await this.progressTracker.trackProgress('File Update', {
+            description: `Updated ${filename}`,
+            filename,
+          });
+        } catch (progressError) {
+          console.warn(`Failed to track progress for file update ${filename}:`, progressError);
+          // Continue despite progress tracking error
+        }
+      }
+    } catch (error) {
+      console.error(`Error writing to file ${filename} in Memory Bank:`, error);
+      throw new Error(`Error writing to file ${filename} in Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -210,12 +328,17 @@ export class MemoryBankManager {
    * @throws Error if the Memory Bank directory is not set
    */
   async listFiles(): Promise<string[]> {
-    if (!this.memoryBankDir) {
-      throw new Error('Memory Bank directory not set');
+    try {
+      if (!this.memoryBankDir) {
+        throw new Error('Memory Bank directory not set');
+      }
+      
+      const files = await FileUtils.listFiles(this.memoryBankDir);
+      return files.filter(file => file.endsWith('.md'));
+    } catch (error) {
+      console.error('Error listing files in Memory Bank:', error);
+      throw new Error(`Error listing files in Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
     }
-    
-    const files = await FileUtils.listFiles(this.memoryBankDir);
-    return files.filter(file => file.endsWith('.md'));
   }
 
   /**
@@ -224,61 +347,67 @@ export class MemoryBankManager {
    * @returns Status object with information about the Memory Bank
    * @throws Error if the Memory Bank directory is not set
    */
-  async getStatus(): Promise<{
-    path: string;
-    files: string[];
-    coreFilesPresent: string[];
-    missingCoreFiles: string[];
-    isComplete: boolean;
-    language: string;
-    lastUpdated?: Date;
-  }> {
-    if (!this.memoryBankDir) {
-      throw new Error('Memory Bank directory not set');
-    }
-    
-    const files = await this.listFiles();
-    const coreFiles = coreTemplates.map(template => template.name);
-    const missingCoreFiles = coreFiles.filter(file => !files.includes(file));
-    
-    // Get last update time
-    let lastUpdated: Date | undefined;
+  async getStatus(): Promise<MemoryBankStatus> {
     try {
-      if (files.length > 0) {
-        const stats = await Promise.all(
-          files.map(async file => {
-            const filePath = path.join(this.memoryBankDir!, file);
-            return await FileUtils.getFileStats(filePath);
-          })
-        );
-        
-        const latestMtime = Math.max(...stats.map(stat => stat.mtimeMs));
-        lastUpdated = new Date(latestMtime);
+      if (!this.memoryBankDir) {
+        throw new Error('Memory Bank directory not set');
       }
+      
+      const files = await this.listFiles();
+      const coreFiles = coreTemplates.map(template => template.name);
+      const missingCoreFiles = coreFiles.filter(file => !files.includes(file));
+      
+      // Get last update time
+      let lastUpdated: Date | undefined;
+      try {
+        if (files.length > 0) {
+          const stats = await Promise.all(
+            files.map(async file => {
+              try {
+                const filePath = path.join(this.memoryBankDir!, file);
+                return await FileUtils.getFileStats(filePath);
+              } catch (statError) {
+                console.warn(`Error getting stats for file ${file}:`, statError);
+                // Return a default stat object with current time
+                return {
+                  mtimeMs: Date.now(),
+                } as fs.Stats;
+              }
+            })
+          );
+          
+          const latestMtime = Math.max(...stats.map(stat => stat.mtimeMs));
+          lastUpdated = new Date(latestMtime);
+        }
+      } catch (statsError) {
+        console.error('Error getting file stats:', statsError);
+        // Continue without lastUpdated information
+      }
+      
+      return {
+        path: this.memoryBankDir,
+        files,
+        coreFilesPresent: coreFiles.filter(file => files.includes(file)),
+        missingCoreFiles,
+        isComplete: missingCoreFiles.length === 0,
+        language: this.language,
+        lastUpdated,
+      };
     } catch (error) {
-      console.error('Error getting file stats:', error);
+      console.error('Error getting Memory Bank status:', error);
+      throw new Error(`Error getting Memory Bank status: ${error instanceof Error ? error.message : String(error)}`);
     }
-    
-    return {
-      path: this.memoryBankDir,
-      files,
-      coreFilesPresent: coreFiles.filter(file => files.includes(file)),
-      missingCoreFiles,
-      isComplete: missingCoreFiles.length === 0,
-      language: this.language,
-      lastUpdated,
-    };
   }
 
   /**
    * Sets a custom path for the Memory Bank
    * 
-   * If no path is provided, it will use the current directory.
+   * If no path is provided, it will use the project path or current directory.
    * 
    * @param customPath - Custom path (optional)
    */
   setCustomPath(customPath?: string): void {
-    this.customPath = customPath || process.cwd();
+    this.customPath = customPath || this.getProjectPath();
   }
 
   /**
@@ -307,6 +436,10 @@ export class MemoryBankManager {
   setMemoryBankDir(dir: string): void {
     this.memoryBankDir = dir;
     this.progressTracker = new ProgressTracker(dir);
+    
+    // Ensure language is always English
+    this.language = 'en';
+    
     this.updateMemoryBankStatus();
   }
 
@@ -364,17 +497,47 @@ export class MemoryBankManager {
       return; // Already initialized
     }
     
-    // Load external rules
-    this.rulesLoader = new ExternalRulesLoader();
-    await this.rulesLoader.detectAndLoadRules();
-    
-    // Create mode manager
-    this.modeManager = new ModeManager(this.rulesLoader);
-    
-    await this.modeManager.initialize(initialMode);
-    
-    // Update Memory Bank status
-    await this.updateMemoryBankStatus();
+    try {
+      // Load external rules
+      const projectRoot = this.getProjectPath();
+      this.rulesLoader = new ExternalRulesLoader(projectRoot);
+      
+      // Validate and create missing .clinerules files
+      try {
+        const validation = await this.rulesLoader.validateRequiredFiles();
+        if (!validation.valid) {
+          console.warn(`Warning: Some .clinerules files could not be created: ${validation.missingFiles.join(', ')}`);
+          console.warn('Continuing with mode manager initialization despite missing .clinerules files.');
+        }
+      } catch (validationError) {
+        console.warn('Error validating .clinerules files:', validationError);
+        console.warn('Continuing with mode manager initialization despite validation errors.');
+      }
+      
+      try {
+        await this.rulesLoader.detectAndLoadRules();
+      } catch (loadError) {
+        console.warn('Error loading .clinerules files:', loadError);
+        console.warn('Continuing with mode manager initialization despite loading errors.');
+      }
+      
+      // Create mode manager
+      this.modeManager = new ModeManager(this.rulesLoader);
+      
+      try {
+        await this.modeManager.initialize(initialMode);
+      } catch (modeError) {
+        console.warn('Error initializing mode manager:', modeError);
+        console.warn('Mode manager may not be fully functional.');
+      }
+      
+      // Update Memory Bank status
+      await this.updateMemoryBankStatus();
+    } catch (error) {
+      console.error('Error initializing mode manager:', error);
+      console.warn('Continuing without mode manager functionality.');
+      // Don't throw the error, just log it and continue
+    }
   }
 
   /**

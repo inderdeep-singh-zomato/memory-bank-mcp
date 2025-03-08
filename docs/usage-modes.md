@@ -4,6 +4,28 @@
 
 Memory Bank MCP offers different operation modes inspired by [Roo Code Memory Bank](https://github.com/GreatScottyMac/roo-code-memory-bank), allowing you to adapt the AI assistant's behavior for specific tasks. Each mode is configured through rule files (`.clinerules-[mode]`) that can be written in JSON, YAML, or TOML.
 
+## Common Features Across All Modes
+
+### Status Prefix System
+
+All modes in Memory Bank MCP implement a status prefix system that provides immediate visibility into the operational state of the Memory Bank. Every response from the AI assistant begins with one of these status indicators:
+
+- **`[MEMORY BANK: ACTIVE]`**: The Memory Bank is available and being used to provide context-aware responses
+- **`[MEMORY BANK: INACTIVE]`**: The Memory Bank is not available or not properly configured
+- **`[MEMORY BANK: UPDATING]`**: The Memory Bank is currently being updated (during UMB command execution)
+
+This system ensures users always know whether the AI assistant is operating with full context awareness or limited information. For more details, see [Memory Bank Status Prefix System](memory-bank-status-prefix.md).
+
+### UMB Command Support
+
+All modes support the Update Memory Bank (UMB) command, which allows temporary updates to Memory Bank files during a session. When triggered with `Update Memory Bank` or `UMB`, the AI assistant will:
+
+1. Halt the current task
+2. Change status to `[MEMORY BANK: UPDATING]`
+3. Review the chat history for relevant updates
+4. Update appropriate Memory Bank files
+5. Return to the previous status and continue the task
+
 ## Available Modes
 
 ### 1. Architect Mode
@@ -329,37 +351,37 @@ Each mode automatically updates Memory Bank files based on interactions:
 
 - **activeContext.md**: Current design status
 
-* **progress.md**: Architecture progress
-* **decisionLog.md**: Design decisions
-* **systemPatterns.md**: Defined system patterns
+- **progress.md**: Architecture progress
+- **decisionLog.md**: Design decisions
+- **systemPatterns.md**: Defined system patterns
 
 ### Code Mode
 
 - **activeContext.md**: Current tasks
 
-* **progress.md**: Code progress
-* **decisionLog.md**: Implementation decisions
+- **progress.md**: Code progress
+- **decisionLog.md**: Implementation decisions
 
 ### Ask Mode
 
 - **activeContext.md**: Current topics
 
-* **progress.md**: Documentation progress
-* **decisionLog.md**: Knowledge decisions
+- **progress.md**: Documentation progress
+- **decisionLog.md**: Knowledge decisions
 
 ### Debug Mode
 
 - **activeContext.md**: Current issues
 
-* **progress.md**: Debug progress
-* **decisionLog.md**: Solution decisions
+- **progress.md**: Debug progress
+- **decisionLog.md**: Solution decisions
 
 ### Test Mode
 
 - **activeContext.md**: Test status
 
-* **progress.md**: Test progress
-* **decisionLog.md**: Test decisions
+- **progress.md**: Test progress
+- **decisionLog.md**: Test decisions
 
 ## Session Management
 

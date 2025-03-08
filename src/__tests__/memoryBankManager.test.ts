@@ -26,6 +26,29 @@ describe('MemoryBankManager Tests', () => {
     await fs.remove(tempDir);
   });
   
+  test('Should set and get project path', () => {
+    // Create a new MemoryBankManager with a custom project path
+    const customProjectPath = path.join(tempDir, 'custom-project');
+    const managerWithPath = new MemoryBankManager(customProjectPath);
+    
+    // Get project path
+    const projectPath = managerWithPath.getProjectPath();
+    
+    // Verify
+    expect(projectPath).toBe(customProjectPath);
+  });
+  
+  test('Should use default project path when not provided', () => {
+    // Create a new MemoryBankManager without a custom project path
+    const managerWithoutPath = new MemoryBankManager();
+    
+    // Get project path
+    const projectPath = managerWithoutPath.getProjectPath();
+    
+    // Verify it uses process.cwd() as default
+    expect(projectPath).toBe(process.cwd());
+  });
+  
   test('Should set and get Memory Bank directory', () => {
     // Set Memory Bank directory
     memoryBankManager.setMemoryBankDir(memoryBankDir);

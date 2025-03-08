@@ -17,7 +17,8 @@ export class FileUtils {
     try {
       await fs.ensureDir(dirPath);
     } catch (error) {
-      throw new Error(`Failed to create directory ${dirPath}: ${error}`);
+      console.error(`Failed to create directory ${dirPath}:`, error);
+      throw new Error(`Failed to create directory ${dirPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -47,7 +48,8 @@ export class FileUtils {
     try {
       return fs.readFile(filePath, 'utf-8');
     } catch (error) {
-      throw new Error(`Failed to read file ${filePath}: ${error}`);
+      console.error(`Failed to read file ${filePath}:`, error);
+      throw new Error(`Failed to read file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -62,7 +64,8 @@ export class FileUtils {
     try {
       await fs.writeFile(filePath, content);
     } catch (error) {
-      throw new Error(`Failed to write to file ${filePath}: ${error}`);
+      console.error(`Failed to write to file ${filePath}:`, error);
+      throw new Error(`Failed to write to file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -77,7 +80,8 @@ export class FileUtils {
     try {
       return fs.readdir(dirPath);
     } catch (error) {
-      throw new Error(`Failed to list files in directory ${dirPath}: ${error}`);
+      console.error(`Failed to list files in directory ${dirPath}:`, error);
+      throw new Error(`Failed to list files in directory ${dirPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -92,7 +96,8 @@ export class FileUtils {
     try {
       return fs.stat(filePath);
     } catch (error) {
-      throw new Error(`Failed to get file stats for ${filePath}: ${error}`);
+      console.error(`Failed to get file stats for ${filePath}:`, error);
+      throw new Error(`Failed to get file stats for ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -107,6 +112,7 @@ export class FileUtils {
       const stats = await fs.stat(dirPath);
       return stats.isDirectory();
     } catch (error) {
+      console.error(`Error checking if path is a directory ${dirPath}:`, error);
       return false;
     }
   }
@@ -121,7 +127,8 @@ export class FileUtils {
     try {
       await fs.remove(targetPath);
     } catch (error) {
-      throw new Error(`Failed to delete ${targetPath}: ${error}`);
+      console.error(`Failed to delete ${targetPath}:`, error);
+      throw new Error(`Failed to delete ${targetPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -136,7 +143,8 @@ export class FileUtils {
     try {
       await fs.copy(sourcePath, destPath);
     } catch (error) {
-      throw new Error(`Failed to copy from ${sourcePath} to ${destPath}: ${error}`);
+      console.error(`Failed to copy from ${sourcePath} to ${destPath}:`, error);
+      throw new Error(`Failed to copy from ${sourcePath} to ${destPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -160,7 +168,8 @@ export class FileUtils {
     try {
       await fs.remove(filePath);
     } catch (error) {
-      throw new Error(`Failed to delete file ${filePath}: ${error}`);
+      console.error(`Failed to delete file ${filePath}:`, error);
+      throw new Error(`Failed to delete file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }

@@ -4,29 +4,60 @@ import { FileUtils } from '../utils/FileUtils.js';
 /**
  * Interface for progress tracking details
  */
-interface ProgressDetails {
+export interface ProgressDetails {
+  /** Description of the progress or action */
   description: string;
-  [key: string]: any;
+  /** Optional filename related to the action */
+  filename?: string;
+  /** Optional path related to the action */
+  path?: string;
+  /** Optional status of the action (success, error, warning) */
+  status?: 'success' | 'error' | 'warning';
+  /** Optional timestamp of the action */
+  timestamp?: Date;
+  /** Optional additional metadata as key-value pairs */
+  metadata?: Record<string, string | number | boolean>;
+  /** 
+   * Any additional properties
+   * @deprecated Use metadata for additional properties instead
+   */
+  [key: string]: unknown;
 }
 
 /**
  * Interface for decision logging
  */
-interface Decision {
+export interface Decision {
+  /** Title of the decision */
   title: string;
+  /** Context or background information for the decision */
   context: string;
+  /** The actual decision that was made */
   decision: string;
+  /** Alternatives that were considered (string or array of strings) */
   alternatives?: string[] | string;
+  /** Consequences of the decision (string or array of strings) */
   consequences?: string[] | string;
+  /** Optional date when the decision was made (defaults to current date) */
+  date?: Date;
+  /** Optional tags to categorize the decision */
+  tags?: string[];
 }
 
 /**
  * Interface for active context updates
  */
-interface ActiveContext {
+export interface ActiveContext {
+  /** List of ongoing tasks */
   tasks?: string[];
+  /** List of known issues */
   issues?: string[];
+  /** List of next steps */
   nextSteps?: string[];
+  /** Optional project state description */
+  projectState?: string;
+  /** Optional session notes */
+  sessionNotes?: string[];
 }
 
 /**

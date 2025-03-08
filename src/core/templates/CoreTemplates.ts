@@ -1,8 +1,9 @@
 /**
  * Templates for the main Memory Bank files
  * 
- * All templates are in English to ensure consistency across different environments.
- * The Memory Bank will always be generated in English regardless of the system locale.
+ * IMPORTANT: All templates are in English to ensure consistency across different environments.
+ * The Memory Bank will always be generated in English regardless of the system locale or user settings.
+ * This is a deliberate design decision to simplify the codebase and ensure consistency.
  */
 
 /**

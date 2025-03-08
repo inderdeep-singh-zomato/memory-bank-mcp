@@ -72,6 +72,7 @@ export function setupToolHandlers(
           if (!dirPath) {
             throw new McpError(ErrorCode.InvalidParams, 'Path not specified');
           }
+          console.error('Initializing Memory Bank at path:', dirPath);
           return handleInitializeMemoryBank(memoryBankManager, dirPath);
         }
 

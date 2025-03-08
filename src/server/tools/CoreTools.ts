@@ -1,6 +1,8 @@
 import path from 'path';
 import { MemoryBankManager } from '../../core/MemoryBankManager.js';
 import { MigrationUtils } from '../../utils/MigrationUtils.js';
+import { FileUtils } from '../../utils/FileUtils.js';
+import os from 'os';
 
 /**
  * Definition of the main Memory Bank tools
@@ -103,38 +105,52 @@ export const coreTools = [
 /**
  * Processes the set_memory_bank_path tool
  * @param memoryBankManager Memory Bank Manager
- * @param customPath Custom path for the Memory Bank (optional)
+ * @param customPath Custom path for the Memory Bank (ignored, always uses current directory)
  * @returns Operation result
  */
 export async function handleSetMemoryBankPath(
   memoryBankManager: MemoryBankManager,
   customPath?: string
 ) {
-  memoryBankManager.setCustomPath(customPath);
-  const CWD = process.cwd();
-  const memoryBankDir = await memoryBankManager.findMemoryBankDir(CWD, customPath);
+  // Use the provided path, project path, or the current directory
+  const basePath = customPath || memoryBankManager.getProjectPath();
   
-  if (memoryBankDir) {
-    memoryBankManager.setMemoryBankDir(memoryBankDir);
+  // Ensure the path is absolute
+  const absolutePath = path.isAbsolute(basePath) ? basePath : path.resolve(process.cwd(), basePath);
+  console.error('Using absolute path for Memory Bank:', absolutePath);
+  
+  memoryBankManager.setCustomPath(absolutePath);
+  
+  // Check for files in both project directory and fallback directory
+  const directMemoryBankPath = path.join(absolutePath, 'memory-bank');
+  if (await FileUtils.fileExists(directMemoryBankPath) && await FileUtils.isDirectory(directMemoryBankPath)) {
+    // Check if it contains .md files
+    const files = await FileUtils.listFiles(directMemoryBankPath);
+    const mdFiles = files.filter(file => file.endsWith('.md'));
     
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Memory Bank path set to ${memoryBankDir}`,
-        },
-      ],
-    };
-  } else {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Memory Bank not found at ${customPath}. The path will be used when initializing a new Memory Bank.`,
-        },
-      ],
-    };
+    if (mdFiles.length > 0) {
+      memoryBankManager.setMemoryBankDir(directMemoryBankPath);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Memory Bank path set to ${directMemoryBankPath}`,
+          },
+        ],
+      };
+    }
   }
+  
+  // If we get here, no valid Memory Bank was found
+  return {
+    content: [
+      {
+        type: 'text',
+        text: `Memory Bank not found in the provided directory. Use initialize_memory_bank to create one.`,
+      },
+    ],
+  };
 }
 
 /**
@@ -147,20 +163,94 @@ export async function handleInitializeMemoryBank(
   memoryBankManager: MemoryBankManager,
   dirPath: string
 ) {
-  const CWD = process.cwd();
-  const customPath = memoryBankManager.getCustomPath();
-  
-  // Use custom path if defined, otherwise use default
-  const fullPath = customPath ? path.resolve(CWD, dirPath) : dirPath;
-
   try {
-    await memoryBankManager.initializeMemoryBank(fullPath);
+    // If dirPath is not provided, use the project path
+    const basePath = dirPath || memoryBankManager.getProjectPath();
+    
+    // Ensure the path is absolute
+    const absolutePath = path.isAbsolute(basePath) ? basePath : path.resolve(process.cwd(), basePath);
+    console.error('Using absolute path:', absolutePath);
+    
+    try {
+      // Use the provided directory path
+      await memoryBankManager.initializeMemoryBank(absolutePath);
+    } catch (initError) {
+      // Check if the error is related to .clinerules files
+      const errorMessage = String(initError);
+      if (errorMessage.includes('.clinerules')) {
+        console.warn('Warning: Error related to .clinerules files:', initError);
+        console.warn('Continuing with Memory Bank initialization despite .clinerules issues.');
+        
+        // Try to create the memory-bank directory anyway
+        const memoryBankDir = path.join(absolutePath, 'memory-bank');
+        try {
+          await FileUtils.ensureDirectory(memoryBankDir);
+          memoryBankManager.setMemoryBankDir(memoryBankDir);
+          
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Memory Bank initialized at ${memoryBankDir} (with warnings about .clinerules files)`,
+              },
+            ],
+          };
+        } catch (dirError) {
+          console.error('Failed to create memory-bank directory:', dirError);
+          
+          // Try to use an existing memory-bank directory if it exists
+          if (await FileUtils.fileExists(memoryBankDir) && await FileUtils.isDirectory(memoryBankDir)) {
+            memoryBankManager.setMemoryBankDir(memoryBankDir);
+            
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Memory Bank initialized at ${memoryBankDir} (with warnings)`,
+                },
+              ],
+            };
+          }
+          
+          // If we can't create or find a memory-bank directory, try to use a fallback directory
+          try {
+            const homeDir = os.homedir();
+            const fallbackDir = path.join(homeDir, '.memory-bank-mcp', 'memory-bank');
+            await FileUtils.ensureDirectory(fallbackDir);
+            memoryBankManager.setMemoryBankDir(fallbackDir);
+            
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Memory Bank initialized at fallback location: ${fallbackDir}`,
+                },
+              ],
+            };
+          } catch (fallbackError) {
+            // If all else fails, return an error
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Error initializing Memory Bank: ${initError}. Failed to create fallback directory: ${fallbackError}`,
+                },
+              ],
+              isError: true,
+            };
+          }
+        }
+      }
+      
+      // For other types of errors, just return the error
+      throw initError;
+    }
 
     return {
       content: [
         {
           type: 'text',
-          text: `Memory Bank successfully initialized at ${fullPath}`,
+          text: `Memory Bank successfully initialized at ${absolutePath}/memory-bank`,
         },
       ],
     };
