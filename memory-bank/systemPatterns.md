@@ -24,6 +24,17 @@ The system uses a consistent error handling pattern, with MCP-specific error cla
 
 I/O operations are implemented as asynchronous functions using async/await, following best practices for non-blocking operations.
 
+### Testing Patterns
+
+The project uses Bun's built-in test runner with a describe/test pattern similar to Jest:
+
+- `describe` blocks for grouping related tests
+- `test` blocks for individual test cases
+- `beforeEach`/`afterEach` hooks for setup and teardown
+- Asynchronous tests using async/await
+- Event testing using promises
+- Temporary file creation and cleanup for file-based tests
+
 ## Documentation Patterns
 
 ### Markdown Files

@@ -49,3 +49,26 @@ This document tracks important decisions made during the development of the Memo
   - Improved discoverability on npm
   - Clear indication that it's an MCP server
   - Consistent naming across documentation and code
+
+## Testing Framework Selection
+
+- **Date:** 2024-03-08 22:40:00
+- **Context:** The project needed automated tests for the clinerules integration, and a testing framework had to be selected.
+- **Decision:** Use Bun's built-in test runner instead of Jest or other testing frameworks.
+- **Alternatives Considered:**
+  - Jest
+  - Mocha + Chai
+  - Vitest
+  - AVA
+- **Consequences:**
+  - Faster test execution with Bun's test runner
+  - Simplified setup without additional dependencies
+  - Consistent tooling (using Bun for both building and testing)
+  - Better integration with the Bun ecosystem
+  - Reduced configuration complexity
+## Test Framework Selection
+- **Date:** 2025-03-08
+- **Context:** The project needed a testing framework for implementing automated tests. We had to choose between Jest, Mocha, and Bun's built-in test runner.
+- **Decision:** Use Bun's built-in test runner for all tests.
+- **Alternatives Considered:** Jest - Popular testing framework with extensive features, Mocha + Chai - Flexible testing framework with separate assertion library, Vitest - Fast testing framework compatible with Vite, AVA - Minimalist testing framework
+- **Consequences:** Faster test execution with Bun's test runner, Simplified setup without additional dependencies, Consistent tooling (using Bun for both building and testing), Better integration with the Bun ecosystem, Reduced configuration complexity, Some limitations compared to more mature frameworks like Jest

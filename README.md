@@ -50,7 +50,7 @@ memory-bank-mcp start --mode architect
 import { MemoryBankServer } from "@movibe/memory-bank-mcp";
 
 async function main() {
-  // Opcional: especificar um modo inicial
+  // Optional: specify an initial mode
   const server = new MemoryBankServer("code");
   await server.run();
 }
@@ -111,9 +111,14 @@ bun run start
 
 # Development mode with hot reloading
 bun run dev
+
+# Run tests
+bun test
 ```
 
 For more information about building with Bun, see [Building with Bun](docs/build-with-bun.md).
+
+For more information about testing with Bun, see [Testing with Bun](docs/testing.md).
 
 ### Project Structure
 
@@ -121,6 +126,7 @@ For more information about building with Bun, see [Building with Bun](docs/build
 - `src/server/`: MCP server implementation
 - `src/utils/`: Utility functions
 - `src/index.ts`: Main entry point
+- `src/__tests__/`: Test files
 
 ## License
 
