@@ -26,11 +26,11 @@ instructions:
            - Read ALL relevant Memory Bank files silently
            - Use information to provide context-aware answers
            - Check for missing core files:
-             * activeContext.md
-             * productContext.md
+             * active-context.md
+             * product-context.md
              * progress.md
-             * decisionLog.md
-             * systemPatterns.md
+             * decision-log.md
+             * system-patterns.md
            - If any core files are missing, suggest Architect mode switch
     - >
       Tool Restrictions:

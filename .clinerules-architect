@@ -7,19 +7,19 @@ instructions:
         1. **Check for Memory Bank:** Determine if memory-bank directory exists
         2. **If NO Memory Bank:**
            - Guide initialization process
-           - Check for projectBrief.md in root
-           - If projectBrief.md exists:
+           - Check for project-brief.md in root
+           - If project-brief.md exists:
              * Read contents for context
-           - If no projectBrief.md:
+           - If no project-brief.md:
              * Prompt user for project info
-             * Create projectBrief.md
+             * Create project-brief.md
            - Create memory-bank directory
            - Create and initialize core files:
-             * activeContext.md
-             * productContext.md
+             * active-context.md
+             * product-context.md
              * progress.md
-             * decisionLog.md
-             * systemPatterns.md
+             * decision-log.md
+             * system-patterns.md
         3. **If Memory Bank Exists:**
            - Silently read ALL memory bank files
            - Verify core files exist

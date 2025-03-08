@@ -72,16 +72,45 @@ This document tracks important decisions made during the development of the Memo
   - Simplification of code, as there's no need to handle multiple languages
 
 ## Implementation of Semantic Versioning with Changelog Generation
+
 - **Date:** 2025-03-08 2:10:24 AM
 - **Context:** The project needed a standardized approach to versioning and a way to automatically generate a changelog based on commit messages.
 - **Decision:** Implemented Semantic Versioning with automatic changelog generation using standard-version in the GitHub Actions workflow for npm publish.
-- **Alternatives Considered:** 
+- **Alternatives Considered:**
   - Manual version management
   - Using a different versioning tool like semantic-release
   - Not using automatic versioning at all
-- **Consequences:** 
+- **Consequences:**
   - Automatic version bumping based on commit message types
   - Standardized changelog generation
   - Better documentation of changes for users
   - Enforced commit message format for contributors
   - Simplified release process
+
+## Roo Code Integration Strategy
+- **Date:** 2025-03-08 10:42:38 AM
+- **Context:** When running Memory Bank MCP in Roo Code environments, the system was encountering errors because it was trying to create .clinerules files in the root directory (/), which is a read-only file system. This prevented the Memory Bank from initializing properly.
+- **Decision:** Implemented a fallback directory strategy that uses alternative writable directories (home directory or temporary directory) when the project directory is read-only. Enhanced error handling throughout the codebase to continue operation despite non-critical errors.
+- **Alternatives Considered:** 
+  - Require users to manually create .clinerules files in a writable location
+  - Disable .clinerules functionality in read-only environments
+  - Store .clinerules content in memory without writing to disk
+- **Consequences:** 
+  - Memory Bank MCP now works correctly in Roo Code environments
+  - The system is more robust when running in environments with file system restrictions
+  - Users don't need to manually configure anything for read-only environments
+  - The codebase is more resilient to errors in general
+
+## Environment Variables Configuration Support
+- **Date:** 2025-03-08 10:48:08 AM
+- **Context:** When running Memory Bank MCP in environments like Roo Code with read-only file systems, users were encountering errors because the system was trying to create files in directories that weren't writable. While we implemented fallback directory strategies, users needed a way to explicitly specify a writable project directory without modifying the code.
+- **Decision:** Implemented support for environment variables (MEMORY_BANK_PROJECT_PATH and MEMORY_BANK_MODE) to allow users to configure Memory Bank MCP without modifying command-line arguments. Modified the codebase to consistently use the project path throughout the application.
+- **Alternatives Considered:** 
+  - Add a configuration file option
+  - Only support command-line arguments
+  - Automatically detect writable directories without user input
+- **Consequences:** 
+  - Users can now easily configure Memory Bank MCP in environments with read-only file systems
+  - The system is more flexible and can be configured in containerized environments
+  - Environment variables take precedence over command-line arguments, providing a clear priority order
+  - Added documentation makes it easy for users to understand how to use the environment variables

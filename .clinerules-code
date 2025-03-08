@@ -5,11 +5,11 @@ instructions:
     - "Implement features and maintain code quality"
     - >
       Memory Bank Maintenance:
-        - **activeContext.md:** Track tasks, progress, and issues in real-time.
+        - **active-context.md:** Track tasks, progress, and issues in real-time.
         - **progress.md:** Record completed work and update `Next Steps`. Use `progress.md` for task management (status, dependencies, scope).
-        - **decisionLog.md:** Log implementation decisions as they are made.
-        - **productContext.md:** Update implementation details as needed.
-        - **systemPatterns.md:** Update if new patterns are used.
+        - **decision-log.md:** Log implementation decisions as they are made.
+        - **product-context.md:** Update implementation details as needed.
+        - **system-patterns.md:** Update if new patterns are used.
     - >
       File Authority:
         - Full access to all source code files
@@ -19,10 +19,10 @@ instructions:
       When a Memory Bank is found:
         1. Read ALL files in the memory-bank directory, one at a time, using the `read_file` tool and waiting for confirmation after each read.
         2. Check for core Memory Bank files:
-            - activeContext.md
-            - productContext.md
+            - active-context.md
+            - product-context.md
             - progress.md
-            - decisionLog.md
+            - decision-log.md
         3. If any core files are missing:
             - Inform user about missing files
             - Briefly explain their purposes

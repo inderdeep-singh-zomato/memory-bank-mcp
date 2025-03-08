@@ -14,11 +14,11 @@ instructions:
         3. **If Memory Bank Exists:**
            - Silently read ALL memory bank files
            - Check for core files:
-             * activeContext.md
-             * productContext.md
+             * active-context.md
+             * product-context.md
              * progress.md
-             * decisionLog.md
-             * systemPatterns.md
+             * decision-log.md
+             * system-patterns.md
            - If any core files missing, suggest Architect mode switch
     - >
       Access Rules:

@@ -2,6 +2,8 @@ import fs from 'fs-extra';
 import path from 'path';
 import { EventEmitter } from 'events';
 import yaml from 'js-yaml';
+import { clineruleTemplates } from './ClineruleTemplates.js';
+import os from 'os';
 
 /**
  * Interface to represent the basic structure of rules
@@ -35,6 +37,105 @@ export class ExternalRulesLoader extends EventEmitter {
   constructor(projectDir?: string) {
     super();
     this.projectDir = projectDir || process.cwd();
+    console.error(`ExternalRulesLoader initialized with project directory: ${this.projectDir}`);
+  }
+
+  /**
+   * Gets a writable directory for storing .clinerules files
+   * Tries project directory first, then user's home directory, then temp directory
+   * @returns A writable directory path
+   */
+  private async getWritableDirectory(): Promise<string> {
+    // Check if the project directory is writable
+    let targetDir = this.projectDir;
+    let isWritable = false;
+    
+    try {
+      // Try to write a temporary file to check if the directory is writable
+      const testFile = path.join(targetDir, '.clinerules-test-write');
+      await fs.writeFile(testFile, 'test');
+      await fs.remove(testFile);
+      isWritable = true;
+    } catch (error) {
+      console.warn(`Project directory ${targetDir} is not writable. Using fallback directory.`);
+      isWritable = false;
+    }
+    
+    // If the directory is not writable, use a fallback directory
+    if (!isWritable) {
+      // Try user's home directory
+      try {
+        targetDir = path.join(os.homedir(), '.memory-bank-mcp');
+        await fs.ensureDir(targetDir);
+        console.warn(`Using fallback directory: ${targetDir}`);
+        return targetDir;
+      } catch (error) {
+        // If home directory is not writable, try temporary directory
+        try {
+          targetDir = path.join(os.tmpdir(), '.memory-bank-mcp');
+          await fs.ensureDir(targetDir);
+          console.warn(`Using temporary directory: ${targetDir}`);
+          return targetDir;
+        } catch (tmpError) {
+          console.error('Failed to create fallback directory:', tmpError);
+          // Return project directory as a last resort, even if it's not writable
+          return this.projectDir;
+        }
+      }
+    }
+    
+    return targetDir;
+  }
+
+  /**
+   * Validates if all required .clinerules files exist
+   * @returns Validation result with missing files
+   */
+  async validateRequiredFiles(): Promise<{
+    valid: boolean;
+    missingFiles: string[];
+    existingFiles: string[];
+  }> {
+    const modes = ['architect', 'ask', 'code', 'debug', 'test'];
+    const missingFiles: string[] = [];
+    const existingFiles: string[] = [];
+    
+    // Get a writable directory for .clinerules files
+    const targetDir = await this.getWritableDirectory();
+    
+    // Check for files in both project directory and fallback directory
+    for (const mode of modes) {
+      const filename = `.clinerules-${mode}`;
+      const projectFilePath = path.join(this.projectDir, filename);
+      const fallbackFilePath = path.join(targetDir, filename);
+      
+      if (await fs.pathExists(projectFilePath) || await fs.pathExists(fallbackFilePath)) {
+        existingFiles.push(filename);
+      } else {
+        missingFiles.push(filename);
+      }
+    }
+    
+    // If there are missing files, try to create them
+    if (missingFiles.length > 0) {
+      console.warn(`Missing .clinerules files: ${missingFiles.join(', ')}`);
+      const createdFiles = await this.createMissingClinerules(missingFiles);
+      
+      // Update the lists
+      for (const file of createdFiles) {
+        const index = missingFiles.indexOf(file);
+        if (index !== -1) {
+          missingFiles.splice(index, 1);
+          existingFiles.push(file);
+        }
+      }
+    }
+    
+    return {
+      valid: missingFiles.length === 0,
+      missingFiles,
+      existingFiles
+    };
   }
 
   /**
@@ -43,33 +144,59 @@ export class ExternalRulesLoader extends EventEmitter {
   async detectAndLoadRules(): Promise<Map<string, ClineruleBase>> {
     const modes = ['architect', 'ask', 'code', 'debug', 'test'];
     
+    // Validate required files and create missing ones
+    const validation = await this.validateRequiredFiles();
+    if (!validation.valid) {
+      console.warn(`Warning: Some .clinerules files could not be created: ${validation.missingFiles.join(', ')}`);
+    }
+    
     // Clear existing watchers
     this.stopWatching();
     
     // Clear existing rules
     this.rules.clear();
     
+    // Get the fallback directory
+    const fallbackDir = await this.getWritableDirectory();
+    
     for (const mode of modes) {
       const filename = `.clinerules-${mode}`;
-      const filePath = path.join(this.projectDir, filename);
+      const projectFilePath = path.join(this.projectDir, filename);
+      const fallbackFilePath = path.join(fallbackDir, filename);
       
       try {
-        if (await fs.pathExists(filePath)) {
-          const content = await fs.readFile(filePath, 'utf8');
+        // First try to load from project directory
+        if (await fs.pathExists(projectFilePath)) {
+          const content = await fs.readFile(projectFilePath, 'utf8');
           const rule = this.parseRuleContent(content);
           
           if (rule && rule.mode === mode) {
             this.rules.set(mode, rule);
-            console.error(`Loaded ${filename} rules`);
+            console.error(`Loaded ${filename} rules from project directory`);
             
             // Set up watcher for this file
-            this.watchRuleFile(filePath, mode);
+            this.watchRuleFile(projectFilePath, mode);
           } else {
-            console.error(`Invalid rule format in ${filename}`);
+            console.warn(`Invalid rule format in ${filename} (project directory)`);
+          }
+        } 
+        // If not found in project directory, try fallback directory
+        else if (await fs.pathExists(fallbackFilePath)) {
+          const content = await fs.readFile(fallbackFilePath, 'utf8');
+          const rule = this.parseRuleContent(content);
+          
+          if (rule && rule.mode === mode) {
+            this.rules.set(mode, rule);
+            console.error(`Loaded ${filename} rules from fallback directory`);
+            
+            // Set up watcher for this file
+            this.watchRuleFile(fallbackFilePath, mode);
+          } else {
+            console.warn(`Invalid rule format in ${filename} (fallback directory)`);
           }
         }
       } catch (error) {
-        console.error(`Error loading ${filename}:`, error);
+        console.warn(`Error loading ${filename}:`, error);
       }
     }
     
@@ -180,4 +307,36 @@ export class ExternalRulesLoader extends EventEmitter {
     this.removeAllListeners();
     this.rules.clear();
   }
-} 
+
+  /**
+   * Creates missing .clinerules files using templates
+   * @param missingFiles Array of missing file names
+   * @returns Array of created file names
+   */
+  async createMissingClinerules(missingFiles: string[]): Promise<string[]> {
+    const createdFiles: string[] = [];
+    
+    // Get a writable directory for .clinerules files
+    const targetDir = await this.getWritableDirectory();
+    
+    for (const filename of missingFiles) {
+      // Extract mode from filename (e.g., 'architect' from '.clinerules-architect')
+      const mode = filename.replace('.clinerules-', '');
+      
+      if (clineruleTemplates[mode]) {
+        const filePath = path.join(targetDir, filename);
+        try {
+          await fs.writeFile(filePath, clineruleTemplates[mode]);
+          createdFiles.push(filename);
+          console.error(`Created ${filename} with default template in ${targetDir}`);
+        } catch (error) {
+          console.error(`Failed to create ${filename}:`, error);
+        }
+      } else {
+        console.error(`No template available for ${filename}`);
+      }
+    }
+    
+    return createdFiles;
+  }
+}

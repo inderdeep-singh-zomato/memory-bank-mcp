@@ -6,6 +6,15 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Update History
 
+- [2025-03-08 10:48:08 AM] - Decision Made: Environment Variables Configuration Support
+- [2025-03-08 10:48:00 AM] - Environment Variables Support: Added support for configuring Memory Bank MCP through environment variables. Implemented MEMORY_BANK_PROJECT_PATH to specify the project directory, which is particularly useful in environments with read-only file systems like Roo Code. Modified the codebase to use the project path consistently throughout the application. Created documentation explaining how to use environment variables with Memory Bank MCP.
+- [2025-03-08 10:42:38 AM] - Decision Made: Roo Code Integration Strategy
+- [2025-03-08 10:42:30 AM] - Roo Code Integration: Implemented robust error handling and fallback directory strategies to ensure Memory Bank MCP works correctly in Roo Code environments with read-only file systems. Modified ExternalRulesLoader to detect writable directories and use alternative locations when needed. Enhanced error handling throughout the codebase to continue operation despite non-critical errors. Created documentation explaining the changes and how to test in read-only environments.
+- [2025-03-08 10:38:20 AM] - English Translation Update: Updated Memory Bank files to ensure all content is in English. Translated Portuguese entries in active-context.md and progress.md to English, specifically the recent bug fix documentation and completion notes. This ensures consistency across all Memory Bank files and aligns with the project's development guidelines that specify all content should be in English.
+- [2025-03-08 10:37:57 AM] - File Update: Updated progress.md
+- [2025-03-08 10:34:15 AM] - Completion: We completed the bug fixing task in Memory Bank MCP. We identified and fixed issues with Memory Bank initialization, memory-bank directory detection, and .clinerules files validation. We made the code more robust to handle errors and improved the user experience. We also created detailed documentation about the changes and updated the README.md to mention the recent improvements.
+- [2025-03-08 10:33:59 AM] - Documentation: We created detailed documentation about the bug fixes implemented in Memory Bank MCP. We added a docs/memory-bank-bug-fixes.md file with information about the identified issues, implemented solutions, and the impact of the changes. We also updated the README.md to mention the recent improvements.
+- [2025-03-08 10:33:14 AM] - File Update: Updated memory-bank-bug-fixes.md
 - [2025-03-08 2:27:39 AM] - Memory Bank English Translation: Reviewed all Memory Bank files and translated the remaining Portuguese content to English. Updated progress.md and active-context.md to ensure all entries are in English. This completes the task of ensuring all files in the project are in English as required.
 - [2025-03-08 2:27:35 AM] - File Update: Updated active-context.md
 - [2025-03-08 2:26:35 AM] - File Update: Updated progress.md

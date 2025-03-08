@@ -20,6 +20,7 @@ Memory Bank MCP was inspired by [Roo Code Memory Bank](https://github.com/GreatS
 1. **Mode Concept**: Both systems use the concept of "modes" to adapt the AI assistant's behavior for different tasks (architect, code, debug, etc.).
 
 2. **Context Files**: Both maintain similar context files:
+
    - `activeContext.md` - Current project state
    - `progress.md` - Progress record
    - `decisionLog.md` - Decision record
@@ -32,14 +33,17 @@ Memory Bank MCP was inspired by [Roo Code Memory Bank](https://github.com/GreatS
 ### Differences
 
 1. **Technical Implementation**:
+
    - Memory Bank MCP: Implemented as an MCP (Model Context Protocol) server in TypeScript/Node.js
    - Roo Code: Implemented as a set of instructions and templates for AI assistants
 
 2. **Integration**:
+
    - Memory Bank MCP: Provides an API and programmatic tools for system integration
    - Roo Code: Primarily designed for direct use by humans and AI assistants
 
 3. **Rule Formats**:
+
    - Memory Bank MCP: Supports multiple formats (JSON, YAML, TOML)
    - Roo Code: Primarily focuses on text format instructions
 
@@ -54,12 +58,14 @@ Memory Bank MCP was inspired by [Roo Code Memory Bank](https://github.com/GreatS
 If you're already using Roo Code Memory Bank, you can migrate to Memory Bank MCP by following these steps:
 
 1. **Transfer Context Files**:
+
    ```bash
    # Copy files from Roo Code to Memory Bank MCP
    cp /path/to/roo-code/*.md /path/to/memory-bank/
    ```
 
 2. **Convert Instructions to Rule Files**:
+
    - Transform Roo Code instructions into `.clinerules-[mode]` files in JSON, YAML, or TOML
    - Use the examples provided in `rule-examples.md` as a base
 
@@ -72,10 +78,12 @@ If you're already using Roo Code Memory Bank, you can migrate to Memory Bank MCP
 The two systems can be used complementarily:
 
 1. **Roo Code for Conceptual Structure**:
+
    - Use Roo Code as a conceptual guide and thinking structure
    - Leverage its templates and prompt examples
 
 2. **Memory Bank MCP for Technical Implementation**:
+
    - Use Memory Bank MCP as the technical implementation and infrastructure
    - Leverage programmatic resources and MCP integration
 
@@ -89,16 +97,16 @@ The two systems can be used complementarily:
 
 ```typescript
 // Import Memory Bank MCP
-import { MemoryBankManager } from 'memory-bank-mcp';
+import { MemoryBankManager } from "memory-bank-mcp";
 
 // Initialize with Roo Code-inspired structure
 const memoryBank = new MemoryBankManager({
   templates: {
-    activeContext: require('./roo-code-templates/activeContext.md'),
-    progress: require('./roo-code-templates/progress.md'),
-    decisionLog: require('./roo-code-templates/decisionLog.md'),
-    systemPatterns: require('./roo-code-templates/systemPatterns.md')
-  }
+    activeContext: require("./roo-code-templates/activeContext.md"),
+    progress: require("./roo-code-templates/progress.md"),
+    decisionLog: require("./roo-code-templates/decisionLog.md"),
+    systemPatterns: require("./roo-code-templates/systemPatterns.md"),
+  },
 });
 
 // Use Memory Bank MCP with Roo Code concepts
@@ -136,4 +144,4 @@ Memory Bank MCP acknowledges and thanks Scott MacKenzie (GreatScottyMac) for dev
 
 ---
 
-*Memory Bank MCP is inspired by [Roo Code Memory Bank](https://github.com/GreatScottyMac/roo-code-memory-bank) developed by Scott MacKenzie.*
+_Memory Bank MCP is inspired by [Roo Code Memory Bank](https://github.com/GreatScottyMac/roo-code-memory-bank) developed by Scott MacKenzie._

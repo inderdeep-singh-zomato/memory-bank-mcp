@@ -19,6 +19,16 @@ Memory Bank Server provides a set of tools and resources for AI assistants to in
 - **Active Context Management**: Maintain and update active context information
 - **Mode Support**: Detect and use .clinerules files for mode-specific behavior
 - **UMB Command**: Update Memory Bank files temporarily with the UMB command
+- **Robust Error Handling**: Gracefully handle errors and continue operation when possible
+
+## Recent Improvements 🛠️
+
+- **Enhanced Initialization**: Memory Bank now works even when .clinerules files don't exist
+- **Better Path Handling**: Improved handling of absolute and relative paths
+- **Improved Directory Detection**: Better detection of existing memory-bank directories
+- **More Robust Error Handling**: Graceful handling of errors related to .clinerules files
+
+For more details, see [Memory Bank Bug Fixes](docs/memory-bank-bug-fixes.md).
 
 ## Installation 🚀
 
