@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [0.1.2](https://github.com/movibe/memory-bank-server/compare/v0.1.1...v0.1.2) (2025-03-08)
+
+
+### Documentation
+
+* Update repository URLs and English translation ([75afb2c](https://github.com/movibe/memory-bank-server/commit/75afb2cad335709bc01cca3fcaf91a4e66346341))
+
 ### 0.1.1 (2025-03-08)
 
 
