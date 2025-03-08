@@ -2,7 +2,7 @@
 
 [![NPM Version](https://img.shields.io/npm/v/@movibe/memory-bank-mcp.svg)](https://www.npmjs.com/package/@movibe/memory-bank-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/movibe/memory-bank-server/actions/workflows/test.yml/badge.svg)](https://github.com/movibe/memory-bank-server/actions/workflows/test.yml)
+[![Tests](https://github.com/movibe/memory-bank-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/movibe/memory-bank-mcp/actions/workflows/test.yml)
 
 A Model Context Protocol (MCP) server for managing Memory Banks, allowing AI assistants to store and retrieve information across sessions.
 

@@ -1,0 +1,16 @@
+{
+    "mcpServers": {
+        "memory-bank": {
+            "command": "node",
+            "args": [
+                "/Users/movibe/Documents/Cline/MCP/memory-bank-server/build/index.js"
+            ],
+            "disabled": false,
+            "alwaysAllow": [],
+            "env": {
+                "DEBUG": "mcp:*",
+                "NODE_ENV": "production"
+            }
+        }
+    }
+}

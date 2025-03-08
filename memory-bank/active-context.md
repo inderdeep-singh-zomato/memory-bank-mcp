@@ -6,8 +6,12 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Current Session Notes
 
-- [2:17:30 AM] Aprimoramento da Documentação: Atualizei o README.md para inglês, adicionei emojis em todas as seções para melhorar a apresentação visual e incluí uma nova seção detalhada sobre os diferentes modos do MCP (Code, Architect, Ask, Debug e Test) com instruções sobre como usar e alternar entre eles.
-- [2:15:54 AM] Atualização da Documentação para uso do npx: Atualizei o README.md e o docs/cursor-integration.md para usar npx em vez de instalação global do pacote Memory Bank MCP. Isso simplifica o processo de instalação e configuração para os usuários do Cursor, eliminando a necessidade de instalar o pacote globalmente.
+- [2:27:39 AM] Memory Bank English Translation: Reviewed all Memory Bank files and translated the remaining Portuguese content to English. Updated progress.md and active-context.md to ensure all entries are in English. This completes the task of ensuring all files in the project are in English as required.
+- [2:27:35 AM] File Update: Updated active-context.md
+- [2:24:17 AM] Repository URL Updates: Updated all repository URLs in package.json and README.md to point to the correct repository (memory-bank-mcp). Ensured all files are in English as required.
+- [2:22:46 AM] GitHub Release Configuration: Configured the GitHub Actions workflow to automatically create a GitHub release when a new version is generated. The release will include only the current version's notes extracted from CHANGELOG.md. Also corrected the repository URLs in the .versionrc.json file to point to the correct repository (memory-bank-mcp).
+- [2:17:30 AM] Documentation Enhancement: Updated the README.md to English, added emojis to all sections to improve visual presentation, and included a new detailed section about the different MCP modes (Code, Architect, Ask, Debug, and Test) with instructions on how to use and switch between them.
+- [2:15:54 AM] Documentation Update for npx Usage: Updated README.md and docs/cursor-integration.md to use npx instead of global installation of the Memory Bank MCP package. This simplifies the installation and configuration process for Cursor users, eliminating the need to install the package globally.
 - [2:14:00 AM] Added Cursor Integration Documentation: Created comprehensive documentation for integrating Memory Bank MCP with Cursor. Added a detailed cursor-integration.md guide with configuration steps, usage examples, workflow examples, troubleshooting tips, and best practices. Updated the main README.md with a link to the new documentation and enhanced the docs/README.md index to include the new guide.
 - [2:12:42 AM] Enhanced README Documentation: Enhanced the README.md with comprehensive information about configuring Memory Bank MCP in Cursor, detailed explanations of how the MCP works, core components, data flow, Memory Bank structure, advanced features, and usage examples both as a command-line tool and as a library.
 - [2:10:24 AM] Decision Made: Implementation of Semantic Versioning with Changelog Generation
@@ -121,19 +125,12 @@ All project documentation and Memory Bank files are now consistently in English,
 
 ## Ongoing Tasks
 
-- Standardize Memory Bank file naming pattern
-- Maintain and update the npm package
-- Ensure all Memory Bank templates are in English
-
+- Ensure all Memory Bank files are in English
 ## Known Issues
 
 - Verify if the build process is correctly generating type declaration files
 
 ## Next Steps
 
-- Add tests for the new MigrationUtils class
-- Update existing tests to use the new file naming convention
-- Create a migration guide for users with existing Memory Banks
-- Consider implementing semantic versioning for future releases
-- Add more examples of using the package via npx in the documentation
-- Document the English-only approach in the project documentation
+- Continue to maintain all documentation and code in English
+- Verify that the GitHub Actions workflow works correctly with the updated repository URLs

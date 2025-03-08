@@ -31,12 +31,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/movibe/memory-bank-server.git"
+    "url": "git+https://github.com/movibe/memory-bank-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/movibe/memory-bank-server/issues"
+    "url": "https://github.com/movibe/memory-bank-mcp/issues"
   },
-  "homepage": "https://github.com/movibe/memory-bank-server#readme",
+  "homepage": "https://github.com/movibe/memory-bank-mcp#readme",
   "publishConfig": {
     "access": "public"
   },

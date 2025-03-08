@@ -59,10 +59,34 @@ jobs:
             npx standard-version --release-as patch
           fi
 
+          # Extract the new version number
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+          # Extract the current version's changelog
+          VERSION_HEADER="## $NEW_VERSION"
+          RELEASE_NOTES=$(awk -v version="$VERSION_HEADER" '/^## [0-9]+\.[0-9]+\.[0-9]+/ {if (p) { exit }; if ($0 ~ version) { p=1; print; next }} p { print }' CHANGELOG.md)
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$RELEASE_NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
           # Push changes back to the repository
           git push --follow-tags origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v${{ env.NEW_VERSION }}
+          name: Release v${{ env.NEW_VERSION }}
+          body: ${{ env.RELEASE_NOTES }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish to NPM
         run: npm publish
         env:
