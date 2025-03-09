@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0](https://github.com/movibe/memory-bank-server/compare/v0.2.1...v0.3.0) (2025-03-09)
+
+
+### Features
+
+* Implement Centralized Logging System with Debug Mode Support ([6b84223](https://github.com/movibe/memory-bank-server/commit/6b842230e8eb3763c74403b1a34ce28832cc1b86))
+* Update User Identification with GitHub Profile URL Support ([4311147](https://github.com/movibe/memory-bank-server/commit/43111473af58f434b0ea5891036ca9cedbda02ce))
+
+
+### Documentation
+
+* Add debug MCP configuration tool and documentation ([22744cc](https://github.com/movibe/memory-bank-server/commit/22744cc9dbc72725ba9d71cb261c64b6216758ed))
+
 ### [0.2.1](https://github.com/movibe/memory-bank-server/compare/v0.2.0...v0.2.1) (2025-03-08)
 
 

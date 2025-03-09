@@ -1,6 +1,6 @@
 {
   "name": "@movibe/memory-bank-mcp",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "MCP Server for managing Memory Bank",
   "type": "module",
   "main": "build/index.js",
