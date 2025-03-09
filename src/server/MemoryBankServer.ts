@@ -30,9 +30,10 @@ export class MemoryBankServer {
    * @param projectPath Project path (optional)
    * @param userId User ID for tracking changes (optional)
    * @param folderName Memory Bank folder name (optional, default: 'memory-bank')
+   * @param debugMode Enable debug mode (optional, default: false)
    */
-  constructor(initialMode?: string, projectPath?: string, userId?: string, folderName?: string) {
-    this.memoryBankManager = new MemoryBankManager(projectPath, userId, folderName);
+  constructor(initialMode?: string, projectPath?: string, userId?: string, folderName?: string, debugMode?: boolean) {
+    this.memoryBankManager = new MemoryBankManager(projectPath, userId, folderName, debugMode);
     
     // Combine all tools
     const allTools = [

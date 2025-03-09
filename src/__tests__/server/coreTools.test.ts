@@ -67,7 +67,7 @@ describe('CoreTools Tests', () => {
     // Verify the result
     expect(typeof result).toBe('object');
     expect(result.content).toHaveLength(1);
-    expect(result.content[0].text).toContain('Memory Bank successfully initialized');
+    expect(result.content[0].text).toContain('Memory Bank initialized at');
     
     // Verify the memory bank directory was created
     const memoryBankExists = await fs.pathExists(path.join(projectPath, 'memory-bank'));
@@ -89,7 +89,7 @@ describe('CoreTools Tests', () => {
     // Verify the result
     expect(typeof result).toBe('object');
     expect(result.content).toHaveLength(1);
-    expect(result.content[0].text).toContain('Memory Bank successfully initialized');
+    expect(result.content[0].text).toContain('Memory Bank initialized at');
     
     // Verify the memory bank directory was created
     const memoryBankExists = await fs.pathExists(path.join(customDir, 'memory-bank'));

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { MemoryBankServer } from './server/MemoryBankServer.js';
+import { getLogManager, logger, LogLevel } from './utils/LogManager.js';
 
 /**
  * Display program help
@@ -15,6 +16,7 @@ Options:
   --path, -p <path>    Set project path (default: current directory)
   --folder, -f <folder> Set Memory Bank folder name (default: memory-bank)
   --user, -u <user>    Set user ID for tracking changes
+  --debug, -d          Enable debug mode (show detailed logs)
   --help, -h           Display this help
   
 Examples:
@@ -23,6 +25,7 @@ Examples:
   memory-bank-mcp --path /path/to/project
   memory-bank-mcp --folder custom-memory-bank
   memory-bank-mcp --user "John Doe"
+  memory-bank-mcp --debug
   
 For more information, visit: https://github.com/movibe/memory-bank-server
 `);
@@ -35,7 +38,13 @@ For more information, visit: https://github.com/movibe/memory-bank-server
  */
 function processArgs() {
   const args = process.argv.slice(2);
-  const options: { mode?: string; projectPath?: string; folderName?: string; userId?: string } = {};
+  const options: { 
+    mode?: string; 
+    projectPath?: string; 
+    folderName?: string; 
+    userId?: string;
+    debug?: boolean;
+  } = {};
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -48,6 +57,8 @@ function processArgs() {
       options.folderName = args[++i];
     } else if (arg === '--user' || arg === '-u') {
       options.userId = args[++i];
+    } else if (arg === '--debug' || arg === '-d') {
+      options.debug = true;
     } else if (arg === '--help' || arg === '-h') {
       showHelp();
     }
@@ -67,25 +78,32 @@ async function main() {
   try {
     const options = processArgs();
     
-    console.error('Starting Memory Bank Server...');
-    if (options.mode) {
-      console.error(`Using mode: ${options.mode}`);
-    }
-    if (options.projectPath) {
-      console.error(`Using project path: ${options.projectPath}`);
-    }
-    if (options.folderName) {
-      console.error(`Using Memory Bank folder name: ${options.folderName}`);
-    }
-    if (options.userId) {
-      console.error(`Using user ID: ${options.userId}`);
+    // Configure log manager
+    const logManager = getLogManager();
+    if (options.debug) {
+      logManager.enableDebugMode();
+      logger.info('Main', 'Debug mode enabled');
     }
     
-    const server = new MemoryBankServer(options.mode, options.projectPath, options.userId, options.folderName);
+    logger.info('Main', 'Starting Memory Bank Server...');
+    if (options.mode) {
+      logger.debug('Main', `Using mode: ${options.mode}`);
+    }
+    if (options.projectPath) {
+      logger.debug('Main', `Using project path: ${options.projectPath}`);
+    }
+    if (options.folderName) {
+      logger.debug('Main', `Using Memory Bank folder name: ${options.folderName}`);
+    }
+    if (options.userId) {
+      logger.debug('Main', `Using user ID: ${options.userId}`);
+    }
+    
+    const server = new MemoryBankServer(options.mode, options.projectPath, options.userId, options.folderName, options.debug);
     await server.run();
-    console.error('Memory Bank Server started successfully');
+    logger.info('Main', 'Memory Bank Server started successfully');
   } catch (error) {
-    console.error('Error starting Memory Bank server:', error);
+    logger.error('Main', `Error starting Memory Bank server: ${error}`);
     process.exit(1);
   }
 }

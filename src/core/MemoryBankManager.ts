@@ -7,6 +7,7 @@ import { ExternalRulesLoader } from '../utils/ExternalRulesLoader.js';
 import fs from 'fs';
 import { MemoryBankStatus, ModeState } from '../types/index.js';
 import { MigrationUtils } from '../utils/MigrationUtils.js';
+import { logger } from '../utils/LogManager.js';
 
 /**
  * Class responsible for managing Memory Bank operations
@@ -33,35 +34,36 @@ export class MemoryBankManager {
    * @param projectPath Optional project path to use instead of current directory
    * @param userId Optional user ID for tracking changes
    * @param folderName Optional folder name for the Memory Bank (default: 'memory-bank')
+   * @param debugMode Optional flag to enable debug mode
    */
-  constructor(projectPath?: string, userId?: string, folderName?: string) {
+  constructor(projectPath?: string, userId?: string, folderName?: string, debugMode?: boolean) {
     // Ensure language is always English - this is a hard requirement
     // All Memory Bank content will be in English regardless of system locale or user settings
     this.language = 'en';
     
     if (projectPath) {
       this.projectPath = projectPath;
-      console.error(`MemoryBankManager initialized with project path: ${projectPath}`);
+      logger.debug('MemoryBankManager', `Initialized with project path: ${projectPath}`);
     } else {
       this.projectPath = process.cwd();
-      console.error(`MemoryBankManager initialized with current directory: ${this.projectPath}`);
+      logger.debug('MemoryBankManager', `Initialized with current directory: ${this.projectPath}`);
     }
     
     this.userId = userId || "Unknown User";
-    console.error(`MemoryBankManager initialized with user ID: ${this.userId}`);
+    logger.debug('MemoryBankManager', `Initialized with user ID: ${this.userId}`);
     
     if (folderName) {
       this.folderName = folderName;
-      console.error(`MemoryBankManager initialized with folder name: ${folderName}`);
+      logger.debug('MemoryBankManager', `Initialized with folder name: ${folderName}`);
     } else {
-      console.error(`MemoryBankManager initialized with default folder name: ${this.folderName}`);
+      logger.debug('MemoryBankManager', `Initialized with default folder name: ${this.folderName}`);
     }
     
-    console.error(`Memory Bank language is set to English (${this.language}) - all content will be in English`);
+    logger.info('MemoryBankManager', `Memory Bank language is set to English (${this.language}) - all content will be in English`);
     
     // Check for an existing memory-bank directory in the project path
     this.setCustomPath(this.projectPath).catch(error => {
-      console.error(`Error checking for memory-bank directory: ${error}`);
+      logger.error('MemoryBankManager', `Error checking for memory-bank directory: ${error}`);
     });
   }
 
@@ -134,7 +136,9 @@ export class MemoryBankManager {
    */
   async isMemoryBank(dirPath: string): Promise<boolean> {
     try {
-      if (!await FileUtils.isDirectory(dirPath)) return false;
+      if (!await FileUtils.isDirectory(dirPath)) {
+        return false;
+      }
 
       // Check if at least one of the core files exists
       const files = await FileUtils.listFiles(dirPath);
@@ -156,9 +160,17 @@ export class MemoryBankManager {
         'systemPatterns.md'
       ];
       
-      return coreFiles.some(file => files.includes(file));
+      // Verificar cada arquivo individualmente
+      for (const coreFile of coreFiles) {
+        const filePath = path.join(dirPath, coreFile);
+        if (await FileUtils.fileExists(filePath)) {
+          return true;
+        }
+      }
+      
+      return false;
     } catch (error) {
-      console.error(`Error checking if ${dirPath} is a Memory Bank:`, error);
+      logger.error('MemoryBankManager', `Error checking if ${dirPath} is a Memory Bank: ${error}`);
       return false;
     }
   }
@@ -254,9 +266,9 @@ export class MemoryBankManager {
       // Initialize the mode manager
       await this.initializeModeManager();
       
-      console.error(`Memory Bank initialized at: ${memoryBankPath}`);
+      logger.debug('MemoryBankManager', `Memory Bank initialized at: ${memoryBankPath}`);
     } catch (error) {
-      console.error(`Error initializing Memory Bank: ${error}`);
+      logger.error('MemoryBankManager', `Error initializing Memory Bank: ${error}`);
       throw new Error(`Failed to initialize Memory Bank: ${error}`);
     }
   }
@@ -281,7 +293,7 @@ export class MemoryBankManager {
       
       return await FileUtils.readFile(filePath);
     } catch (error) {
-      console.error(`Error reading file ${filename} from Memory Bank:`, error);
+      logger.error('MemoryBankManager', `Error reading file ${filename} from Memory Bank: ${error}`);
       throw new Error(`Error reading file ${filename} from Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -315,7 +327,7 @@ export class MemoryBankManager {
         }
       }
     } catch (error) {
-      console.error(`Error writing to file ${filename} in Memory Bank:`, error);
+      logger.error('MemoryBankManager', `Error writing to file ${filename} in Memory Bank: ${error}`);
       throw new Error(`Error writing to file ${filename} in Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -414,11 +426,16 @@ export class MemoryBankManager {
     // Combine the base path with the folder name to create the Memory Bank path
     const memoryBankPath = path.join(basePath, this.folderName);
     
-    if (await FileUtils.fileExists(memoryBankPath) && await FileUtils.isDirectory(memoryBankPath)) {
-      // Check if it's a valid Memory Bank
-      if (await this.isMemoryBank(memoryBankPath)) {
-        this.setMemoryBankDir(memoryBankPath);
-        console.error(`Found existing Memory Bank at: ${memoryBankPath}`);
+    if (await FileUtils.fileExists(memoryBankPath)) {
+      if (await FileUtils.isDirectory(memoryBankPath)) {
+        // Check if it's a valid Memory Bank
+        if (await this.isMemoryBank(memoryBankPath)) {
+          this.setMemoryBankDir(memoryBankPath);
+          logger.debug('MemoryBankManager', `Found existing Memory Bank at: ${memoryBankPath}`);
+          
+          // Atualizar o status do Memory Bank
+          await this.updateMemoryBankStatus();
+        }
       }
     }
   }
@@ -493,10 +510,10 @@ export class MemoryBankManager {
         await FileUtils.writeFile(path.join(backupPath, file), content);
       }
       
-      console.error(`Memory Bank backup created at ${backupPath}`);
+      logger.debug('MemoryBankManager', `Memory Bank backup created at ${backupPath}`);
       return backupPath;
     } catch (error) {
-      console.error('Error creating Memory Bank backup:', error);
+      logger.error('MemoryBankManager', `Error creating Memory Bank backup: ${error}`);
       throw new Error(`Failed to create Memory Bank backup: ${error}`);
     }
   }
@@ -549,9 +566,8 @@ export class MemoryBankManager {
       // Update Memory Bank status
       await this.updateMemoryBankStatus();
     } catch (error) {
-      console.error('Error initializing mode manager:', error);
-      console.warn('Continuing without mode manager functionality.');
-      // Don't throw the error, just log it and continue
+      logger.error('MemoryBankManager', `Error initializing mode manager: ${error}`);
+      throw error;
     }
   }
 

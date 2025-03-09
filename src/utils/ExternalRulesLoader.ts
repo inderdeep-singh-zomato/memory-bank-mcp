@@ -6,6 +6,7 @@ import { clineruleTemplates } from './ClineruleTemplates.js';
 import os from 'os';
 import { ValidationResult } from '../types/index.js';
 import { ClineruleBase, MemoryBankConfig } from '../types/rules.js';
+import { logger } from './LogManager.js';
 
 /**
  * Class responsible for loading and monitoring external .clinerules files
@@ -22,7 +23,7 @@ export class ExternalRulesLoader extends EventEmitter {
   constructor(projectDir?: string) {
     super();
     this.projectDir = projectDir || process.cwd();
-    console.error(`ExternalRulesLoader initialized with project directory: ${this.projectDir}`);
+    logger.debug('ExternalRulesLoader', `Initialized with project directory: ${this.projectDir}`);
   }
 
   /**
@@ -38,7 +39,7 @@ export class ExternalRulesLoader extends EventEmitter {
       await fs.access(targetDir, fs.constants.W_OK);
       return targetDir;
     } catch (error) {
-      console.error(`Project directory ${targetDir} is not writable`);
+      logger.error('ExternalRulesLoader', `Project directory ${targetDir} is not writable`);
       throw new Error(`Project directory ${targetDir} is not writable`);
     }
   }
@@ -70,7 +71,7 @@ export class ExternalRulesLoader extends EventEmitter {
     
     // If there are missing files, try to create them
     if (missingFiles.length > 0) {
-      console.warn(`Missing .clinerules files: ${missingFiles.join(', ')}`);
+      logger.warn('ExternalRulesLoader', `Missing .clinerules files: ${missingFiles.join(', ')}`);
       const createdFiles = await this.createMissingClinerules(missingFiles);
       
       // Update the lists
@@ -99,7 +100,7 @@ export class ExternalRulesLoader extends EventEmitter {
     // Validate required files and create missing ones
     const validation = await this.validateRequiredFiles();
     if (!validation.valid) {
-      console.warn(`Warning: Some .clinerules files could not be created: ${validation.missingFiles.join(', ')}`);
+      logger.warn('ExternalRulesLoader', `Warning: Some .clinerules files could not be created: ${validation.missingFiles.join(', ')}`);
     }
     
     // Clear existing watchers
@@ -124,12 +125,12 @@ export class ExternalRulesLoader extends EventEmitter {
           
           if (rule && rule.mode === mode) {
             this.rules.set(mode, rule);
-            console.error(`Loaded ${filename} rules from project directory`);
+            logger.debug('ExternalRulesLoader', `Loaded ${filename} rules from project directory`);
             
             // Set up watcher for this file
             this.watchRuleFile(projectFilePath, mode);
           } else {
-            console.warn(`Invalid rule format in ${filename} (project directory)`);
+            logger.warn('ExternalRulesLoader', `Invalid rule format in ${filename} (project directory)`);
           }
         } 
         // If not found in project directory, try fallback directory
@@ -139,16 +140,16 @@ export class ExternalRulesLoader extends EventEmitter {
           
           if (rule && rule.mode === mode) {
             this.rules.set(mode, rule);
-            console.error(`Loaded ${filename} rules from fallback directory`);
+            logger.debug('ExternalRulesLoader', `Loaded ${filename} rules from fallback directory`);
             
             // Set up watcher for this file
             this.watchRuleFile(fallbackFilePath, mode);
           } else {
-            console.warn(`Invalid rule format in ${filename} (fallback directory)`);
+            logger.warn('ExternalRulesLoader', `Invalid rule format in ${filename} (fallback directory)`);
           }
         }
       } catch (error) {
-        console.warn(`Error loading ${filename}:`, error);
+        logger.warn('ExternalRulesLoader', `Error loading ${filename}: ${error}`);
       }
     }
     
@@ -204,10 +205,10 @@ export class ExternalRulesLoader extends EventEmitter {
           if (rule && rule.mode === mode) {
             this.rules.set(mode, rule);
             this.emit('ruleChanged', mode, rule);
-            console.error(`Updated ${path.basename(filePath)} rules`);
+            logger.debug('ExternalRulesLoader', `Updated ${path.basename(filePath)} rules`);
           }
         } catch (error) {
-          console.error(`Error updating ${path.basename(filePath)}:`, error);
+          logger.error('ExternalRulesLoader', `Error updating ${path.basename(filePath)}: ${error}`);
         }
       }
     });
@@ -282,12 +283,12 @@ export class ExternalRulesLoader extends EventEmitter {
         try {
           await fs.writeFile(filePath, template);
           createdFiles.push(filename);
-          console.error(`Created ${filename} in ${targetDir}`);
+          logger.debug('ExternalRulesLoader', `Created ${filename} in ${targetDir}`);
         } catch (error) {
-          console.error(`Failed to create ${filename}:`, error);
+          logger.error('ExternalRulesLoader', `Failed to create ${filename}: ${error}`);
         }
       } else {
-        console.error(`No template available for ${filename}`);
+        logger.warn('ExternalRulesLoader', `No template available for ${filename}`);
       }
     }
     
