@@ -18,6 +18,30 @@ You can specify a specific execution mode:
 npx @movibe/memory-bank-mcp --mode code
 ```
 
+### Project Path
+
+You can specify a custom project path:
+
+```bash
+npx @movibe/memory-bank-mcp --path /path/to/project
+```
+
+### Memory Bank Folder Name
+
+You can specify a custom folder name for the Memory Bank:
+
+```bash
+npx @movibe/memory-bank-mcp --folder custom-memory-bank
+```
+
+### GitHub Profile URL
+
+You can specify your GitHub profile URL for tracking changes:
+
+```bash
+npx @movibe/memory-bank-mcp --githubProfileUrl https://github.com/username
+```
+
 ## Global Installation
 
 If you prefer, you can also install the package globally:

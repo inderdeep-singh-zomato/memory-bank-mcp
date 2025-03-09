@@ -284,3 +284,19 @@ This document tracks important decisions made during the development of the Memo
   - Clean output in production environments
   - Detailed logs available when needed for debugging
   - Command line support for enabling debug mode
+
+## User Identification Format Change
+
+- **Date:** 2025-03-09
+- **Author:** @movibe
+- **Context:** The system was using a simple user ID to identify who made changes in the Memory Bank. It was necessary to change it to use GitHub URLs and display the username in a more user-friendly way.
+- **Decision:** Replace the --user argument with --githubProfileUrl and implement a display format [@username](https://github.com/username) to improve user identification in the Memory Bank.
+- **Alternatives Considered:**
+  - Keep the current format with just the username
+  - Use a different format like 'username (link)'
+  - Implement a complete authentication system with GitHub
+- **Consequences:**
+  - Better integration with GitHub
+  - Clearer visual identification of who made changes
+  - Direct links to user profiles
+  - Compatibility with markdown format

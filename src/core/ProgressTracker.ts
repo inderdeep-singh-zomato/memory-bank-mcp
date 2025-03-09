@@ -17,7 +17,7 @@ export interface ProgressDetails {
   timestamp?: Date;
   /** Optional additional metadata as key-value pairs */
   metadata?: Record<string, string | number | boolean>;
-  /** Optional user ID who performed the action */
+  /** Optional GitHub profile URL of who performed the action */
   userId?: string;
   /** 
    * Any additional properties
@@ -44,7 +44,7 @@ export interface Decision {
   date?: Date;
   /** Optional tags to categorize the decision */
   tags?: string[];
-  /** Optional user ID who made the decision */
+  /** Optional GitHub profile URL of who made the decision */
   userId?: string;
 }
 
@@ -77,11 +77,41 @@ export class ProgressTracker {
    * Creates a new ProgressTracker instance
    * 
    * @param memoryBankDir - Directory of the Memory Bank
-   * @param userId - User ID for tracking changes
+   * @param userId - GitHub profile URL for tracking changes
    */
   constructor(private memoryBankDir: string, userId?: string) {
     // Use provided userId or "Unknown User" as default
     this.userId = userId || "Unknown User";
+  }
+
+  /**
+   * Formats the GitHub profile URL for display in markdown
+   * 
+   * If the userId is a GitHub URL, it will be formatted as [@username](url)
+   * 
+   * @param userId - The GitHub profile URL
+   * @returns Formatted GitHub profile URL string
+   * @private
+   */
+  private formatUserId(userId: string): string {
+    // Check if the userId is a GitHub URL
+    if (userId.includes('github.com/')) {
+      try {
+        // Extract the username from the URL
+        const url = new URL(userId);
+        const pathParts = url.pathname.split('/').filter(Boolean);
+        if (pathParts.length > 0) {
+          const username = pathParts[pathParts.length - 1];
+          return `[@${username}](${userId})`;
+        }
+      } catch (error) {
+        // If URL parsing fails, just use the original userId
+        console.error(`Error parsing GitHub URL: ${error}`);
+      }
+    }
+    
+    // Return the original userId if it's not a valid GitHub URL
+    return userId;
   }
 
   /**
@@ -95,7 +125,7 @@ export class ProgressTracker {
    */
   async trackProgress(action: string, details: ProgressDetails): Promise<string> {
     try {
-      // Add user ID to details if not already present
+      // Add GitHub profile URL to details if not already present
       if (!details.userId) {
         details.userId = this.userId;
       }
@@ -130,7 +160,8 @@ export class ProgressTracker {
       const timestamp = new Date().toISOString().split('T')[0];
       const time = new Date().toLocaleTimeString();
       const userId = details.userId || this.userId;
-      const newEntry = `- [${timestamp} ${time}] [${userId}] - ${action}: ${details.description}`;
+      const formattedUserId = this.formatUserId(userId);
+      const newEntry = `- [${timestamp} ${time}] [${formattedUserId}] - ${action}: ${details.description}`;
       
       // Add the entry to the update history section
       const updateHistoryRegex = /## Update History\s+/;
@@ -171,7 +202,8 @@ export class ProgressTracker {
       const sessionNotesRegex = /## Current Session Notes\s+/;
       const time = new Date().toLocaleTimeString();
       const userId = details.userId || this.userId;
-      const newNote = `- [${time}] [${userId}] ${action}: ${details.description}`;
+      const formattedUserId = this.formatUserId(userId);
+      const newNote = `- [${time}] [${formattedUserId}] ${action}: ${details.description}`;
       
       if (sessionNotesRegex.test(contextContent)) {
         contextContent = contextContent.replace(
@@ -295,6 +327,7 @@ export class ProgressTracker {
       const timestamp = new Date().toISOString().split('T')[0];
       const time = new Date().toLocaleTimeString();
       const userId = decision.userId || this.userId;
+      const formattedUserId = this.formatUserId(userId);
       
       // Format alternatives and consequences
       const alternatives = Array.isArray(decision.alternatives) 
@@ -308,7 +341,7 @@ export class ProgressTracker {
       const newDecision = `
 ## ${decision.title}
 - **Date:** ${timestamp} ${time}
-- **Author:** ${userId}
+- **Author:** ${formattedUserId}
 - **Context:** ${decision.context}
 - **Decision:** ${decision.decision}
 - **Alternatives Considered:** 

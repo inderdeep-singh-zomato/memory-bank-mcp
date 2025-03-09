@@ -32,7 +32,7 @@ export class MemoryBankManager {
    * Creates a new MemoryBankManager instance
    * 
    * @param projectPath Optional project path to use instead of current directory
-   * @param userId Optional user ID for tracking changes
+   * @param userId Optional GitHub profile URL for tracking changes
    * @param folderName Optional folder name for the Memory Bank (default: 'memory-bank')
    * @param debugMode Optional flag to enable debug mode
    */
@@ -50,7 +50,7 @@ export class MemoryBankManager {
     }
     
     this.userId = userId || "Unknown User";
-    logger.debug('MemoryBankManager', `Initialized with user ID: ${this.userId}`);
+    logger.debug('MemoryBankManager', `Initialized with GitHub profile URL: ${this.userId}`);
     
     if (folderName) {
       this.folderName = folderName;

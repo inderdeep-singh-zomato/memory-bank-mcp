@@ -127,4 +127,35 @@ Test project state
     expect(updatedContent.includes('Task 1')).toBe(true);
     expect(updatedContent.includes('Task 2')).toBe(true);
   });
+  
+  test('Should format GitHub profile URL correctly', async () => {
+    // Create a ProgressTracker with a GitHub URL
+    const githubUrl = 'https://github.com/username';
+    const progressTrackerWithGithub = new ProgressTracker(memoryBankDir, githubUrl);
+    
+    // Track progress
+    const action = 'test-action';
+    const details = { description: 'Test description' };
+    await progressTrackerWithGithub.trackProgress(action, details);
+    
+    // Verify progress.md was updated with formatted GitHub URL
+    const progressContent = await fs.readFile(path.join(memoryBankDir, 'progress.md'), 'utf8');
+    
+    // Check if progress.md contains the formatted GitHub URL
+    expect(progressContent.includes('[@username](https://github.com/username)')).toBe(true);
+    
+    // Log a decision
+    const decision = {
+      title: 'Test Decision',
+      context: 'Test Context',
+      decision: 'Test Decision Content',
+    };
+    await progressTrackerWithGithub.logDecision(decision);
+    
+    // Verify decision-log.md was updated with formatted GitHub URL
+    const decisionLogContent = await fs.readFile(path.join(memoryBankDir, 'decision-log.md'), 'utf8');
+    
+    // Check if decision-log.md contains the formatted GitHub URL
+    expect(decisionLogContent.includes('[@username](https://github.com/username)')).toBe(true);
+  });
 }); 

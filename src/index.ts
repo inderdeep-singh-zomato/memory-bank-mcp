@@ -15,7 +15,7 @@ Options:
   --mode, -m <mode>    Set execution mode (code, ask, architect, etc.)
   --path, -p <path>    Set project path (default: current directory)
   --folder, -f <folder> Set Memory Bank folder name (default: memory-bank)
-  --user, -u <user>    Set user ID for tracking changes
+  --githubProfileUrl, -g <url>    Set GitHub profile URL for tracking changes
   --debug, -d          Enable debug mode (show detailed logs)
   --help, -h           Display this help
   
@@ -24,7 +24,7 @@ Examples:
   memory-bank-mcp --mode code
   memory-bank-mcp --path /path/to/project
   memory-bank-mcp --folder custom-memory-bank
-  memory-bank-mcp --user "John Doe"
+  memory-bank-mcp --githubProfileUrl "https://github.com/username"
   memory-bank-mcp --debug
   
 For more information, visit: https://github.com/movibe/memory-bank-server
@@ -55,7 +55,7 @@ function processArgs() {
       options.projectPath = args[++i];
     } else if (arg === '--folder' || arg === '-f') {
       options.folderName = args[++i];
-    } else if (arg === '--user' || arg === '-u') {
+    } else if (arg === '--githubProfileUrl' || arg === '-g') {
       options.userId = args[++i];
     } else if (arg === '--debug' || arg === '-d') {
       options.debug = true;
@@ -96,7 +96,7 @@ async function main() {
       logger.debug('Main', `Using Memory Bank folder name: ${options.folderName}`);
     }
     if (options.userId) {
-      logger.debug('Main', `Using user ID: ${options.userId}`);
+      logger.debug('Main', `Using GitHub profile URL: ${options.userId}`);
     }
     
     const server = new MemoryBankServer(options.mode, options.projectPath, options.userId, options.folderName, options.debug);
