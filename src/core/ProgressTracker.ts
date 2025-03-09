@@ -17,7 +17,7 @@ export interface ProgressDetails {
   timestamp?: Date;
   /** Optional additional metadata as key-value pairs */
   metadata?: Record<string, string | number | boolean>;
-  /** Optional user ID who performed the action */
+  /** Optional GitHub profile URL of who performed the action */
   userId?: string;
   /** 
    * Any additional properties
@@ -44,7 +44,7 @@ export interface Decision {
   date?: Date;
   /** Optional tags to categorize the decision */
   tags?: string[];
-  /** Optional user ID who made the decision */
+  /** Optional GitHub profile URL of who made the decision */
   userId?: string;
 }
 
@@ -77,7 +77,7 @@ export class ProgressTracker {
    * Creates a new ProgressTracker instance
    * 
    * @param memoryBankDir - Directory of the Memory Bank
-   * @param userId - User ID for tracking changes
+   * @param userId - GitHub profile URL for tracking changes
    */
   constructor(private memoryBankDir: string, userId?: string) {
     // Use provided userId or "Unknown User" as default
@@ -85,26 +85,59 @@ export class ProgressTracker {
   }
 
   /**
-   * Tracks project progress
+   * Formats the GitHub profile URL for display in markdown
    * 
-   * Updates both the progress file and active context file with the action details.
+   * If the userId is a GitHub URL, it will be formatted as [@username](url)
    * 
-   * @param action - Action performed
-   * @param details - Details of the action
-   * @throws Error if tracking fails
+   * @param userId - The GitHub profile URL
+   * @returns Formatted GitHub profile URL string
+   * @private
    */
-  async trackProgress(action: string, details: ProgressDetails): Promise<void> {
+  private formatUserId(userId: string): string {
+    // Check if the userId is a GitHub URL
+    if (userId.includes('github.com/')) {
+      try {
+        // Extract the username from the URL
+        const url = new URL(userId);
+        const pathParts = url.pathname.split('/').filter(Boolean);
+        if (pathParts.length > 0) {
+          const username = pathParts[pathParts.length - 1];
+          return `[@${username}](${userId})`;
+        }
+      } catch (error) {
+        // If URL parsing fails, just use the original userId
+        console.error(`Error parsing GitHub URL: ${error}`);
+      }
+    }
+    
+    // Return the original userId if it's not a valid GitHub URL
+    return userId;
+  }
+
+  /**
+   * Tracks progress by adding an entry to the progress file
+   * 
+   * Note: All progress entries are stored in English regardless of the system locale or user settings.
+   * 
+   * @param action - Action performed (e.g., 'Implemented feature', 'Fixed bug')
+   * @param details - Details of the progress
+   * @returns The updated progress content
+   */
+  async trackProgress(action: string, details: ProgressDetails): Promise<string> {
     try {
-      // Add user ID to details if not already present
+      // Add GitHub profile URL to details if not already present
       if (!details.userId) {
         details.userId = this.userId;
       }
       
       // Update the progress file
-      await this.updateProgressFile(action, details);
+      const updatedContent = await this.updateProgressFile(action, details);
       
       // Update the active context file
       await this.updateActiveContextFile(action, details);
+      
+      // Return the updated progress content
+      return updatedContent;
     } catch (error) {
       console.error(`Error tracking progress: ${error}`);
       throw new Error(`Failed to track progress: ${error}`);
@@ -118,7 +151,7 @@ export class ProgressTracker {
    * @param details - Details of the action
    * @private
    */
-  private async updateProgressFile(action: string, details: ProgressDetails): Promise<void> {
+  private async updateProgressFile(action: string, details: ProgressDetails): Promise<string> {
     const progressPath = path.join(this.memoryBankDir, 'progress.md');
     
     try {
@@ -127,7 +160,8 @@ export class ProgressTracker {
       const timestamp = new Date().toISOString().split('T')[0];
       const time = new Date().toLocaleTimeString();
       const userId = details.userId || this.userId;
-      const newEntry = `- [${timestamp} ${time}] [${userId}] - ${action}: ${details.description}`;
+      const formattedUserId = this.formatUserId(userId);
+      const newEntry = `- [${timestamp} ${time}] [${formattedUserId}] - ${action}: ${details.description}`;
       
       // Add the entry to the update history section
       const updateHistoryRegex = /## Update History\s+/;
@@ -142,6 +176,9 @@ export class ProgressTracker {
       }
       
       await FileUtils.writeFile(progressPath, progressContent);
+      
+      // Return the updated progress content
+      return progressContent;
     } catch (error) {
       console.error(`Error updating progress file: ${error}`);
       throw new Error(`Failed to update progress file: ${error}`);
@@ -165,7 +202,8 @@ export class ProgressTracker {
       const sessionNotesRegex = /## Current Session Notes\s+/;
       const time = new Date().toLocaleTimeString();
       const userId = details.userId || this.userId;
-      const newNote = `- [${time}] [${userId}] ${action}: ${details.description}`;
+      const formattedUserId = this.formatUserId(userId);
+      const newNote = `- [${time}] [${formattedUserId}] ${action}: ${details.description}`;
       
       if (sessionNotesRegex.test(contextContent)) {
         contextContent = contextContent.replace(
@@ -185,59 +223,18 @@ export class ProgressTracker {
   }
 
   /**
-   * Logs a decision in the decision log
-   * 
-   * @param decision - Decision to log
-   * @throws Error if logging fails
-   */
-  async logDecision(decision: Decision): Promise<void> {
-    const decisionLogPath = path.join(this.memoryBankDir, 'decision-log.md');
-    
-    try {
-      let decisionLogContent = await FileUtils.readFile(decisionLogPath);
-      
-      const timestamp = new Date().toISOString().split('T')[0];
-      const time = new Date().toLocaleTimeString();
-      const userId = decision.userId || this.userId;
-      
-      // Format alternatives and consequences
-      const alternatives = Array.isArray(decision.alternatives) 
-        ? decision.alternatives.map(alt => `  - ${alt}`).join('\n') 
-        : decision.alternatives || 'None';
-        
-      const consequences = Array.isArray(decision.consequences) 
-        ? decision.consequences.map(cons => `  - ${cons}`).join('\n') 
-        : decision.consequences || 'None';
-      
-      const newDecision = `
-## ${decision.title}
-- **Date:** ${timestamp} ${time}
-- **Author:** ${userId}
-- **Context:** ${decision.context}
-- **Decision:** ${decision.decision}
-- **Alternatives Considered:** 
-${Array.isArray(decision.alternatives) ? alternatives : `  - ${alternatives}`}
-- **Consequences:** 
-${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
-`;
-      
-      // Add the new decision to the end of the file
-      decisionLogContent += newDecision;
-      
-      await FileUtils.writeFile(decisionLogPath, decisionLogContent);
-    } catch (error) {
-      console.error(`Error logging decision: ${error}`);
-      throw new Error(`Failed to log decision: ${error}`);
-    }
-  }
-
-  /**
    * Updates the active context
+   * 
+   * Note: All content is stored in English regardless of the system locale or user settings.
    * 
    * @param context - Context to update
    * @throws Error if update fails
    */
-  async updateActiveContext(context: ActiveContext): Promise<void> {
+  async updateActiveContext(context: {
+    tasks?: string[];
+    issues?: string[];
+    nextSteps?: string[];
+  }): Promise<void> {
     const contextPath = path.join(this.memoryBankDir, 'active-context.md');
     
     try {
@@ -310,6 +307,56 @@ ${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
     } catch (error) {
       console.error(`Error clearing session notes: ${error}`);
       throw new Error(`Failed to clear session notes: ${error}`);
+    }
+  }
+
+  /**
+   * Logs a decision in the decision log
+   * 
+   * Note: All decision entries are stored in English regardless of the system locale or user settings.
+   * 
+   * @param decision - Decision to log
+   * @throws Error if logging fails
+   */
+  async logDecision(decision: Decision): Promise<void> {
+    const decisionLogPath = path.join(this.memoryBankDir, 'decision-log.md');
+    
+    try {
+      let decisionLogContent = await FileUtils.readFile(decisionLogPath);
+      
+      const timestamp = new Date().toISOString().split('T')[0];
+      const time = new Date().toLocaleTimeString();
+      const userId = decision.userId || this.userId;
+      const formattedUserId = this.formatUserId(userId);
+      
+      // Format alternatives and consequences
+      const alternatives = Array.isArray(decision.alternatives) 
+        ? decision.alternatives.map(alt => `  - ${alt}`).join('\n') 
+        : decision.alternatives || 'None';
+        
+      const consequences = Array.isArray(decision.consequences) 
+        ? decision.consequences.map(cons => `  - ${cons}`).join('\n') 
+        : decision.consequences || 'None';
+      
+      const newDecision = `
+## ${decision.title}
+- **Date:** ${timestamp} ${time}
+- **Author:** ${formattedUserId}
+- **Context:** ${decision.context}
+- **Decision:** ${decision.decision}
+- **Alternatives Considered:** 
+${Array.isArray(decision.alternatives) ? alternatives : `  - ${alternatives}`}
+- **Consequences:** 
+${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
+`;
+      
+      // Add the new decision to the end of the file
+      decisionLogContent += newDecision;
+      
+      await FileUtils.writeFile(decisionLogPath, decisionLogContent);
+    } catch (error) {
+      console.error(`Error logging decision: ${error}`);
+      throw new Error(`Failed to log decision: ${error}`);
     }
   }
 }

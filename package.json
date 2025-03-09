@@ -14,6 +14,7 @@
     "dev": "bun --watch src/index.ts",
     "build:start": "bun run build && bun run start",
     "test": "bun test",
+    "test:coverage": "bun test --coverage",
     "prepublishOnly": "bun run build",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",

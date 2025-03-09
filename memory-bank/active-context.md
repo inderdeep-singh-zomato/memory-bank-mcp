@@ -6,6 +6,24 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Current Session Notes
 
+- [7:16:03 PM] [@movibe] Translated: Translated all remaining Portuguese content in Memory Bank files and documentation to English. Updated memory-bank-mcp-startup.md, active-context.md, decision-log.md, progress.md, and test-coverage.md to ensure all content is in English, maintaining consistency across the project.
+- [7:11:50 PM] [@movibe] Updated: Documentation updated to reflect the change from --user to --githubProfileUrl
+- [7:11:15 PM] [@movibe] Verified: Unit tests for GitHub URL formatting functionality are passing correctly
+- [7:08:36 PM] [@movibe] Decision Made: User Identification Format Change
+- [7:08:29 PM] [@movibe] Implemented: Changed the --user argument to --githubProfileUrl and implemented the [@username](https://github.com/username) format in Memory Bank progress
+- [6:58:46 PM] [@movibe] Translated Test Coverage Documentation: Translated the test-coverage.md file from Portuguese to English. The document now provides information about the test status, code coverage, implemented tests, and areas for improvement in English, ensuring consistency with the project's language guidelines.
+- [6:57:26 PM] [@movibe] Updated Memory Bank Files: Translated all Portuguese content in Memory Bank files to English. Updated active-context.md, progress.md, and decision-log.md to ensure all entries are in English. This ensures consistency across all Memory Bank files and aligns with the project's development guidelines that specify all content should be in English.
+- [6:55:00 PM] [@movibe] Refined Logging System: Refined the logging system by adjusting log levels to ensure appropriate visibility of messages. Changed many INFO level logs to DEBUG level to ensure they only appear in debug mode. This includes initialization details, configuration values, path information, and Memory Bank detection messages. Updated the logging system documentation with detailed examples of appropriate log levels and clarified what is shown in normal mode versus debug mode. These changes ensure a cleaner output in production environments while still providing detailed information when needed for debugging.
+- [6:52:08 PM] [@movibe] Decision Made: Logging System Implementation Approach
+- [6:52:02 PM] [@movibe] Implemented Logging System: Created a centralized logging system with support for different log levels (DEBUG, INFO, WARN, ERROR) and debug mode. Implemented a LogManager class using the singleton pattern to manage logs across the application. Modified the code to use the new logging system instead of direct console.error calls. Added command line support for enabling debug mode with --debug or -d flag. Created documentation explaining the logging system in docs/logging-system.md and updated the documentation index.
+- [6:46:21 PM] [@movibe] Decision Made: Memory Bank Status Detection Fix Approach
+- [6:46:08 PM] [@movibe] Fixed Memory Bank Status Detection: Fixed the issue with Memory Bank status detection where the Memory Bank was being found but its status was not being set to ACTIVE. Modified the isMemoryBank method to check for each core file individually using FileUtils.fileExists() instead of relying on the list of files. Enhanced the setCustomPath method to update the Memory Bank status immediately after finding a valid Memory Bank. Improved error handling in the initializeModeManager method. Created documentation on the fix in docs/memory-bank-status-fix.md and updated the documentation index.
+- [6:25:57 PM] [@movibe] Decision Made: Approach for Unit Test Correction
+- [6:25:47 PM] [@movibe] Executed Unit Tests and Updated Coverage: Executed the project's unit tests, identified and fixed issues in several failing tests. Created a test coverage document to record the current status and next steps to improve coverage.
+- [6:16:23 PM] [@movibe] Documentation: Created documentation on the English language policy for Memory Bank and reinforced the English-only requirement in the code with additional comments and warnings.
+- [6:16:20 PM] [@movibe] File Update: Updated docs/english-language-policy.md
+- [6:13:32 PM] [@movibe] Bug Fix: Fixed the issue where Memory Bank files were being created in the project root instead of using the directory + folder name. Modified the setCustomPath, findMemoryBankDir, and initializeMemoryBank methods to combine the base path with the folderName.
+- [6:13:29 PM] [@movibe] Decision Made: Memory Bank Path Correction to Use folderName
 - [5:26:20 PM] [@movibe] Updated Memory Bank Documentation: Updated the Memory Bank Structure section in system-patterns.md to reflect the correct file naming convention (kebab-case). Changed references from camelCase (productContext.md, activeContext.md, decisionLog.md, systemPatterns.md) to kebab-case (product-context.md, active-context.md, decision-log.md, system-patterns.md) to match the actual file names used in the Memory Bank.
 - [5:23:30 PM] [@movibe] Decision Made: Memory Bank Directory Structure Simplification
 - [5:23:24 PM] [@movibe] Fixed Memory Bank Directory Structure: Fixed the Memory Bank initialization to prevent creation of unnecessary subdirectories and duplicate files. The function initializeMemoryBank was creating subdirectories (progress, decisions, context, templates, backups, modes) and placing files in those subdirectories, but the rest of the code expected the files to be in the root directory of the Memory Bank. Modified the function to create all core files directly in the root directory, which is consistent with how the files are accessed throughout the codebase. Removed all duplicate directories and files that were previously created.
@@ -161,14 +179,14 @@ All project documentation and Memory Bank files are now consistently in English,
 
 ## Ongoing Tasks
 
-- Test Memory Bank initialization to ensure it creates files correctly
-- Update documentation if needed to reflect the simplified directory structure
+- Verify if the documentation has been updated correctly
 
 ## Known Issues
 
-- Previous Memory Bank initializations may have created unnecessary subdirectories
+- Need to ensure all console.error calls are replaced with logger calls
+- Need to verify that debug logs don't appear in normal mode
 
 ## Next Steps
 
-- Test Memory Bank initialization
-- Verify that all Memory Bank operations work correctly with the simplified structure
+- Review all documentation to ensure consistent terminology
+- Update any remaining documentation that might contain Portuguese content

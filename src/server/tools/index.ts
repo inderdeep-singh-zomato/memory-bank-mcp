@@ -4,7 +4,7 @@ import { MemoryBankManager } from '../../core/MemoryBankManager.js';
 import { ProgressTracker } from '../../core/ProgressTracker.js';
 
 // Import tools and handlers
-import { coreTools, handleSetMemoryBankPath, handleInitializeMemoryBank, handleReadMemoryBankFile, handleWriteMemoryBankFile, handleListMemoryBankFiles, handleGetMemoryBankStatus, handleMigrateFileNaming } from './CoreTools.js';
+import { coreTools, handleSetMemoryBankPath, handleInitializeMemoryBank, handleReadMemoryBankFile, handleWriteMemoryBankFile, handleListMemoryBankFiles, handleGetMemoryBankStatus, handleMigrateFileNaming, handleDebugMcpConfig } from './CoreTools.js';
 import { progressTools, handleTrackProgress } from './ProgressTools.js';
 import { contextTools, handleUpdateActiveContext } from './ContextTools.js';
 import { decisionTools, handleLogDecision } from './DecisionTools.js';
@@ -74,6 +74,11 @@ export function setupToolHandlers(
           }
           console.error('Initializing Memory Bank at path:', dirPath);
           return handleInitializeMemoryBank(memoryBankManager, dirPath);
+        }
+
+        case 'debug_mcp_config': {
+          const { verbose } = request.params.arguments as { verbose?: boolean };
+          return handleDebugMcpConfig(memoryBankManager, verbose || false);
         }
 
         case 'read_memory_bank_file': {

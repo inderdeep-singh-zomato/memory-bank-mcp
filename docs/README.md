@@ -47,6 +47,7 @@ The documentation is organized into the following categories:
 - [**architecture-plan.md**](./architecture-plan.md) - Overall architecture plan
 - [**modular-architecture-proposal.md**](./modular-architecture-proposal.md) - Proposal for modular architecture
 - [**documentation-structure.md**](./documentation-structure.md) - Documentation on the structure of documentation
+- [**logging-system.md**](./logging-system.md) - Documentation on the logging system
 
 ### 7. Migration and Updates
 
@@ -55,6 +56,7 @@ The documentation is organized into the following categories:
 - [**memory-bank-path-changes.md**](./memory-bank-path-changes.md) - Documentation on path handling changes
 - [**file-naming-convention-update.md**](./file-naming-convention-update.md) - Update on file naming convention (camelCase to kebab-case)
 - [**memory-bank-bug-fixes.md**](./memory-bank-bug-fixes.md) - Documentation on bug fixes
+- [**memory-bank-status-fix.md**](./memory-bank-status-fix.md) - Documentation on Memory Bank status detection fix
 - [**code-improvements.md**](./code-improvements.md) - Documentation on code improvements
 
 ## Supported Modes

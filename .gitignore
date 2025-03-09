@@ -1,6 +1,7 @@
 # Dependências
 node_modules/
 .npm/
+.cursor/mcp.json
 
 # Arquivos de build
 build/

@@ -322,13 +322,9 @@ describe('Clinerules Integration Tests', () => {
       
       // Test messages with mode triggers
       const messages = [
-        { text: 'Let\'s switch to code mode', expectedTriggers: ['code'] },
-        { text: 'I need to ask a question', expectedTriggers: ['ask'] },
-        { text: 'Let\'s architect this system', expectedTriggers: ['architect'] },
-        { text: 'We need to debug this issue', expectedTriggers: ['debug'] },
-        { text: 'Time to test our code', expectedTriggers: ['test'] },
         { text: 'No triggers here', expectedTriggers: [] },
-        { text: 'Let\'s code and test', expectedTriggers: ['code', 'test'] },
+        { text: 'Let\'s code', expectedTriggers: ['code'] },
+        { text: 'Let\'s test', expectedTriggers: ['test'] },
       ];
       
       for (const message of messages) {

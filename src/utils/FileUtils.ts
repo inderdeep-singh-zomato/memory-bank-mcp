@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+import { logger } from './LogManager.js';
 
 /**
  * Utility class for file operations
@@ -17,7 +18,7 @@ export class FileUtils {
     try {
       await fs.ensureDir(dirPath);
     } catch (error) {
-      console.error(`Failed to create directory ${dirPath}:`, error);
+      logger.error('FileUtils', `Failed to create directory ${dirPath}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to create directory ${dirPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -30,9 +31,13 @@ export class FileUtils {
    */
   static async fileExists(filePath: string): Promise<boolean> {
     try {
-      return fs.pathExists(filePath);
+      await fs.access(filePath);
+      return true;
     } catch (error) {
-      console.error(`Error checking if path exists ${filePath}:`, error);
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        return false;
+      }
+      logger.error('FileUtils', `Error checking if path exists ${filePath}: ${error}`);
       return false;
     }
   }
@@ -48,7 +53,7 @@ export class FileUtils {
     try {
       return fs.readFile(filePath, 'utf-8');
     } catch (error) {
-      console.error(`Failed to read file ${filePath}:`, error);
+      logger.error('FileUtils', `Failed to read file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to read file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -64,7 +69,7 @@ export class FileUtils {
     try {
       await fs.writeFile(filePath, content);
     } catch (error) {
-      console.error(`Failed to write to file ${filePath}:`, error);
+      logger.error('FileUtils', `Failed to write to file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to write to file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -80,7 +85,7 @@ export class FileUtils {
     try {
       return fs.readdir(dirPath);
     } catch (error) {
-      console.error(`Failed to list files in directory ${dirPath}:`, error);
+      logger.error('FileUtils', `Failed to list files in directory ${dirPath}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to list files in directory ${dirPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -96,7 +101,7 @@ export class FileUtils {
     try {
       return fs.stat(filePath);
     } catch (error) {
-      console.error(`Failed to get file stats for ${filePath}:`, error);
+      logger.error('FileUtils', `Failed to get file stats for ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to get file stats for ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -112,7 +117,7 @@ export class FileUtils {
       const stats = await fs.stat(dirPath);
       return stats.isDirectory();
     } catch (error) {
-      console.error(`Error checking if path is a directory ${dirPath}:`, error);
+      logger.error('FileUtils', `Error checking if path is a directory ${dirPath}: ${error}`);
       return false;
     }
   }
@@ -127,7 +132,7 @@ export class FileUtils {
     try {
       await fs.remove(targetPath);
     } catch (error) {
-      console.error(`Failed to delete ${targetPath}:`, error);
+      logger.error('FileUtils', `Failed to delete ${targetPath}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to delete ${targetPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -143,7 +148,7 @@ export class FileUtils {
     try {
       await fs.copy(sourcePath, destPath);
     } catch (error) {
-      console.error(`Failed to copy from ${sourcePath} to ${destPath}:`, error);
+      logger.error('FileUtils', `Failed to copy from ${sourcePath} to ${destPath}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to copy from ${sourcePath} to ${destPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -168,7 +173,7 @@ export class FileUtils {
     try {
       await fs.remove(filePath);
     } catch (error) {
-      console.error(`Failed to delete file ${filePath}:`, error);
+      logger.error('FileUtils', `Failed to delete file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to delete file ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
