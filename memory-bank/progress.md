@@ -6,6 +6,10 @@ Memory Bank MCP is an MCP (Model Context Protocol) server that provides tools an
 
 ## Update History
 
+- [2025-03-09 6:16:23 PM] [@movibe] - Documentation: Created documentation on the English language policy for Memory Bank and reinforced the English-only requirement in the code with additional comments and warnings.
+- [2025-03-09 6:16:20 PM] [@movibe] - File Update: Updated docs/english-language-policy.md
+- [2025-03-09 6:13:32 PM] [@movibe] - Correção de Bug: Corrigido o problema onde os arquivos do Memory Bank estavam sendo criados na raiz do projeto em vez de usar o diretório + nome da pasta. Modificados os métodos setCustomPath, findMemoryBankDir e initializeMemoryBank para combinar o caminho base com o folderName.
+- [2025-03-09 6:13:29 PM] [@movibe] - Decision Made: Correção do caminho do Memory Bank para usar folderName
 - [2025-03-08 5:26:20 PM] [@movibe] - Updated Memory Bank Documentation: Updated the Memory Bank Structure section in system-patterns.md to reflect the correct file naming convention (kebab-case). Changed references from camelCase (productContext.md, activeContext.md, decisionLog.md, systemPatterns.md) to kebab-case (product-context.md, active-context.md, decision-log.md, system-patterns.md) to match the actual file names used in the Memory Bank.
 - [2025-03-08 5:23:30 PM] [@movibe] - Decision Made: Memory Bank Directory Structure Simplification
 - [2025-03-08 5:23:24 PM] [@movibe] - Fixed Memory Bank Directory Structure: Fixed the Memory Bank initialization to prevent creation of unnecessary subdirectories and duplicate files. The function initializeMemoryBank was creating subdirectories (progress, decisions, context, templates, backups, modes) and placing files in those subdirectories, but the rest of the code expected the files to be in the root directory of the Memory Bank. Modified the function to create all core files directly in the root directory, which is consistent with how the files are accessed throughout the codebase. Removed all duplicate directories and files that were previously created.

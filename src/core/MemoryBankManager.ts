@@ -6,6 +6,7 @@ import { ModeManager } from '../utils/ModeManager.js';
 import { ExternalRulesLoader } from '../utils/ExternalRulesLoader.js';
 import fs from 'fs';
 import { MemoryBankStatus, ModeState } from '../types/index.js';
+import { MigrationUtils } from '../utils/MigrationUtils.js';
 
 /**
  * Class responsible for managing Memory Bank operations
@@ -34,7 +35,8 @@ export class MemoryBankManager {
    * @param folderName Optional folder name for the Memory Bank (default: 'memory-bank')
    */
   constructor(projectPath?: string, userId?: string, folderName?: string) {
-    // Ensure language is always English
+    // Ensure language is always English - this is a hard requirement
+    // All Memory Bank content will be in English regardless of system locale or user settings
     this.language = 'en';
     
     if (projectPath) {
@@ -55,7 +57,7 @@ export class MemoryBankManager {
       console.error(`MemoryBankManager initialized with default folder name: ${this.folderName}`);
     }
     
-    console.error(`Memory Bank language is set to English (${this.language})`);
+    console.error(`Memory Bank language is set to English (${this.language}) - all content will be in English`);
     
     // Check for an existing memory-bank directory in the project path
     this.setCustomPath(this.projectPath).catch(error => {
@@ -77,13 +79,14 @@ export class MemoryBankManager {
    * 
    * Note: This method is provided for API consistency, but the Memory Bank
    * will always use English (en) regardless of the language parameter.
+   * This is a deliberate design decision to ensure consistency across all Memory Banks.
    * 
    * @param language - Language code (ignored, always sets to 'en')
    */
   setLanguage(language: string): void {
     // Always use English regardless of the parameter
     this.language = 'en';
-    console.warn('Memory Bank language is always set to English (en) regardless of the requested language.');
+    console.warn('Memory Bank language is always set to English (en) regardless of the requested language. This is a hard requirement for consistency.');
   }
 
   /**
@@ -98,16 +101,15 @@ export class MemoryBankManager {
   /**
    * Finds a Memory Bank directory in the provided directory
    * 
-   * Always uses the provided directory directly as the Memory Bank directory.
-   * If a custom path is provided, it will be ignored as we always use the provided directory.
+   * Combines the provided directory with the folder name to create the Memory Bank path.
    * 
    * @param startDir - Starting directory for the search
    * @param customPath - Optional custom path (ignored in this implementation)
    * @returns Path to the Memory Bank directory or null if not found
    */
   async findMemoryBankDir(startDir: string, customPath?: string): Promise<string | null> {
-    // Use the provided directory directly as the Memory Bank directory
-    const mbDir = startDir;
+    // Combine the start directory with the folder name
+    const mbDir = path.join(startDir, this.folderName);
     
     // Check if the directory exists and is a valid Memory Bank
     if (await FileUtils.fileExists(mbDir) && await FileUtils.isDirectory(mbDir)) {
@@ -209,13 +211,13 @@ export class MemoryBankManager {
    */
   async initializeMemoryBank(dirPath: string): Promise<void> {
     try {
+      // Combine the directory path with the folder name
+      const memoryBankPath = path.join(dirPath, this.folderName);
+      
       // Create the Memory Bank directory if it doesn't exist
-      await FileUtils.ensureDirectory(dirPath);
+      await FileUtils.ensureDirectory(memoryBankPath);
       
-      // Use the provided path directly as the memory bank path
-      const memoryBankPath = dirPath;
-      
-      // Create initial files in the root directory
+      // Create initial files in the Memory Bank directory
       const initialFiles = [
         {
           path: path.join(memoryBankPath, 'product-context.md'),
@@ -409,8 +411,9 @@ export class MemoryBankManager {
     const basePath = customPath || this.getProjectPath();
     this.customPath = basePath;
     
-    // Use the provided path directly as the Memory Bank directory
-    const memoryBankPath = basePath;
+    // Combine the base path with the folder name to create the Memory Bank path
+    const memoryBankPath = path.join(basePath, this.folderName);
+    
     if (await FileUtils.fileExists(memoryBankPath) && await FileUtils.isDirectory(memoryBankPath)) {
       // Check if it's a valid Memory Bank
       if (await this.isMemoryBank(memoryBankPath)) {
@@ -682,5 +685,30 @@ export class MemoryBankManager {
    */
   getFolderName(): string {
     return this.folderName;
+  }
+
+  /**
+   * Migrates Memory Bank files from camelCase to kebab-case naming convention
+   * 
+   * @returns Object with migration results
+   * @throws Error if Memory Bank directory is not set
+   */
+  async migrateFileNaming(): Promise<{
+    success: boolean;
+    migrated: string[];
+    errors: string[];
+  }> {
+    const memoryBankDir = this.getMemoryBankDir();
+    if (!memoryBankDir) {
+      throw new Error('Memory Bank directory not set');
+    }
+
+    const result = await MigrationUtils.migrateFileNamingConvention(memoryBankDir);
+    
+    return {
+      success: result.success,
+      migrated: result.migratedFiles,
+      errors: result.errors
+    };
   }
 }

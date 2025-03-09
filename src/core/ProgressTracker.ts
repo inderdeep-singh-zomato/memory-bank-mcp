@@ -85,15 +85,15 @@ export class ProgressTracker {
   }
 
   /**
-   * Tracks project progress
+   * Tracks progress by adding an entry to the progress file
    * 
-   * Updates both the progress file and active context file with the action details.
+   * Note: All progress entries are stored in English regardless of the system locale or user settings.
    * 
-   * @param action - Action performed
-   * @param details - Details of the action
-   * @throws Error if tracking fails
+   * @param action - Action performed (e.g., 'Implemented feature', 'Fixed bug')
+   * @param details - Details of the progress
+   * @returns The updated progress content
    */
-  async trackProgress(action: string, details: ProgressDetails): Promise<void> {
+  async trackProgress(action: string, details: ProgressDetails): Promise<string> {
     try {
       // Add user ID to details if not already present
       if (!details.userId) {
@@ -101,10 +101,13 @@ export class ProgressTracker {
       }
       
       // Update the progress file
-      await this.updateProgressFile(action, details);
+      const updatedContent = await this.updateProgressFile(action, details);
       
       // Update the active context file
       await this.updateActiveContextFile(action, details);
+      
+      // Return the updated progress content
+      return updatedContent;
     } catch (error) {
       console.error(`Error tracking progress: ${error}`);
       throw new Error(`Failed to track progress: ${error}`);
@@ -118,7 +121,7 @@ export class ProgressTracker {
    * @param details - Details of the action
    * @private
    */
-  private async updateProgressFile(action: string, details: ProgressDetails): Promise<void> {
+  private async updateProgressFile(action: string, details: ProgressDetails): Promise<string> {
     const progressPath = path.join(this.memoryBankDir, 'progress.md');
     
     try {
@@ -142,6 +145,9 @@ export class ProgressTracker {
       }
       
       await FileUtils.writeFile(progressPath, progressContent);
+      
+      // Return the updated progress content
+      return progressContent;
     } catch (error) {
       console.error(`Error updating progress file: ${error}`);
       throw new Error(`Failed to update progress file: ${error}`);
@@ -185,59 +191,18 @@ export class ProgressTracker {
   }
 
   /**
-   * Logs a decision in the decision log
-   * 
-   * @param decision - Decision to log
-   * @throws Error if logging fails
-   */
-  async logDecision(decision: Decision): Promise<void> {
-    const decisionLogPath = path.join(this.memoryBankDir, 'decision-log.md');
-    
-    try {
-      let decisionLogContent = await FileUtils.readFile(decisionLogPath);
-      
-      const timestamp = new Date().toISOString().split('T')[0];
-      const time = new Date().toLocaleTimeString();
-      const userId = decision.userId || this.userId;
-      
-      // Format alternatives and consequences
-      const alternatives = Array.isArray(decision.alternatives) 
-        ? decision.alternatives.map(alt => `  - ${alt}`).join('\n') 
-        : decision.alternatives || 'None';
-        
-      const consequences = Array.isArray(decision.consequences) 
-        ? decision.consequences.map(cons => `  - ${cons}`).join('\n') 
-        : decision.consequences || 'None';
-      
-      const newDecision = `
-## ${decision.title}
-- **Date:** ${timestamp} ${time}
-- **Author:** ${userId}
-- **Context:** ${decision.context}
-- **Decision:** ${decision.decision}
-- **Alternatives Considered:** 
-${Array.isArray(decision.alternatives) ? alternatives : `  - ${alternatives}`}
-- **Consequences:** 
-${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
-`;
-      
-      // Add the new decision to the end of the file
-      decisionLogContent += newDecision;
-      
-      await FileUtils.writeFile(decisionLogPath, decisionLogContent);
-    } catch (error) {
-      console.error(`Error logging decision: ${error}`);
-      throw new Error(`Failed to log decision: ${error}`);
-    }
-  }
-
-  /**
    * Updates the active context
+   * 
+   * Note: All content is stored in English regardless of the system locale or user settings.
    * 
    * @param context - Context to update
    * @throws Error if update fails
    */
-  async updateActiveContext(context: ActiveContext): Promise<void> {
+  async updateActiveContext(context: {
+    tasks?: string[];
+    issues?: string[];
+    nextSteps?: string[];
+  }): Promise<void> {
     const contextPath = path.join(this.memoryBankDir, 'active-context.md');
     
     try {
@@ -310,6 +275,55 @@ ${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
     } catch (error) {
       console.error(`Error clearing session notes: ${error}`);
       throw new Error(`Failed to clear session notes: ${error}`);
+    }
+  }
+
+  /**
+   * Logs a decision in the decision log
+   * 
+   * Note: All decision entries are stored in English regardless of the system locale or user settings.
+   * 
+   * @param decision - Decision to log
+   * @throws Error if logging fails
+   */
+  async logDecision(decision: Decision): Promise<void> {
+    const decisionLogPath = path.join(this.memoryBankDir, 'decision-log.md');
+    
+    try {
+      let decisionLogContent = await FileUtils.readFile(decisionLogPath);
+      
+      const timestamp = new Date().toISOString().split('T')[0];
+      const time = new Date().toLocaleTimeString();
+      const userId = decision.userId || this.userId;
+      
+      // Format alternatives and consequences
+      const alternatives = Array.isArray(decision.alternatives) 
+        ? decision.alternatives.map(alt => `  - ${alt}`).join('\n') 
+        : decision.alternatives || 'None';
+        
+      const consequences = Array.isArray(decision.consequences) 
+        ? decision.consequences.map(cons => `  - ${cons}`).join('\n') 
+        : decision.consequences || 'None';
+      
+      const newDecision = `
+## ${decision.title}
+- **Date:** ${timestamp} ${time}
+- **Author:** ${userId}
+- **Context:** ${decision.context}
+- **Decision:** ${decision.decision}
+- **Alternatives Considered:** 
+${Array.isArray(decision.alternatives) ? alternatives : `  - ${alternatives}`}
+- **Consequences:** 
+${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
+`;
+      
+      // Add the new decision to the end of the file
+      decisionLogContent += newDecision;
+      
+      await FileUtils.writeFile(decisionLogPath, decisionLogContent);
+    } catch (error) {
+      console.error(`Error logging decision: ${error}`);
+      throw new Error(`Failed to log decision: ${error}`);
     }
   }
 }

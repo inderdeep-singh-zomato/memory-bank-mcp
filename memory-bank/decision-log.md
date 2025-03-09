@@ -214,3 +214,18 @@ This document tracks important decisions made during the development of the Memo
   - Easier maintenance and debugging
   - Reduced risk of file access errors
   - Cleaner user experience
+
+## Correção do caminho do Memory Bank para usar folderName
+- **Date:** 2025-03-09 6:13:29 PM
+- **Author:** @movibe
+- **Context:** O Memory Bank estava sendo criado e atualizado na raiz do projeto, em vez de usar o diretório + nome da pasta recebida via argumentos ou definida no prompt. Isso ocorria porque o código não estava usando o folderName corretamente.
+- **Decision:** Modificar os métodos setCustomPath, findMemoryBankDir e initializeMemoryBank para combinar o caminho base com o folderName, garantindo que o Memory Bank seja criado e acessado no diretório correto.
+- **Alternatives Considered:** 
+  - Manter o comportamento atual e documentar que o Memory Bank é sempre criado na raiz
+  - Adicionar uma opção de configuração para escolher entre usar o folderName ou não
+  - Criar uma estrutura de diretórios mais complexa com subdiretórios para diferentes tipos de arquivos
+- **Consequences:** 
+  - Os arquivos do Memory Bank serão criados no diretório correto (projectPath/folderName)
+  - Melhor organização dos arquivos do projeto
+  - Compatibilidade com a documentação e expectativas do usuário
+  - Possível necessidade de migrar Memory Banks existentes para a nova estrutura
