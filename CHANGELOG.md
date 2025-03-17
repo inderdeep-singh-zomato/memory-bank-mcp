@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0](https://github.com/movibe/memory-bank-server/compare/v0.3.0...v0.4.0) (2025-03-17)
+
+
+### Features
+
+* Add MIT License file ([e19e4da](https://github.com/movibe/memory-bank-server/commit/e19e4da551dc33011cf4821153fc3bae786e5fbd))
+
 ## [0.3.0](https://github.com/movibe/memory-bank-server/compare/v0.2.1...v0.3.0) (2025-03-09)
 
 
