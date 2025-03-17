@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+### [0.4.1](https://github.com/movibe/memory-bank-server/compare/v0.4.0...v0.4.1) (2025-03-17)
+
 ## [0.4.0](https://github.com/movibe/memory-bank-server/compare/v0.3.0...v0.4.0) (2025-03-17)
 
 
