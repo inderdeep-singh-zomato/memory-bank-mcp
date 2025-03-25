@@ -3,6 +3,7 @@ import { MemoryBankManager } from '../../core/MemoryBankManager.js';
 import { MigrationUtils } from '../../utils/MigrationUtils.js';
 import { FileUtils } from '../../utils/FileUtils.js';
 import os from 'os';
+import { LocalStorageProvider } from '../../core/storage/LocalStorageProvider.js';
 
 /**
  * Definition of the main Memory Bank tools
@@ -140,12 +141,15 @@ export async function handleSetMemoryBankPath(
   // Use the provided path, project path, or the current directory
   const basePath = customPath || memoryBankManager.getProjectPath();
   
-  // Ensure the path is absolute
-  const absolutePath = path.isAbsolute(basePath) ? basePath : path.resolve(process.cwd(), basePath);
-  console.error('Using absolute path for Memory Bank:', absolutePath);
+  // Only convert to absolute path if we're using local storage
+  const finalPath = memoryBankManager.getStorageProvider() instanceof LocalStorageProvider
+    ? path.isAbsolute(basePath) ? basePath : path.resolve(process.cwd(), basePath)
+    : basePath;
+  
+  console.error('Using path for Memory Bank:', finalPath);
   
   // Set the custom path and check for a memory-bank directory
-  await memoryBankManager.setCustomPath(absolutePath);
+  await memoryBankManager.setCustomPath(finalPath);
   
   // Check if a memory-bank directory was found
   const memoryBankDir = memoryBankManager.getMemoryBankDir();
@@ -185,13 +189,16 @@ export async function handleInitializeMemoryBank(
     // If dirPath is not provided, use the project path
     const basePath = dirPath || memoryBankManager.getProjectPath();
     
-    // Ensure the path is absolute
-    const absolutePath = path.isAbsolute(basePath) ? basePath : path.resolve(process.cwd(), basePath);
-    console.error('Using absolute path:', absolutePath);
+    // Only convert to absolute path if we're using local storage
+    const finalPath = memoryBankManager.getStorageProvider() instanceof LocalStorageProvider
+      ? path.isAbsolute(basePath) ? basePath : path.resolve(process.cwd(), basePath)
+      : basePath;
+    
+    console.error('Using path:', finalPath);
     
     try {
       // Initialize the Memory Bank in the provided directory
-      await memoryBankManager.initializeMemoryBank(absolutePath);
+      await memoryBankManager.initializeMemoryBank(finalPath);
       
       // Get the Memory Bank directory
       const memoryBankDir = memoryBankManager.getMemoryBankDir();
@@ -212,7 +219,7 @@ export async function handleInitializeMemoryBank(
         console.warn('Continuing with Memory Bank initialization despite .clinerules issues.');
         
         // Use the provided path directly as the memory bank directory
-        const memoryBankDir = absolutePath;
+        const memoryBankDir = finalPath;
         try {
           await FileUtils.ensureDirectory(memoryBankDir);
           memoryBankManager.setMemoryBankDir(memoryBankDir);
@@ -269,7 +276,7 @@ export async function handleInitializeMemoryBank(
       content: [
         {
           type: 'text',
-          text: `Error initializing Memory Bank: ${error}`,
+          text: `Error: ${error}`,
         },
       ],
     };

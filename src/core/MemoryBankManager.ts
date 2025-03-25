@@ -667,4 +667,13 @@ export class MemoryBankManager {
       errors: result.errors
     };
   }
+
+  /**
+   * Gets the storage provider being used
+   * 
+   * @returns The storage provider instance
+   */
+  getStorageProvider(): StorageProvider {
+    return this.storageProvider;
+  }
 }
