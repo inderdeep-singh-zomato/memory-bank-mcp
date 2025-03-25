@@ -36,7 +36,7 @@ describe('SftpStorageProvider Tests', () => {
 
   describe('Path Handling', () => {
     test('should handle paths correctly for SFTP server', async () => {
-      const localPath = '/Users/theidsingh/Documents/ZomatoProject/zomato-ios/memory-bank';
+      const localPath = '/project/memory-bank';
       const expectedSftpPath = 'sftp/memory-bank';
 
       // Test directory creation
@@ -60,7 +60,7 @@ describe('SftpStorageProvider Tests', () => {
     });
 
     test('should not include local project path in SFTP paths', async () => {
-      const localProjectPath = '/Users/theidsingh/Documents/ZomatoProject/zomato-ios';
+      const localProjectPath = '/project';
       const expectedSftpPath = 'sftp/memory-bank';
 
       // Test that the path is not affected by local project path
@@ -81,8 +81,8 @@ describe('SftpStorageProvider Tests', () => {
     });
 
     test('should handle backup paths correctly', async () => {
-      const sourcePath = '/Users/theidsingh/Documents/ZomatoProject/zomato-ios/memory-bank';
-      const backupPath = '/Users/theidsingh/Documents/ZomatoProject/zomato-ios/memory-bank-backup';
+      const sourcePath = '/project/memory-bank';
+      const backupPath = '/project/memory-bank-backup';
       const expectedSourcePath = 'sftp/memory-bank';
       const expectedBackupPath = 'sftp/memory-bank-backup';
 

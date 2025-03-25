@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 const server = spawn('node', [
   'build/index.js',
   '--debug',
-  '--sftp-host', '10.200.72.31',
+  '--sftp-host', 'test-sftp-server',
   '--sftp-port', '2022',
   '--sftp-user', 'cursor',
   '--sftp-pass', 'cursor',
