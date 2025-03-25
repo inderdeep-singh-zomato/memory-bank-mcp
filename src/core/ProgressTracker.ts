@@ -1,5 +1,6 @@
 import path from 'path';
 import { FileUtils } from '../utils/FileUtils.js';
+import { StorageProvider } from './storage/StorageProvider.js';
 
 /**
  * Interface for progress tracking details
@@ -78,8 +79,13 @@ export class ProgressTracker {
    * 
    * @param memoryBankDir - Directory of the Memory Bank
    * @param userId - GitHub profile URL for tracking changes
+   * @param storageProvider - Storage provider for file operations
    */
-  constructor(private memoryBankDir: string, userId?: string) {
+  constructor(
+    private memoryBankDir: string,
+    userId?: string,
+    private storageProvider?: StorageProvider
+  ) {
     // Use provided userId or "Unknown User" as default
     this.userId = userId || "Unknown User";
   }
@@ -155,7 +161,9 @@ export class ProgressTracker {
     const progressPath = path.join(this.memoryBankDir, 'progress.md');
     
     try {
-      let progressContent = await FileUtils.readFile(progressPath);
+      let progressContent = this.storageProvider
+        ? await this.storageProvider.readFile(progressPath)
+        : await FileUtils.readFile(progressPath);
       
       const timestamp = new Date().toISOString().split('T')[0];
       const time = new Date().toLocaleTimeString();
@@ -175,7 +183,11 @@ export class ProgressTracker {
         progressContent += `\n\n## Update History\n\n${newEntry}\n`;
       }
       
-      await FileUtils.writeFile(progressPath, progressContent);
+      if (this.storageProvider) {
+        await this.storageProvider.writeFile(progressPath, progressContent);
+      } else {
+        await FileUtils.writeFile(progressPath, progressContent);
+      }
       
       // Return the updated progress content
       return progressContent;
@@ -196,7 +208,9 @@ export class ProgressTracker {
     const contextPath = path.join(this.memoryBankDir, 'active-context.md');
     
     try {
-      let contextContent = await FileUtils.readFile(contextPath);
+      let contextContent = this.storageProvider
+        ? await this.storageProvider.readFile(contextPath)
+        : await FileUtils.readFile(contextPath);
       
       // Add the entry to the current session notes section
       const sessionNotesRegex = /## Current Session Notes\s+/;
@@ -215,7 +229,11 @@ export class ProgressTracker {
         contextContent += `\n\n## Current Session Notes\n\n${newNote}\n`;
       }
       
-      await FileUtils.writeFile(contextPath, contextContent);
+      if (this.storageProvider) {
+        await this.storageProvider.writeFile(contextPath, contextContent);
+      } else {
+        await FileUtils.writeFile(contextPath, contextContent);
+      }
     } catch (error) {
       console.error(`Error updating active context file: ${error}`);
       throw new Error(`Failed to update active context file: ${error}`);
@@ -238,7 +256,9 @@ export class ProgressTracker {
     const contextPath = path.join(this.memoryBankDir, 'active-context.md');
     
     try {
-      let contextContent = await FileUtils.readFile(contextPath);
+      let contextContent = this.storageProvider
+        ? await this.storageProvider.readFile(contextPath)
+        : await FileUtils.readFile(contextPath);
       
       // Update ongoing tasks
       if (context.tasks && context.tasks.length > 0) {
@@ -276,7 +296,11 @@ export class ProgressTracker {
         }
       }
       
-      await FileUtils.writeFile(contextPath, contextContent);
+      if (this.storageProvider) {
+        await this.storageProvider.writeFile(contextPath, contextContent);
+      } else {
+        await FileUtils.writeFile(contextPath, contextContent);
+      }
     } catch (error) {
       console.error(`Error updating active context: ${error}`);
       throw new Error(`Failed to update active context: ${error}`);
@@ -292,7 +316,9 @@ export class ProgressTracker {
     const contextPath = path.join(this.memoryBankDir, 'active-context.md');
     
     try {
-      let contextContent = await FileUtils.readFile(contextPath);
+      let contextContent = this.storageProvider
+        ? await this.storageProvider.readFile(contextPath)
+        : await FileUtils.readFile(contextPath);
       
       // Replace the current session notes with an empty section
       const sessionNotesRegex = /## Current Session Notes\s+([^#]*)/s;
@@ -302,7 +328,11 @@ export class ProgressTracker {
           `## Current Session Notes\n\n`
         );
         
-        await FileUtils.writeFile(contextPath, contextContent);
+        if (this.storageProvider) {
+          await this.storageProvider.writeFile(contextPath, contextContent);
+        } else {
+          await FileUtils.writeFile(contextPath, contextContent);
+        }
       }
     } catch (error) {
       console.error(`Error clearing session notes: ${error}`);
@@ -322,7 +352,9 @@ export class ProgressTracker {
     const decisionLogPath = path.join(this.memoryBankDir, 'decision-log.md');
     
     try {
-      let decisionLogContent = await FileUtils.readFile(decisionLogPath);
+      let decisionLogContent = this.storageProvider
+        ? await this.storageProvider.readFile(decisionLogPath)
+        : await FileUtils.readFile(decisionLogPath);
       
       const timestamp = new Date().toISOString().split('T')[0];
       const time = new Date().toLocaleTimeString();
@@ -353,7 +385,11 @@ ${Array.isArray(decision.consequences) ? consequences : `  - ${consequences}`}
       // Add the new decision to the end of the file
       decisionLogContent += newDecision;
       
-      await FileUtils.writeFile(decisionLogPath, decisionLogContent);
+      if (this.storageProvider) {
+        await this.storageProvider.writeFile(decisionLogPath, decisionLogContent);
+      } else {
+        await FileUtils.writeFile(decisionLogPath, decisionLogContent);
+      }
     } catch (error) {
       console.error(`Error logging decision: ${error}`);
       throw new Error(`Failed to log decision: ${error}`);

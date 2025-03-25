@@ -9,6 +9,7 @@ import { MemoryBankStatus, ModeState } from '../types/index.js';
 import { MigrationUtils } from '../utils/MigrationUtils.js';
 import { logger } from '../utils/LogManager.js';
 import { StorageProvider } from './storage/StorageProvider.js';
+import { LocalStorageProvider } from './storage/LocalStorageProvider.js';
 
 /**
  * Class responsible for managing Memory Bank operations
@@ -223,7 +224,8 @@ export class MemoryBankManager {
    */
   async initializeMemoryBank(dirPath: string): Promise<void> {
     try {
-      const memoryBankPath = path.join(dirPath, this.folderName);
+      // Don't append folderName if the path already ends with it
+      const memoryBankPath = dirPath.endsWith(this.folderName) ? dirPath : path.join(dirPath, this.folderName);
       
       await this.storageProvider.createDirectory(memoryBankPath);
       
@@ -256,7 +258,7 @@ export class MemoryBankManager {
       
       this.memoryBankDir = memoryBankPath;
       
-      this.progressTracker = new ProgressTracker(memoryBankPath, this.userId || undefined);
+      this.progressTracker = new ProgressTracker(memoryBankPath, this.userId || undefined, this.storageProvider);
       
       await this.initializeModeManager();
       
@@ -372,7 +374,8 @@ export class MemoryBankManager {
     const basePath = customPath || this.getProjectPath();
     this.customPath = basePath;
     
-    const memoryBankPath = path.join(basePath, this.folderName);
+    // Don't append folderName if the path already ends with it
+    const memoryBankPath = basePath.endsWith(this.folderName) ? basePath : path.join(basePath, this.folderName);
     
     if (await this.storageProvider.exists(memoryBankPath)) {
       if (await this.isMemoryBank(memoryBankPath)) {
@@ -411,7 +414,7 @@ export class MemoryBankManager {
     this.memoryBankDir = dir;
     
     // Initialize the progress tracker
-    this.progressTracker = new ProgressTracker(dir, this.userId || undefined);
+    this.progressTracker = new ProgressTracker(dir, this.userId || undefined, this.storageProvider);
     
     // Initialize the mode manager
     this.initializeModeManager().catch(error => {

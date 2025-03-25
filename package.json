@@ -1,6 +1,6 @@
 {
   "name": "@z-test/memory-bank-mcp",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "MCP Server for managing Memory Bank",
   "type": "module",
   "main": "build/index.js",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "clean": "rm -rf build",
-    "build": "bun run clean && bun build src/index.ts --outdir build --target node",
+    "build": "bun run clean && bun build src/index.ts --outdir build --target node --external ssh2-sftp-client --external ssh2 --external cpu-features",
     "start": "bun build/index.js",
     "dev": "bun --watch src/index.ts",
     "build:start": "bun run build && bun run start",
@@ -53,6 +53,8 @@
     "@types/bun": "^1.2.4",
     "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.4.5",
+    "@types/ssh2-sftp-client": "^9.0.4",
+    "esbuild": "^0.25.1",
     "standard-version": "^9.5.0",
     "ts-node": "10.9.2",
     "typescript": "^5.1.6"

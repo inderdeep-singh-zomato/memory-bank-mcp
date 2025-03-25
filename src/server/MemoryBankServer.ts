@@ -68,6 +68,23 @@ export class MemoryBankServer {
         capabilities: {
           tools: {
             tools: allTools,
+            handlers: {
+              initialize_memory_bank: true,
+              set_memory_bank_path: true,
+              debug_mcp_config: true,
+              read_memory_bank_file: true,
+              write_memory_bank_file: true,
+              list_memory_bank_files: true,
+              get_memory_bank_status: true,
+              migrate_file_naming: true,
+              track_progress: true,
+              update_active_context: true,
+              log_decision: true,
+              switch_mode: true,
+              get_current_mode: true,
+              process_umb_command: true,
+              complete_umb: true
+            }
           },
           resources: {},
         },

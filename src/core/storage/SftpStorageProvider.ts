@@ -1,4 +1,4 @@
-import { Client } from 'ssh2-sftp-client';
+import SftpClient from 'ssh2-sftp-client';
 import { StorageProvider } from './StorageProvider.js';
 import { MemoryBankStatus } from '../../types/index.js';
 import { logger } from '../../utils/LogManager.js';
@@ -13,12 +13,13 @@ interface SftpConfig {
 }
 
 export class SftpStorageProvider implements StorageProvider {
-  private client: Client;
+  private client: SftpClient;
   private config: SftpConfig;
   private connected: boolean = false;
 
-  constructor() {
-    this.client = new Client();
+  constructor(config: SftpConfig) {
+    this.client = new SftpClient();
+    this.config = config;
   }
 
   async initialize(config: SftpConfig): Promise<void> {
@@ -123,8 +124,8 @@ export class SftpStorageProvider implements StorageProvider {
   }
 
   async getStatus(path: string): Promise<MemoryBankStatus> {
-    await this.ensureConnected();
     try {
+      await this.ensureConnected();
       const fullPath = this.getFullPath(path);
       const files = await this.listFiles(fullPath);
       const coreFiles = [
@@ -140,11 +141,8 @@ export class SftpStorageProvider implements StorageProvider {
       
       let lastUpdated: Date | undefined;
       if (files.length > 0) {
-        const stats = await Promise.all(
-          files.map(file => this.getFileStats(path + '/' + file))
-        );
-        const latestMtime = Math.max(...stats.map(stat => stat.mtimeMs));
-        lastUpdated = new Date(latestMtime);
+        const stats = await this.client.stat(fullPath);
+        lastUpdated = new Date(stats.modifyTime || 0);
       }
 
       return {
@@ -176,7 +174,8 @@ export class SftpStorageProvider implements StorageProvider {
       for (const file of files) {
         const sourceFile = `${fullSourcePath}/${file}`;
         const backupFile = `${fullBackupPath}/${file}`;
-        await this.client.fastGet(sourceFile, backupFile);
+        const content = await this.readFile(sourceFile);
+        await this.writeFile(backupFile, content);
       }
       
       logger.debug('SftpStorageProvider', `Created backup at: ${fullBackupPath}`);
@@ -187,7 +186,21 @@ export class SftpStorageProvider implements StorageProvider {
   }
 
   private getFullPath(path: string): string {
-    return `${this.config.basePath}/${path}`.replace(/\/+/g, '/');
+    const cleanBasePath = this.config.basePath.replace(/^\/+|\/+$/g, '');
+    const cleanPath = path.replace(/^\/+|\/+$/g, '');
+
+    // If the path is empty, return just the base path
+    if (!cleanPath) {
+      return `/${cleanBasePath}`;
+    }
+
+    // If the path already starts with the base path, don't add it again
+    if (cleanPath.startsWith(cleanBasePath)) {
+      return `/${cleanPath}`;
+    }
+
+    // Combine the paths
+    return `/${cleanBasePath}/${cleanPath}`;
   }
 
   async disconnect(): Promise<void> {
