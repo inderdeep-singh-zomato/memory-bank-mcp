@@ -1,133 +1,167 @@
-import SftpClient from 'ssh2-sftp-client';
+import Client from 'ssh2-sftp-client';
 import { StorageProvider } from './StorageProvider.js';
 import { MemoryBankStatus } from '../../types/index.js';
 import { logger } from '../../utils/LogManager.js';
 
-interface SftpConfig {
+export interface SftpConfig {
   host: string;
   port: number;
   username: string;
-  password?: string;
-  privateKey?: string;
+  password: string;
   basePath: string;
 }
 
 export class SftpStorageProvider implements StorageProvider {
-  private client: SftpClient;
+  private client: Client;
   private config: SftpConfig;
   private connected: boolean = false;
 
   constructor(config: SftpConfig) {
-    this.client = new SftpClient();
     this.config = config;
+    this.client = new Client();
   }
 
   async initialize(config: SftpConfig): Promise<void> {
     this.config = config;
-    await this.connect();
+    await this.ensureConnection();
   }
 
-  private async connect(): Promise<void> {
-    if (this.connected) return;
+  private async ensureConnection(): Promise<void> {
+    if (!this.connected) {
+      try {
+        await this.client.connect({
+          host: this.config.host,
+          port: this.config.port,
+          username: this.config.username,
+          password: this.config.password,
+        });
+        this.connected = true;
+        logger.debug('SftpStorageProvider', 'Connected to SFTP server');
+      } catch (error) {
+        logger.error('SftpStorageProvider', `Failed to connect to SFTP server: ${error}`);
+        throw error;
+      }
+    }
+  }
 
+  private getSftpPath(localPath: string): string {
+    // If the path starts with the base path, use it as is
+    if (localPath.startsWith(this.config.basePath)) {
+      return localPath;
+    }
+
+    // If the path contains the base path, extract everything after it
+    const basePathIndex = localPath.indexOf(this.config.basePath);
+    if (basePathIndex !== -1) {
+      return localPath.substring(basePathIndex);
+    }
+
+    // Otherwise, just use the base path
+    return this.config.basePath;
+  }
+
+  async exists(path: string): Promise<boolean> {
     try {
-      await this.client.connect({
-        host: this.config.host,
-        port: this.config.port,
-        username: this.config.username,
-        password: this.config.password,
-        privateKey: this.config.privateKey,
-      });
-      this.connected = true;
-      logger.debug('SftpStorageProvider', 'Connected to SFTP server');
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      return await this.client.exists(sftpPath);
     } catch (error) {
-      logger.error('SftpStorageProvider', `Failed to connect to SFTP server: ${error}`);
+      logger.error('SftpStorageProvider', `Error checking if path exists: ${error}`);
       throw error;
     }
   }
 
-  private async ensureConnected(): Promise<void> {
-    if (!this.connected) {
-      await this.connect();
-    }
-  }
-
-  async exists(path: string): Promise<boolean> {
-    await this.ensureConnected();
-    try {
-      const fullPath = this.getFullPath(path);
-      const stats = await this.client.stat(fullPath);
-      return stats !== null;
-    } catch (error) {
-      return false;
-    }
-  }
-
   async createDirectory(path: string): Promise<void> {
-    await this.ensureConnected();
     try {
-      const fullPath = this.getFullPath(path);
-      await this.client.mkdir(fullPath, true);
-      logger.debug('SftpStorageProvider', `Created directory: ${fullPath}`);
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      await this.client.mkdir(sftpPath, true);
+      logger.debug('SftpStorageProvider', `Created directory: ${sftpPath}`);
     } catch (error) {
-      logger.error('SftpStorageProvider', `Failed to create directory: ${error}`);
+      logger.error('SftpStorageProvider', `Error creating directory: ${error}`);
       throw error;
     }
   }
 
   async readFile(path: string): Promise<string> {
-    await this.ensureConnected();
     try {
-      const fullPath = this.getFullPath(path);
-      const buffer = await this.client.get(fullPath);
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      const buffer = await this.client.get(sftpPath);
       return buffer.toString('utf-8');
     } catch (error) {
-      logger.error('SftpStorageProvider', `Failed to read file: ${error}`);
+      logger.error('SftpStorageProvider', `Error reading file: ${error}`);
       throw error;
     }
   }
 
   async writeFile(path: string, content: string): Promise<void> {
-    await this.ensureConnected();
     try {
-      const fullPath = this.getFullPath(path);
-      await this.client.put(Buffer.from(content, 'utf-8'), fullPath);
-      logger.debug('SftpStorageProvider', `Wrote file: ${fullPath}`);
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      const buffer = Buffer.from(content, 'utf-8');
+      await this.client.put(buffer, sftpPath);
+      logger.debug('SftpStorageProvider', `Wrote file: ${sftpPath}`);
     } catch (error) {
-      logger.error('SftpStorageProvider', `Failed to write file: ${error}`);
+      logger.error('SftpStorageProvider', `Error writing file: ${error}`);
       throw error;
     }
   }
 
   async listFiles(path: string): Promise<string[]> {
-    await this.ensureConnected();
     try {
-      const fullPath = this.getFullPath(path);
-      const list = await this.client.list(fullPath);
-      return list.map(item => item.name);
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      const list = await this.client.list(sftpPath);
+      return list.map((item: { name: string }) => item.name);
     } catch (error) {
-      logger.error('SftpStorageProvider', `Failed to list files: ${error}`);
+      logger.error('SftpStorageProvider', `Error listing files: ${error}`);
+      throw error;
+    }
+  }
+
+  async deleteFile(path: string): Promise<void> {
+    try {
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      await this.client.delete(sftpPath);
+      logger.debug('SftpStorageProvider', `Deleted file: ${sftpPath}`);
+    } catch (error) {
+      logger.error('SftpStorageProvider', `Error deleting file: ${error}`);
+      throw error;
+    }
+  }
+
+  async deleteDirectory(path: string): Promise<void> {
+    try {
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      await this.client.rmdir(sftpPath, true);
+      logger.debug('SftpStorageProvider', `Deleted directory: ${sftpPath}`);
+    } catch (error) {
+      logger.error('SftpStorageProvider', `Error deleting directory: ${error}`);
       throw error;
     }
   }
 
   async getFileStats(path: string): Promise<{ mtimeMs: number }> {
-    await this.ensureConnected();
     try {
-      const fullPath = this.getFullPath(path);
-      const stats = await this.client.stat(fullPath);
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      const stats = await this.client.stat(sftpPath);
       return { mtimeMs: stats.mtime * 1000 };
     } catch (error) {
-      logger.error('SftpStorageProvider', `Failed to get file stats: ${error}`);
+      logger.error('SftpStorageProvider', `Error getting file stats: ${error}`);
       throw error;
     }
   }
 
   async getStatus(path: string): Promise<MemoryBankStatus> {
     try {
-      await this.ensureConnected();
-      const fullPath = this.getFullPath(path);
-      const files = await this.listFiles(fullPath);
+      await this.ensureConnection();
+      const sftpPath = this.getSftpPath(path);
+      const files = await this.listFiles(sftpPath);
+      
       const coreFiles = [
         'product-context.md',
         'active-context.md',
@@ -141,12 +175,12 @@ export class SftpStorageProvider implements StorageProvider {
       
       let lastUpdated: Date | undefined;
       if (files.length > 0) {
-        const stats = await this.client.stat(fullPath);
-        lastUpdated = new Date(stats.modifyTime || 0);
+        const stats = await this.client.stat(sftpPath);
+        lastUpdated = new Date(stats.mtime * 1000);
       }
 
       return {
-        path: fullPath,
+        path: sftpPath,
         files,
         coreFilesPresent,
         missingCoreFiles,
@@ -155,59 +189,55 @@ export class SftpStorageProvider implements StorageProvider {
         lastUpdated
       };
     } catch (error) {
-      logger.error('SftpStorageProvider', `Failed to get status: ${error}`);
+      logger.error('SftpStorageProvider', `Error getting status: ${error}`);
       throw error;
     }
   }
 
   async createBackup(sourcePath: string, backupPath: string): Promise<void> {
-    await this.ensureConnected();
     try {
-      const fullSourcePath = this.getFullPath(sourcePath);
-      const fullBackupPath = this.getFullPath(backupPath);
-      
+      await this.ensureConnection();
+      const sourceSftpPath = this.getSftpPath(sourcePath);
+      const backupSftpPath = this.getSftpPath(backupPath);
+
       // Create backup directory
-      await this.createDirectory(fullBackupPath);
-      
-      // Copy all files from source to backup
-      const files = await this.listFiles(fullSourcePath);
+      await this.client.mkdir(backupSftpPath, true);
+
+      // List all files in source directory
+      const files = await this.client.list(sourceSftpPath);
+
+      // Copy each file
       for (const file of files) {
-        const sourceFile = `${fullSourcePath}/${file}`;
-        const backupFile = `${fullBackupPath}/${file}`;
-        const content = await this.readFile(sourceFile);
-        await this.writeFile(backupFile, content);
+        const sourceFile = `${sourceSftpPath}/${file.name}`;
+        const backupFile = `${backupSftpPath}/${file.name}`;
+
+        if (file.type === 'd') {
+          // Recursively backup directories
+          await this.createBackup(sourceFile, backupFile);
+        } else {
+          // Copy files
+          const buffer = await this.client.get(sourceFile);
+          await this.client.put(buffer, backupFile);
+        }
       }
-      
-      logger.debug('SftpStorageProvider', `Created backup at: ${fullBackupPath}`);
+
+      logger.debug('SftpStorageProvider', `Created backup at: ${backupSftpPath}`);
     } catch (error) {
-      logger.error('SftpStorageProvider', `Failed to create backup: ${error}`);
+      logger.error('SftpStorageProvider', `Error creating backup: ${error}`);
       throw error;
     }
   }
 
-  private getFullPath(path: string): string {
-    const cleanBasePath = this.config.basePath.replace(/^\/+|\/+$/g, '');
-    const cleanPath = path.replace(/^\/+|\/+$/g, '');
-
-    // If the path is empty, return just the base path
-    if (!cleanPath) {
-      return `/${cleanBasePath}`;
-    }
-
-    // If the path already starts with the base path, don't add it again
-    if (cleanPath.startsWith(cleanBasePath)) {
-      return `/${cleanPath}`;
-    }
-
-    // Combine the paths
-    return `/${cleanBasePath}/${cleanPath}`;
-  }
-
   async disconnect(): Promise<void> {
     if (this.connected) {
-      await this.client.end();
-      this.connected = false;
-      logger.debug('SftpStorageProvider', 'Disconnected from SFTP server');
+      try {
+        await this.client.end();
+        this.connected = false;
+        logger.debug('SftpStorageProvider', 'Disconnected from SFTP server');
+      } catch (error) {
+        logger.error('SftpStorageProvider', `Error disconnecting from SFTP server: ${error}`);
+        throw error;
+      }
     }
   }
 } 
