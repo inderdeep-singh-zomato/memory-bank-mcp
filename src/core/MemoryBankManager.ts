@@ -225,29 +225,29 @@ export class MemoryBankManager {
   async initializeMemoryBank(dirPath: string): Promise<void> {
     try {
       // Don't append folderName if the path already ends with it
-      const memoryBankPath = dirPath.endsWith(this.folderName) ? dirPath : path.join(dirPath, this.folderName);
+      const memoryBankPath = dirPath.endsWith(this.folderName) ? dirPath : `${dirPath}/${this.folderName}`;
       
       await this.storageProvider.createDirectory(memoryBankPath);
       
       const initialFiles = [
         {
-          path: path.join(memoryBankPath, 'product-context.md'),
+          path: `${memoryBankPath}/product-context.md`,
           content: coreTemplates.find(t => t.name === 'product-context.md')?.content || '',
         },
         {
-          path: path.join(memoryBankPath, 'active-context.md'),
+          path: `${memoryBankPath}/active-context.md`,
           content: coreTemplates.find(t => t.name === 'active-context.md')?.content || '',
         },
         {
-          path: path.join(memoryBankPath, 'progress.md'),
+          path: `${memoryBankPath}/progress.md`,
           content: coreTemplates.find(t => t.name === 'progress.md')?.content || '',
         },
         {
-          path: path.join(memoryBankPath, 'decision-log.md'),
+          path: `${memoryBankPath}/decision-log.md`,
           content: coreTemplates.find(t => t.name === 'decision-log.md')?.content || '',
         },
         {
-          path: path.join(memoryBankPath, 'system-patterns.md'),
+          path: `${memoryBankPath}/system-patterns.md`,
           content: coreTemplates.find(t => t.name === 'system-patterns.md')?.content || '',
         },
       ];
@@ -374,8 +374,8 @@ export class MemoryBankManager {
     const basePath = customPath || this.getProjectPath();
     this.customPath = basePath;
     
-    // Don't append folderName if the path already ends with it
-    const memoryBankPath = basePath.endsWith(this.folderName) ? basePath : path.join(basePath, this.folderName);
+    // Use template literal instead of path.join for SFTP compatibility
+    const memoryBankPath = basePath.endsWith(this.folderName) ? basePath : `${basePath}/${this.folderName}`;
     
     if (await this.storageProvider.exists(memoryBankPath)) {
       if (await this.isMemoryBank(memoryBankPath)) {
