@@ -1,6 +1,6 @@
 {
   "name": "@z-test/memory-bank-mcp",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "MCP Server for managing Memory Bank",
   "type": "module",
   "main": "build/index.js",
