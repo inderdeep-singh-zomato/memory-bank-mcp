@@ -8,6 +8,7 @@ import fs from 'fs';
 import { MemoryBankStatus, ModeState } from '../types/index.js';
 import { MigrationUtils } from '../utils/MigrationUtils.js';
 import { logger } from '../utils/LogManager.js';
+import { StorageProvider } from './storage/StorageProvider.js';
 
 /**
  * Class responsible for managing Memory Bank operations
@@ -24,6 +25,7 @@ export class MemoryBankManager {
   private projectPath: string | null = null;
   private userId: string | null = null;
   private folderName: string = 'memory-bank';
+  private storageProvider: StorageProvider;
   
   // Language is always set to English
   private language: string = 'en';
@@ -35,8 +37,15 @@ export class MemoryBankManager {
    * @param userId Optional GitHub profile URL for tracking changes
    * @param folderName Optional folder name for the Memory Bank (default: 'memory-bank')
    * @param debugMode Optional flag to enable debug mode
+   * @param storageProvider Optional storage provider to use instead of direct file system operations
    */
-  constructor(projectPath?: string, userId?: string, folderName?: string, debugMode?: boolean) {
+  constructor(
+    projectPath?: string,
+    userId?: string,
+    folderName?: string,
+    debugMode?: boolean,
+    storageProvider?: StorageProvider
+  ) {
     // Ensure language is always English - this is a hard requirement
     // All Memory Bank content will be in English regardless of system locale or user settings
     this.language = 'en';
@@ -60,6 +69,8 @@ export class MemoryBankManager {
     }
     
     logger.info('MemoryBankManager', `Memory Bank language is set to English (${this.language}) - all content will be in English`);
+    
+    this.storageProvider = storageProvider || new LocalStorageProvider();
     
     // Check for an existing memory-bank directory in the project path
     this.setCustomPath(this.projectPath).catch(error => {
@@ -110,13 +121,10 @@ export class MemoryBankManager {
    * @returns Path to the Memory Bank directory or null if not found
    */
   async findMemoryBankDir(startDir: string, customPath?: string): Promise<string | null> {
-    // Combine the start directory with the folder name
     const mbDir = path.join(startDir, this.folderName);
     
-    // Check if the directory exists and is a valid Memory Bank
-    if (await FileUtils.fileExists(mbDir) && await FileUtils.isDirectory(mbDir)) {
-      // Check if it's a valid Memory Bank or just a directory
-      const files = await FileUtils.listFiles(mbDir);
+    if (await this.storageProvider.exists(mbDir)) {
+      const files = await this.storageProvider.listFiles(mbDir);
       const mdFiles = files.filter(file => file.endsWith('.md'));
       
       if (mdFiles.length > 0) {
@@ -124,7 +132,6 @@ export class MemoryBankManager {
       }
     }
     
-    // If directory doesn't exist or is not a valid Memory Bank, return null
     return null;
   }
 
@@ -136,23 +143,18 @@ export class MemoryBankManager {
    */
   async isMemoryBank(dirPath: string): Promise<boolean> {
     try {
-      if (!await FileUtils.isDirectory(dirPath)) {
+      if (!await this.storageProvider.exists(dirPath)) {
         return false;
       }
 
-      // Check if at least one of the core files exists
-      const files = await FileUtils.listFiles(dirPath);
+      const files = await this.storageProvider.listFiles(dirPath);
       
-      // Support both camelCase and kebab-case during transition
       const coreFiles = [
-        // Kebab-case (new format)
         'product-context.md',
         'active-context.md',
         'progress.md',
         'decision-log.md',
         'system-patterns.md',
-        
-        // CamelCase (old format)
         'productContext.md',
         'activeContext.md',
         'progress.md',
@@ -160,10 +162,8 @@ export class MemoryBankManager {
         'systemPatterns.md'
       ];
       
-      // Verificar cada arquivo individualmente
       for (const coreFile of coreFiles) {
-        const filePath = path.join(dirPath, coreFile);
-        if (await FileUtils.fileExists(filePath)) {
+        if (files.includes(coreFile)) {
           return true;
         }
       }
@@ -223,13 +223,10 @@ export class MemoryBankManager {
    */
   async initializeMemoryBank(dirPath: string): Promise<void> {
     try {
-      // Combine the directory path with the folder name
       const memoryBankPath = path.join(dirPath, this.folderName);
       
-      // Create the Memory Bank directory if it doesn't exist
-      await FileUtils.ensureDirectory(memoryBankPath);
+      await this.storageProvider.createDirectory(memoryBankPath);
       
-      // Create initial files in the Memory Bank directory
       const initialFiles = [
         {
           path: path.join(memoryBankPath, 'product-context.md'),
@@ -254,16 +251,13 @@ export class MemoryBankManager {
       ];
       
       for (const file of initialFiles) {
-        await FileUtils.writeFile(file.path, file.content);
+        await this.storageProvider.writeFile(file.path, file.content);
       }
       
-      // Set the Memory Bank directory
       this.memoryBankDir = memoryBankPath;
       
-      // Initialize the progress tracker
       this.progressTracker = new ProgressTracker(memoryBankPath, this.userId || undefined);
       
-      // Initialize the mode manager
       await this.initializeModeManager();
       
       logger.debug('MemoryBankManager', `Memory Bank initialized at: ${memoryBankPath}`);
@@ -287,11 +281,7 @@ export class MemoryBankManager {
       }
       
       const filePath = path.join(this.memoryBankDir, filename);
-      if (!await FileUtils.fileExists(filePath)) {
-        throw new Error(`File ${filename} not found in Memory Bank`);
-      }
-      
-      return await FileUtils.readFile(filePath);
+      return await this.storageProvider.readFile(filePath);
     } catch (error) {
       logger.error('MemoryBankManager', `Error reading file ${filename} from Memory Bank: ${error}`);
       throw new Error(`Error reading file ${filename} from Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
@@ -312,7 +302,7 @@ export class MemoryBankManager {
       }
       
       const filePath = path.join(this.memoryBankDir, filename);
-      await FileUtils.writeFile(filePath, content);
+      await this.storageProvider.writeFile(filePath, content);
       
       // Track progress if ProgressTracker is available
       if (this.progressTracker) {
@@ -344,8 +334,7 @@ export class MemoryBankManager {
         throw new Error('Memory Bank directory not set');
       }
       
-      const files = await FileUtils.listFiles(this.memoryBankDir);
-      return files.filter(file => file.endsWith('.md'));
+      return await this.storageProvider.listFiles(this.memoryBankDir);
     } catch (error) {
       console.error('Error listing files in Memory Bank:', error);
       throw new Error(`Error listing files in Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
@@ -364,46 +353,7 @@ export class MemoryBankManager {
         throw new Error('Memory Bank directory not set');
       }
       
-      const files = await this.listFiles();
-      const coreFiles = coreTemplates.map(template => template.name);
-      const missingCoreFiles = coreFiles.filter(file => !files.includes(file));
-      
-      // Get last update time
-      let lastUpdated: Date | undefined;
-      try {
-        if (files.length > 0) {
-          const stats = await Promise.all(
-            files.map(async file => {
-              try {
-                const filePath = path.join(this.memoryBankDir!, file);
-                return await FileUtils.getFileStats(filePath);
-              } catch (statError) {
-                console.warn(`Error getting stats for file ${file}:`, statError);
-                // Return a default stat object with current time
-                return {
-                  mtimeMs: Date.now(),
-                } as fs.Stats;
-              }
-            })
-          );
-          
-          const latestMtime = Math.max(...stats.map(stat => stat.mtimeMs));
-          lastUpdated = new Date(latestMtime);
-        }
-      } catch (statsError) {
-        console.error('Error getting file stats:', statsError);
-        // Continue without lastUpdated information
-      }
-      
-      return {
-        path: this.memoryBankDir,
-        files,
-        coreFilesPresent: coreFiles.filter(file => files.includes(file)),
-        missingCoreFiles,
-        isComplete: missingCoreFiles.length === 0,
-        language: this.language,
-        lastUpdated,
-      };
+      return await this.storageProvider.getStatus(this.memoryBankDir);
     } catch (error) {
       console.error('Error getting Memory Bank status:', error);
       throw new Error(`Error getting Memory Bank status: ${error instanceof Error ? error.message : String(error)}`);
@@ -419,23 +369,17 @@ export class MemoryBankManager {
    * @param customPath - Custom path (optional)
    */
   async setCustomPath(customPath?: string): Promise<void> {
-    // Use the provided path or the project path
     const basePath = customPath || this.getProjectPath();
     this.customPath = basePath;
     
-    // Combine the base path with the folder name to create the Memory Bank path
     const memoryBankPath = path.join(basePath, this.folderName);
     
-    if (await FileUtils.fileExists(memoryBankPath)) {
-      if (await FileUtils.isDirectory(memoryBankPath)) {
-        // Check if it's a valid Memory Bank
-        if (await this.isMemoryBank(memoryBankPath)) {
-          this.setMemoryBankDir(memoryBankPath);
-          logger.debug('MemoryBankManager', `Found existing Memory Bank at: ${memoryBankPath}`);
-          
-          // Atualizar o status do Memory Bank
-          await this.updateMemoryBankStatus();
-        }
+    if (await this.storageProvider.exists(memoryBankPath)) {
+      if (await this.isMemoryBank(memoryBankPath)) {
+        this.setMemoryBankDir(memoryBankPath);
+        logger.debug('MemoryBankManager', `Found existing Memory Bank at: ${memoryBankPath}`);
+        
+        await this.updateMemoryBankStatus();
       }
     }
   }
@@ -502,14 +446,7 @@ export class MemoryBankManager {
         ? path.join(backupDir, `memory-bank-backup-${timestamp}`)
         : path.join(path.dirname(this.memoryBankDir), `memory-bank-backup-${timestamp}`);
       
-      await FileUtils.ensureDirectory(backupPath);
-      
-      const files = await this.listFiles();
-      for (const file of files) {
-        const content = await this.readFile(file);
-        await FileUtils.writeFile(path.join(backupPath, file), content);
-      }
-      
+      await this.storageProvider.createBackup(this.memoryBankDir, backupPath);
       logger.debug('MemoryBankManager', `Memory Bank backup created at ${backupPath}`);
       return backupPath;
     } catch (error) {

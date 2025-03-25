@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { MemoryBankServer } from './server/MemoryBankServer.js';
 import { getLogManager, logger, LogLevel } from './utils/LogManager.js';
+import { SftpStorageProvider } from './core/storage/SftpStorageProvider.js';
 
 /**
  * Display program help
@@ -19,6 +20,14 @@ Options:
   --debug, -d          Enable debug mode (show detailed logs)
   --help, -h           Display this help
   
+SFTP Options:
+  --sftp-host <host>   SFTP server host
+  --sftp-port <port>   SFTP server port (default: 22)
+  --sftp-user <user>   SFTP username
+  --sftp-pass <pass>   SFTP password
+  --sftp-key <key>     SFTP private key file path
+  --sftp-base <path>   SFTP base path for Memory Bank
+  
 Examples:
   memory-bank-mcp
   memory-bank-mcp --mode code
@@ -26,6 +35,7 @@ Examples:
   memory-bank-mcp --folder custom-memory-bank
   memory-bank-mcp --githubProfileUrl "https://github.com/username"
   memory-bank-mcp --debug
+  memory-bank-mcp --sftp-host example.com --sftp-user user --sftp-pass pass --sftp-base /path/to/memory-bank
   
 For more information, visit: https://github.com/movibe/memory-bank-server
 `);
@@ -44,6 +54,14 @@ function processArgs() {
     folderName?: string; 
     userId?: string;
     debug?: boolean;
+    sftp?: {
+      host: string;
+      port: number;
+      username: string;
+      password?: string;
+      privateKey?: string;
+      basePath: string;
+    };
   } = {};
 
   for (let i = 0; i < args.length; i++) {
@@ -61,6 +79,54 @@ function processArgs() {
       options.debug = true;
     } else if (arg === '--help' || arg === '-h') {
       showHelp();
+    } else if (arg === '--sftp-host') {
+      options.sftp = options.sftp || {
+        host: '',
+        port: 22,
+        username: '',
+        basePath: '/'
+      };
+      options.sftp.host = args[++i];
+    } else if (arg === '--sftp-port') {
+      options.sftp = options.sftp || {
+        host: '',
+        port: 22,
+        username: '',
+        basePath: '/'
+      };
+      options.sftp.port = parseInt(args[++i], 10);
+    } else if (arg === '--sftp-user') {
+      options.sftp = options.sftp || {
+        host: '',
+        port: 22,
+        username: '',
+        basePath: '/'
+      };
+      options.sftp.username = args[++i];
+    } else if (arg === '--sftp-pass') {
+      options.sftp = options.sftp || {
+        host: '',
+        port: 22,
+        username: '',
+        basePath: '/'
+      };
+      options.sftp.password = args[++i];
+    } else if (arg === '--sftp-key') {
+      options.sftp = options.sftp || {
+        host: '',
+        port: 22,
+        username: '',
+        basePath: '/'
+      };
+      options.sftp.privateKey = args[++i];
+    } else if (arg === '--sftp-base') {
+      options.sftp = options.sftp || {
+        host: '',
+        port: 22,
+        username: '',
+        basePath: '/'
+      };
+      options.sftp.basePath = args[++i];
     }
   }
 
@@ -98,8 +164,25 @@ async function main() {
     if (options.userId) {
       logger.debug('Main', `Using GitHub profile URL: ${options.userId}`);
     }
+    if (options.sftp) {
+      logger.debug('Main', `Using SFTP storage: ${options.sftp.host}`);
+    }
     
-    const server = new MemoryBankServer(options.mode, options.projectPath, options.userId, options.folderName, options.debug);
+    let storageProvider;
+    if (options.sftp) {
+      storageProvider = new SftpStorageProvider();
+      await storageProvider.initialize(options.sftp);
+    }
+    
+    const server = new MemoryBankServer(
+      options.mode,
+      options.projectPath,
+      options.userId,
+      options.folderName,
+      options.debug,
+      storageProvider
+    );
+    
     await server.run();
     logger.info('Main', 'Memory Bank Server started successfully');
   } catch (error) {

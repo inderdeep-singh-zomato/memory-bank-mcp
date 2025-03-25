@@ -4,14 +4,19 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/movibe/memory-bank-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/movibe/memory-bank-mcp/actions/workflows/test.yml)
 
-A Model Context Protocol (MCP) server for managing Memory Banks, allowing AI assistants to store and retrieve information across sessions.
+A Model Context Protocol (MCP) server for managing Memory Banks, supporting both local and SFTP storage.
 
 <a href="https://glama.ai/mcp/servers/riei9a6dhx">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/riei9a6dhx/badge" alt="Memory Bank MCP server" />
 </a>
 
-## Overview 📋
+## Features ✨
 
+- **Local and SFTP storage support**: Store and retrieve Memory Banks from local file system or SFTP server
+- **Memory Bank management tools**: Initialize, find, and manage Memory Banks
+- **Progress tracking**: Track progress and update Memory Bank files
+- **Context management**: Maintain and update active context information
+- **Decision logging**: Log important decisions with context and alternatives
 Memory Bank Server provides a set of tools and resources for AI assistants to interact with Memory Banks. Memory Banks are structured repositories of information that help maintain context and track progress across multiple sessions.
 
 ## Features ✨
@@ -57,6 +62,63 @@ npm install -g @movibe/memory-bank-mcp
 # Or run directly with npx (no installation required)
 npx @movibe/memory-bank-mcp
 ```
+
+## SFTP Setup and Configuration 🔐
+
+Memory Bank MCP supports storing Memory Banks on SFTP servers. Here's how to set it up:
+
+### Prerequisites
+
+1. An SFTP server with:
+   - Valid hostname/IP address
+   - Port number (default: 22)
+   - Username and password, or SSH key authentication
+   - Sufficient permissions to read/write files
+
+2. Required npm package:
+   ```bash
+   npm install ssh2-sftp-client
+   ```
+
+### Configuration Options
+
+When using SFTP storage, you can configure the connection using these options:
+
+```bash
+--sftp-host <host>     # SFTP server hostname or IP
+--sftp-port <port>     # SFTP server port (default: 22)
+--sftp-user <user>     # SFTP username
+--sftp-pass <pass>     # SFTP password (if using password auth)
+--sftp-key <path>      # Path to private key file (if using key auth)
+--sftp-base <path>     # Base path on SFTP server for Memory Bank storage
+```
+
+### Usage Examples
+
+1. **Using Password Authentication**:
+   ```bash
+   memory-bank-mcp --sftp-host example.com \
+                   --sftp-user myuser \
+                   --sftp-pass mypassword \
+                   --sftp-base /path/to/memory-bank
+   ```
+
+2. **Using SSH Key Authentication**:
+   ```bash
+   memory-bank-mcp --sftp-host example.com \
+                   --sftp-user myuser \
+                   --sftp-key ~/.ssh/id_rsa \
+                   --sftp-base /path/to/memory-bank
+   ```
+
+3. **With Custom Port**:
+   ```bash
+   memory-bank-mcp --sftp-host example.com \
+                   --sftp-port 2222 \
+                   --sftp-user myuser \
+                   --sftp-pass mypassword \
+                   --sftp-base /path/to/memory-bank
+   ```
 
 ## Usage with npx 💻
 
@@ -175,132 +237,3 @@ You can switch modes in several ways:
    ```bash
    memory-bank-mcp switch_mode mode=debug
    ```
-
-3. **In Cursor**:
-
-   ```
-   /mcp memory-bank-mcp switch_mode mode=test
-   ```
-
-4. **Using .clinerules files**:
-   Create a `.clinerules-[mode]` file in your project to automatically switch to that mode when the file is detected.
-
-## How Memory Bank MCP Works 🧠
-
-Memory Bank MCP is built on the Model Context Protocol (MCP), which enables AI assistants to interact with external tools and resources. Here's how it works:
-
-### Core Components 🧩
-
-1. **Memory Bank**: A structured repository of information stored as markdown files:
-
-   - `product-context.md`: Overall project information and goals
-   - `active-context.md`: Current state, ongoing tasks, and next steps
-   - `progress.md`: History of project updates and milestones
-   - `decision-log.md`: Record of important decisions with context and rationale
-   - `system-patterns.md`: Architecture and code patterns used in the project
-
-2. **MCP Server**: Provides tools and resources for AI assistants to interact with Memory Banks:
-
-   - Runs as a standalone process
-   - Communicates with AI assistants through the MCP protocol
-   - Provides a set of tools for managing Memory Banks
-
-3. **Mode System**: Supports different operational modes:
-   - `code`: Focus on code implementation
-   - `ask`: Focus on answering questions
-   - `architect`: Focus on system design
-   - `debug`: Focus on debugging issues
-   - `test`: Focus on testing
-
-### Data Flow 🔄
-
-1. **Initialization**: The AI assistant connects to the MCP server and initializes a Memory Bank
-2. **Tool Calls**: The AI assistant calls tools provided by the MCP server to read/write Memory Bank files
-3. **Context Maintenance**: The Memory Bank maintains context across sessions, allowing the AI to recall previous decisions and progress
-
-### Memory Bank Structure 📂
-
-Memory Banks use a standardized structure to organize information:
-
-- **Product Context**: Project overview, objectives, technologies, and architecture
-- **Active Context**: Current state, ongoing tasks, known issues, and next steps
-- **Progress**: Chronological record of project updates and milestones
-- **Decision Log**: Record of important decisions with context, alternatives, and consequences
-- **System Patterns**: Architecture patterns, code patterns, and documentation patterns
-
-### Advanced Features 🚀
-
-- **UMB Command**: Temporarily update Memory Bank files during a session without committing changes
-- **Mode Detection**: Automatically detect and switch modes based on user input
-- **File Migration**: Tools for migrating between different file naming conventions
-- **Language Standardization**: All Memory Bank files are generated in English for consistency
-
-## Versioning 📌
-
-This project follows [Semantic Versioning](https://semver.org/) and uses [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. The version is automatically bumped and a changelog is generated based on commit messages when changes are merged into the main branch.
-
-- **Major version** is bumped when there are breaking changes (commit messages with `BREAKING CHANGE` or `!:`)
-- **Minor version** is bumped when new features are added (commit messages with `feat:` or `feat(scope):`)
-- **Patch version** is bumped for all other changes (bug fixes, documentation, etc.)
-
-For the complete history of changes, see the [CHANGELOG.md](CHANGELOG.md) file.
-
-## Usage 📝
-
-### As a Command Line Tool 💻
-
-```bash
-# Initialize a Memory Bank
-memory-bank-mcp initialize_memory_bank path=./memory-bank
-
-# Track progress
-memory-bank-mcp track_progress action="Feature Implementation" description="Implemented feature X"
-
-# Log a decision
-memory-bank-mcp log_decision title="API Design" context="..." decision="..."
-
-# Switch mode
-memory-bank-mcp switch_mode mode=code
-```
-
-### As a Library 📚
-
-```typescript
-import { MemoryBankServer } from "@movibe/memory-bank-mcp";
-
-// Create a new server instance
-const server = new MemoryBankServer();
-
-// Start the server
-server.run().catch(console.error);
-```
-
-## Contributing 👥
-
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## License 📄
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Memory Bank Status System 🚦
-
-Memory Bank MCP implements a status prefix system that provides immediate visibility into the operational state of the Memory Bank:
-
-### Status Indicators
-
-Every response from an AI assistant using Memory Bank MCP begins with one of these status indicators:
-
-- **`[MEMORY BANK: ACTIVE]`**: The Memory Bank is available and being used to provide context-aware responses
-- **`[MEMORY BANK: INACTIVE]`**: The Memory Bank is not available or not properly configured
-- **`[MEMORY BANK: UPDATING]`**: The Memory Bank is currently being updated (during UMB command execution)
-
-This system ensures users always know whether the AI assistant is operating with full context awareness or limited information.
-
-### Benefits
-
-- **Transparency**: Users always know whether the AI has access to the full project context
-- **Troubleshooting**: Makes it immediately obvious when Memory Bank is not properly configured
-- **Context Awareness**: Helps users understand why certain responses may lack historical context
-
-For more details, see [Memory Bank Status Prefix System](docs/memory-bank-status-prefix.md).

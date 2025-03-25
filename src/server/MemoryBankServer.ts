@@ -10,6 +10,7 @@ import { progressTools } from './tools/ProgressTools.js';
 import { contextTools } from './tools/ContextTools.js';
 import { decisionTools } from './tools/DecisionTools.js';
 import { modeTools } from './tools/ModeTools.js';
+import { StorageProvider } from '../core/storage/StorageProvider.js';
 
 /**
  * Main MCP server class for Memory Bank
@@ -31,9 +32,23 @@ export class MemoryBankServer {
    * @param userId GitHub profile URL for tracking changes (optional)
    * @param folderName Memory Bank folder name (optional, default: 'memory-bank')
    * @param debugMode Enable debug mode (optional, default: false)
+   * @param storageProvider Storage provider (optional)
    */
-  constructor(initialMode?: string, projectPath?: string, userId?: string, folderName?: string, debugMode?: boolean) {
-    this.memoryBankManager = new MemoryBankManager(projectPath, userId, folderName, debugMode);
+  constructor(
+    initialMode?: string,
+    projectPath?: string,
+    userId?: string,
+    folderName?: string,
+    debugMode?: boolean,
+    storageProvider?: StorageProvider
+  ) {
+    this.memoryBankManager = new MemoryBankManager(
+      projectPath,
+      userId,
+      folderName,
+      debugMode,
+      storageProvider
+    );
     
     // Combine all tools
     const allTools = [
