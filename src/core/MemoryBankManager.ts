@@ -628,10 +628,10 @@ export class MemoryBankManager {
    * @returns Array with modes corresponding to the triggers found
    */
   detectModeTriggers(message: string): string[] {
-    if (this.modeManager) {
-      return this.modeManager.checkModeTriggers(message);
+    if (!this.modeManager) {
+      return [];
     }
-    return [];
+    return this.modeManager.checkModeTriggers(message);
   }
 
   /**

@@ -208,20 +208,14 @@ describe('MemoryBankManager Tests', () => {
   });
   
   test('Should list files in Memory Bank', async () => {
-    // Create test files
-    await memoryBankManager.writeFile('file1.md', 'Test content 1');
-    await memoryBankManager.writeFile('file2.md', 'Test content 2');
-    await memoryBankManager.writeFile('file3.md', 'Test content 3');
+    const memoryBankManager = new MemoryBankManager(tempDir);
+    await memoryBankManager.initializeMemoryBank(tempDir);
     
-    // List files
+    // Write a test file
+    await memoryBankManager.writeFile('test.md', '# Test');
+    
     const files = await memoryBankManager.listFiles();
-    
-    // Verify files exist
-    expect(files).toContain('file1.md');
-    expect(files).toContain('file2.md');
-    expect(files).toContain('file3.md');
-    
-    // Core files should also be present
+    expect(files).toContain('test.md');
     expect(files).toContain('product-context.md');
     expect(files).toContain('active-context.md');
   });

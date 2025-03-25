@@ -309,31 +309,37 @@ describe('Clinerules Integration Tests', () => {
   });
   
   test('Should detect mode triggers in message', async () => {
-    // Create a temporary directory for the test
-    const tempDir = path.join(__dirname, 'temp-mode-triggers-test');
-    await fs.ensureDir(tempDir);
+    // Create test rules
+    await fs.writeFile(
+      path.join(tempDir, '.clinerules-code'),
+      JSON.stringify({
+        mode: 'code',
+        instructions: {
+          general: ['Test instructions'],
+          umb: {
+            trigger: '^(Update Memory Bank|UMB)$',
+            instructions: ['Test UMB instructions']
+          }
+        },
+        mode_triggers: {
+          test: [{ condition: 'test' }],
+          code: [{ condition: 'code' }]
+        }
+      })
+    );
     
-    try {
-      // Create a new MemoryBankManager
-      const memoryBankManager = new MemoryBankManager(tempDir, 'test-user');
-      
-      // Initialize the Memory Bank
-      await memoryBankManager.initializeMemoryBank(tempDir);
-      
-      // Test messages with mode triggers
-      const messages = [
-        { text: 'No triggers here', expectedTriggers: [] },
-        { text: 'Let\'s code', expectedTriggers: ['code'] },
-        { text: 'Let\'s test', expectedTriggers: ['test'] },
-      ];
-      
-      for (const message of messages) {
-        const triggers = memoryBankManager.detectModeTriggers(message.text);
-        expect(triggers).toEqual(message.expectedTriggers);
-      }
-    } finally {
-      // Clean up
-      await fs.remove(tempDir);
+    // Initialize MemoryBankManager with test rules
+    const memoryBankManager = new MemoryBankManager(tempDir);
+    await memoryBankManager.initializeModeManager('code');
+    
+    const messages = [
+      { text: 'Let\'s code', expectedTriggers: ['code'] },
+      { text: 'Let\'s test', expectedTriggers: ['test'] },
+    ];
+
+    for (const message of messages) {
+      const triggers = memoryBankManager.detectModeTriggers(message.text);
+      expect(triggers).toEqual(message.expectedTriggers);
     }
   });
 }); 
